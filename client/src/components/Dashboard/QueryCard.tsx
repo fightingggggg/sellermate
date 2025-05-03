@@ -145,8 +145,8 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
         {/* Keyword Counts Tab Panel - Ranking by frequency */}
         {activeTab === 'keywordCounts' && (
           <>
-            <div className="mb-4">
-              <h4 className="text-sm font-medium text-gray-500 mb-2">키워드 개수 순위 (상위 12개)</h4>
+            <div>
+              <h4 className="text-sm font-medium text-gray-500 mb-2">키워드 개수 순위</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {sortedByFrequency.map((count, index) => (
                   <div 
@@ -173,53 +173,19 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                       <div className="w-24 bg-gray-200 rounded-full h-2.5">
                         <div 
                           className={`${count.status === 'removed' ? 'bg-gray-400' : 'bg-primary'} h-2.5 rounded-full`} 
-                          style={{ width: `${count.value}%` }}
+                          style={{ width: `${Math.min(100, count.value)}%` }}
                         ></div>
                       </div>
                       <span className={`ml-2 font-semibold ${
                         count.status === 'removed' ? 'text-gray-400' : 'text-primary'
                       }`}>
-                        {count.value}%
+                        {count.value}
                       </span>
                       {renderChangeAmount(count)}
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
-            
-            <h4 className="text-sm font-medium text-gray-500 mb-2">모든 키워드 개수</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[...query.keywordCounts].sort((a, b) => b.value - a.value).map((count, index) => (
-                <div 
-                  key={index} 
-                  className={`flex items-center p-3 bg-gray-50 rounded-lg ${
-                    count.status === 'removed' ? 'text-gray-400' : ''
-                  }`}
-                >
-                  <div className="flex items-center">
-                    <div className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs mr-2">
-                      {index + 1}
-                    </div>
-                    {renderChangeIndicator(count)}
-                    <span className="text-sm font-medium">{count.key}</span>
-                  </div>
-                  <div className="ml-auto flex items-center">
-                    <div className="w-24 bg-gray-200 rounded-full h-2.5">
-                      <div 
-                        className={`${count.status === 'removed' ? 'bg-gray-400' : 'bg-indigo-600'} h-2.5 rounded-full`} 
-                        style={{ width: `${Math.min(100, count.value * 2)}%` }}
-                      ></div>
-                    </div>
-                    <span className={`ml-2 font-semibold ${
-                      count.status === 'removed' ? 'text-gray-400' : 'text-indigo-600'
-                    }`}>
-                      {count.value}
-                    </span>
-                    {renderChangeAmount(count)}
-                  </div>
-                </div>
-              ))}
             </div>
           </>
         )}
@@ -228,7 +194,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
         {activeTab === 'tags' && (
           <>
             <div className="mb-4">
-              <h4 className="text-sm font-medium text-gray-500 mb-2">태그 순위</h4>
+              <h4 className="text-sm font-medium text-gray-500 mb-2">태그</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 {[...query.tags].sort((a, b) => b.value - a.value).map((tag, index) => (
                   <div 
@@ -248,7 +214,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                       <div className="w-20 bg-gray-200 rounded-full h-2.5">
                         <div 
                           className={`${tag.status === 'removed' ? 'bg-gray-400' : 'bg-purple-600'} h-2.5 rounded-full`} 
-                          style={{ width: `${Math.min(100, tag.value * 2)}%` }}
+                          style={{ width: `${Math.min(100, tag.value)}%` }}
                         ></div>
                       </div>
                       <span className={`ml-2 font-semibold ${

@@ -14,16 +14,27 @@ export interface AnalysisData {
   savedAt: string;
 }
 
+// 날짜별 분석 결과
+export interface DateAnalysis {
+  keywords: KeywordItem[];
+  keywordCounts: KeywordItem[];
+  tags: KeywordItem[];
+  lastUpdated: string;
+  savedAt: string;
+}
+
 // Query type
 export interface Query {
   id: string;
   text: string;
+  email: string;
   lastUpdated: string;
+  // 현재 표시할 분석 결과
   keywords: KeywordItem[];
   keywordCounts: KeywordItem[];
   tags: KeywordItem[];
-  email: string;
-  savedAt: string;
+  // 날짜별 분석 결과 저장
+  dates?: Record<string, DateAnalysis>;
 }
 
 // User type

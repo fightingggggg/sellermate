@@ -16,6 +16,7 @@ interface QueryContextProps {
     keywordCounts: KeywordItem[];
     tags: KeywordItem[];
   } | null>;
+  compareAndMarkChanges: (oldItems: KeywordItem[], newItems: KeywordItem[]) => KeywordItem[];
 }
 
 const QueryContext = createContext<QueryContextProps>({
