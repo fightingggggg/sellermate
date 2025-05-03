@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -58,9 +58,7 @@ const passwordSchema = z.object({
 // 회원탈퇴 스키마
 const deleteAccountSchema = z.object({
   password: z.string().min(1, "비밀번호를 입력해주세요"),
-  confirmation: z.string().refine(val => val === "탈퇴합니다", {
-    message: "확인 문구를 정확히 입력해주세요",
-  }),
+  confirmation: z.string().min(1, "확인 문구를 입력해주세요"),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -242,7 +240,7 @@ export default function ProfilePage() {
   };
 
   // 프로필 로딩 시 폼 초기값 업데이트
-  useState(() => {
+  useEffect(() => {
     if (userProfile) {
       profileForm.reset({
         businessName: userProfile.businessName || "",
@@ -255,7 +253,7 @@ export default function ProfilePage() {
         password: "",
       });
     }
-  });
+  }, [userProfile]);
 
   return (
     <div className="container max-w-4xl py-10">
@@ -572,7 +570,7 @@ export default function ProfilePage() {
                                 계정 삭제를 확인하려면 아래에 "탈퇴합니다"라고 입력하세요.
                               </FormDescription>
                               <FormControl>
-                                <Input placeholder="탈퇴합니다" {...field} />
+                                <Input placeholder="이 곳에 입력하세요" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
