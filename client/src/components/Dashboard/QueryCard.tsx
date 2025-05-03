@@ -151,9 +151,9 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
   };
   
   // Calculate frequency-based rank for each keyword
-  const sortedByFrequency = [...query.keywordCounts]
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 12); // Get top 12 items
+  const getKeywordData = () => {
+    return comparedData ? comparedData.keywordCounts : query.keywordCounts;
+  };
   
   // Check if a keyword is newly ranked in top 12
   const isNewlyRanked = (item: KeywordItem, index: number) => {
@@ -353,7 +353,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
             
             <h4 className="text-sm font-medium text-gray-500 mb-2">모든 키워드 개수</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[...query.keywordCounts].sort((a, b) => b.value - a.value).map((count, index) => (
+              {(comparedData ? [...comparedData.keywordCounts] : [...query.keywordCounts]).sort((a, b) => b.value - a.value).map((count, index) => (
                 <div 
                   key={index} 
                   className={`flex items-center p-3 bg-gray-50 rounded-lg ${
@@ -393,7 +393,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
             <div className="mb-4">
               <h4 className="text-sm font-medium text-gray-500 mb-2">태그 순위</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                {[...query.tags].sort((a, b) => b.value - a.value).map((tag, index) => (
+                {(comparedData ? [...comparedData.tags] : [...query.tags]).sort((a, b) => b.value - a.value).map((tag, index) => (
                   <div 
                     key={index} 
                     className={`flex items-center p-3 bg-gray-50 rounded-lg ${
@@ -428,7 +428,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
             
             <h4 className="text-sm font-medium text-gray-500 mb-2">태그 구름</h4>
             <div className="flex flex-wrap gap-2">
-              {[...query.tags].sort((a, b) => b.value - a.value).map((tag, index) => (
+              {(comparedData ? [...comparedData.tags] : [...query.tags]).sort((a, b) => b.value - a.value).map((tag, index) => (
                 <div 
                   key={index} 
                   className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
