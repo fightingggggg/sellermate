@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { collection, doc, setDoc, deleteDoc, getDocs, query as firestoreQuery, where, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Query, KeywordItem } from "@/types";
@@ -151,8 +151,13 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       });
       
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding product:", error);
+      
+      if (error.code === 'permission-denied') {
+        setError('permission-denied');
+      }
+      
       toast({
         title: "상품 추가 오류",
         description: "상품을 추가하는 중 오류가 발생했습니다.",
@@ -184,8 +189,13 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
         title: "상품 삭제 성공",
         description: "상품이 성공적으로 삭제되었습니다.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting product:", error);
+      
+      if (error.code === 'permission-denied') {
+        setError('permission-denied');
+      }
+      
       toast({
         title: "상품 삭제 오류",
         description: "상품을 삭제하는 중 오류가 발생했습니다.",
@@ -249,8 +259,13 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
         title: "상품 새로고침 성공",
         description: "상품이 성공적으로 새로고침되었습니다.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error refreshing product:", error);
+      
+      if (error.code === 'permission-denied') {
+        setError('permission-denied');
+      }
+      
       toast({
         title: "상품 새로고침 오류",
         description: "상품을 새로고침하는 중 오류가 발생했습니다.",
@@ -311,17 +326,19 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
     return result;
   }
 
-  // Effect to handle Firebase permission errors from the useQueries hook
+  // Listen for permission-denied errors from useQueries hook
   useEffect(() => {
-    const handleFirebaseError = (e: Event) => {
-      const customEvent = e as CustomEvent;
+    function handleFirebaseError(event: Event) {
+      const customEvent = event as CustomEvent<{code: string}>;
       if (customEvent.detail?.code === 'permission-denied') {
         setError('permission-denied');
       }
-    };
+    }
     
+    // Add event listener
     window.addEventListener('firebase-error', handleFirebaseError);
     
+    // Clean up event listener
     return () => {
       window.removeEventListener('firebase-error', handleFirebaseError);
     };

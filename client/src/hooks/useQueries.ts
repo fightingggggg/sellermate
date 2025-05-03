@@ -115,8 +115,17 @@ export function useQueries() {
       } finally {
         setLoading(false);
       }
-    }, (error) => {
+    }, (error: any) => {
       console.error("Error fetching queries:", error);
+      
+      // Dispatch custom event for Firebase permission errors
+      if (error.code === 'permission-denied') {
+        const errorEvent = new CustomEvent('firebase-error', { 
+          detail: { code: 'permission-denied' } 
+        });
+        window.dispatchEvent(errorEvent);
+      }
+      
       toast({
         title: "데이터 로딩 오류",
         description: "분석 데이터를 불러오는 중 오류가 발생했습니다.",
