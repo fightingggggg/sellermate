@@ -393,6 +393,14 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                                 <Badge className="mr-2 px-1.5 bg-emerald-100 text-emerald-800 border border-emerald-200">NEW</Badge>
                               ) : k.status === 'removed' ? (
                                 <Badge className="mr-2 px-1.5 bg-red-100 text-red-800 border border-red-200">OUT</Badge>
+                              ) : k.rankChange !== undefined && k.rankChange !== 0 ? (
+                                <Badge className={`mr-2 px-1.5 ${
+                                  k.rankChange > 0 
+                                  ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
+                                  : 'bg-amber-100 text-amber-800 border-amber-300'
+                                } border`}>
+                                  {Math.abs(k.rankChange)}위 {k.rankChange > 0 ? '상승' : '하락'}
+                                </Badge>
                               ) : k.status === 'increased' ? (
                                 <Badge className="mr-2 px-1.5 bg-blue-100 text-blue-800 border border-blue-200">↑</Badge>
                               ) : (
@@ -438,6 +446,14 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                                 <Badge className="mr-2 px-1.5 bg-emerald-100 text-emerald-800 border border-emerald-200">NEW</Badge>
                               ) : k.status === 'removed' ? (
                                 <Badge className="mr-2 px-1.5 bg-red-100 text-red-800 border border-red-200">OUT</Badge>
+                              ) : k.rankChange !== undefined && k.rankChange !== 0 ? (
+                                <Badge className={`mr-2 px-1.5 ${
+                                  k.rankChange > 0 
+                                  ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
+                                  : 'bg-amber-100 text-amber-800 border-amber-300'
+                                } border`}>
+                                  {Math.abs(k.rankChange)}위 {k.rankChange > 0 ? '상승' : '하락'}
+                                </Badge>
                               ) : k.status === 'increased' ? (
                                 <Badge className="mr-2 px-1.5 bg-blue-100 text-blue-800 border border-blue-200">↑</Badge>
                               ) : (
@@ -483,6 +499,14 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                                 <Badge className="mr-2 px-1.5 bg-emerald-100 text-emerald-800 border border-emerald-200">NEW</Badge>
                               ) : k.status === 'removed' ? (
                                 <Badge className="mr-2 px-1.5 bg-red-100 text-red-800 border border-red-200">OUT</Badge>
+                              ) : k.rankChange !== undefined && k.rankChange !== 0 ? (
+                                <Badge className={`mr-2 px-1.5 ${
+                                  k.rankChange > 0 
+                                  ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
+                                  : 'bg-amber-100 text-amber-800 border-amber-300'
+                                } border`}>
+                                  {Math.abs(k.rankChange)}위 {k.rankChange > 0 ? '상승' : '하락'}
+                                </Badge>
                               ) : k.status === 'increased' ? (
                                 <Badge className="mr-2 px-1.5 bg-blue-100 text-blue-800 border border-blue-200">↑</Badge>
                               ) : (
