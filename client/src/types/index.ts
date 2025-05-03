@@ -4,6 +4,9 @@ export interface KeywordItem {
   value: number;
   change?: number;
   status?: 'added' | 'removed' | 'increased' | 'decreased' | 'unchanged';
+  currentRank?: number | null;
+  previousRank?: number | null;
+  rankChange?: number;
 }
 
 export interface AnalysisData {

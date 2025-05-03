@@ -77,48 +77,104 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
     
     // Compare data and mark changes
     const compareAndMarkChanges = (oldItems: KeywordItem[], newItems: KeywordItem[]): KeywordItem[] => {
-      // Create maps for efficient lookup
-      const oldItemMap = new Map<string, number>();
-      oldItems.forEach(item => oldItemMap.set(item.key, item.value));
+      // Sort items by value and create maps for efficient lookup
+      const sortedOldItems = [...oldItems].sort((a, b) => b.value - a.value);
+      const sortedNewItems = [...newItems].sort((a, b) => b.value - a.value);
       
-      const newItemMap = new Map<string, number>();
-      newItems.forEach(item => newItemMap.set(item.key, item.value));
+      // Create maps of old and new items with their values and ranks
+      const oldItemMap = new Map<string, {value: number, rank: number}>();
+      sortedOldItems.forEach((item, index) => {
+        oldItemMap.set(item.key, {value: item.value, rank: index + 1});
+      });
+      
+      const newItemMap = new Map<string, {value: number, rank: number}>();
+      sortedNewItems.forEach((item, index) => {
+        newItemMap.set(item.key, {value: item.value, rank: index + 1});
+      });
       
       // Mark added, removed, or changed items
       const result: KeywordItem[] = [];
       
       // Check for new or changed items
-      newItemMap.forEach((value, key) => {
+      newItemMap.forEach((newInfo, key) => {
+        const { value: newValue, rank: newRank } = newInfo;
+        
         if (!oldItemMap.has(key)) {
-          // New item
-          result.push({ key, value, status: 'added' });
+          // New item - add with current rank
+          result.push({ 
+            key, 
+            value: newValue, 
+            status: 'added', 
+            currentRank: newRank,
+            previousRank: null
+          });
         } else {
-          const oldValue = oldItemMap.get(key)!;
-          if (value > oldValue) {
+          const { value: oldValue, rank: oldRank } = oldItemMap.get(key)!;
+          
+          if (newValue > oldValue) {
             // Increased
-            result.push({ key, value, change: value - oldValue, status: 'increased' });
-          } else if (value < oldValue) {
+            result.push({ 
+              key, 
+              value: newValue, 
+              change: newValue - oldValue, 
+              status: 'increased',
+              currentRank: newRank,
+              previousRank: oldRank,
+              rankChange: oldRank - newRank // positive if moved up in rank
+            });
+          } else if (newValue < oldValue) {
             // Decreased
-            result.push({ key, value, change: oldValue - value, status: 'decreased' });
+            result.push({ 
+              key, 
+              value: newValue, 
+              change: oldValue - newValue, 
+              status: 'decreased',
+              currentRank: newRank,
+              previousRank: oldRank,
+              rankChange: oldRank - newRank // negative if moved down in rank
+            });
           } else {
-            // Unchanged
-            result.push({ key, value, status: 'unchanged' });
+            // Unchanged value, but rank might have changed
+            result.push({ 
+              key, 
+              value: newValue, 
+              status: 'unchanged',
+              currentRank: newRank,
+              previousRank: oldRank,
+              rankChange: oldRank - newRank
+            });
           }
         }
       });
       
       // Check for removed items
-      oldItemMap.forEach((value, key) => {
+      oldItemMap.forEach((oldInfo, key) => {
+        const { value: oldValue, rank: oldRank } = oldInfo;
+        
         if (!newItemMap.has(key)) {
-          // Removed item
-          result.push({ key, value, status: 'removed' });
+          // Removed item - keep its old rank
+          result.push({ 
+            key, 
+            value: oldValue, 
+            status: 'removed',
+            currentRank: null,
+            previousRank: oldRank
+          });
         }
       });
       
-      // Sort by value (higher first) then by status (added first, removed last)
+      // Sort by current rank first, then by status (keeping removed items at the end)
       result.sort((a, b) => {
+        // Always put removed items last
         if (a.status === 'removed' && b.status !== 'removed') return 1;
         if (a.status !== 'removed' && b.status === 'removed') return -1;
+        
+        // For non-removed items, sort by current rank
+        if (a.currentRank && b.currentRank) {
+          return a.currentRank - b.currentRank;
+        }
+        
+        // If we reach here, sort by value as a fallback
         return b.value - a.value;
       });
       
@@ -465,11 +521,24 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                 >
                   <div className="flex items-center">
                     <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs mr-2">
-                      {index + 1}
+                      {keyword.currentRank || index + 1}
                     </div>
                     {renderChangeIndicator(keyword)}
                     <span className="text-sm font-medium">{keyword.key}</span>
-                    {hasChanges && selectedCompareDate && selectedCompareDate !== "none" && (
+                    {keyword.rankChange !== undefined && keyword.rankChange !== 0 && (
+                      <Badge className={`ml-2 ${
+                        keyword.rankChange > 0 
+                        ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
+                        : 'bg-amber-100 text-amber-800 border-amber-300'
+                      } hover:bg-blue-200 border`}>
+                        {keyword.rankChange > 0 
+                          ? <ChevronUp className="w-3 h-3 mr-1" /> 
+                          : <ChevronDown className="w-3 h-3 mr-1" />
+                        }
+                        {Math.abs(keyword.rankChange)}
+                      </Badge>
+                    )}
+                    {hasChanges && selectedCompareDate && selectedCompareDate !== "none" && keyword.status && keyword.status !== 'unchanged' && (
                       <Badge className="ml-2 bg-blue-100 text-blue-800 hover:bg-blue-200 border border-blue-300">
                         <AlertCircle className="w-3 h-3 mr-1" />
                       </Badge>
@@ -548,10 +617,15 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                         
                         <div className="text-center my-4">
                           <span className="text-sm font-medium">
-                            {keyword.status === 'added' ? '새로 추가된 키워드입니다.' : 
-                            keyword.status === 'removed' ? '제거된 키워드입니다.' : 
-                            keyword.status === 'increased' ? `값이 ${keyword.change}만큼 증가했습니다.` : 
-                            `값이 ${keyword.change}만큼 감소했습니다.`}
+                            {keyword.status === 'added' ? (
+                              `"${keyword.key}, ${keyword.value}"이(가) 새로 추가되어 ${index + 1}위에 올랐습니다.`
+                            ) : keyword.status === 'removed' ? (
+                              `"${keyword.key}, ${keyword.value}"이(가) 순위에서 제외되었습니다.`
+                            ) : keyword.status === 'increased' ? (
+                              `"${keyword.key}"의 값이 ${keyword.value - (keyword.change || 0)}에서 ${keyword.value}(으)로 변경되었습니다.`
+                            ) : (
+                              `"${keyword.key}"의 값이 ${keyword.value + (keyword.change || 0)}에서 ${keyword.value}(으)로 변경되었습니다.`
+                            )}
                           </span>
                         </div>
                         
@@ -574,55 +648,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
         {/* Keyword Counts Tab Panel - Ranking by frequency */}
         {activeTab === 'keywordCounts' && (
           <>
-            <div className="mb-4">
-              <h4 className="text-sm font-medium text-gray-500 mb-2">키워드 개수 순위 (상위 12개)</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {(comparedData ? 
-                    (Array.isArray(comparedData.keywordCounts) ? [...comparedData.keywordCounts] : []) : 
-                    (Array.isArray(query.keywordCounts) ? [...query.keywordCounts] : [])
-                  ).sort((a, b) => b.value - a.value)
-                  .slice(0, 12)
-                  .map((count, index) => (
-                  <div 
-                    key={index} 
-                    className={`flex items-center p-3 ${
-                      isNewlyRanked(count, index) 
-                        ? 'bg-emerald-50 border border-emerald-200' 
-                        : 'bg-gray-50'
-                    } rounded-lg ${
-                      count.status === 'removed' ? 'text-gray-400' : ''
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs mr-2">
-                        {index + 1}
-                      </div>
-                      {renderChangeIndicator(count)}
-                      <span className="text-sm font-medium">{count.key}</span>
-                      {isNewlyRanked(count, index) && (
-                        <Badge className="ml-2 bg-emerald-500 text-white">NEW</Badge>
-                      )}
-                    </div>
-                    <div className="ml-auto flex items-center">
-                      <div className="w-24 bg-gray-200 rounded-full h-2.5">
-                        <div 
-                          className={`${count.status === 'removed' ? 'bg-gray-400' : 'bg-primary'} h-2.5 rounded-full`} 
-                          style={{ width: `${count.value}%` }}
-                        ></div>
-                      </div>
-                      <span className={`ml-2 font-semibold ${
-                        count.status === 'removed' ? 'text-gray-400' : 'text-primary'
-                      }`}>
-                        {count.value}%
-                      </span>
-                      {renderChangeAmount(count)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            <h4 className="text-sm font-medium text-gray-500 mb-2">모든 키워드 개수</h4>
+            <h4 className="text-sm font-medium text-gray-500 mb-2">키워드 개수</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {(comparedData ? 
                   (Array.isArray(comparedData.keywordCounts) ? [...comparedData.keywordCounts] : []) : 
@@ -630,26 +656,46 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
               ).sort((a, b) => b.value - a.value).map((count, index) => (
                 <div 
                   key={index} 
-                  className={`flex items-center p-3 bg-gray-50 rounded-lg ${
+                  className={`flex items-center p-3 ${
+                    isNewlyRanked(count, index) && index < 12
+                      ? 'bg-emerald-50 border border-emerald-200' 
+                      : 'bg-gray-50'
+                  } rounded-lg ${
                     count.status === 'removed' ? 'text-gray-400' : ''
                   }`}
                 >
                   <div className="flex items-center">
-                    <div className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs mr-2">
-                      {index + 1}
+                    <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs mr-2">
+                      {count.currentRank || index + 1}
                     </div>
                     {renderChangeIndicator(count)}
                     <span className="text-sm font-medium">{count.key}</span>
+                    {isNewlyRanked(count, index) && index < 12 && (
+                      <Badge className="ml-2 bg-emerald-500 text-white">NEW</Badge>
+                    )}
+                    {count.rankChange !== undefined && count.rankChange !== 0 && (
+                      <Badge className={`ml-2 ${
+                        count.rankChange > 0 
+                        ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
+                        : 'bg-amber-100 text-amber-800 border-amber-300'
+                      } hover:bg-blue-200 border`}>
+                        {count.rankChange > 0 
+                          ? <ChevronUp className="w-3 h-3 mr-1" /> 
+                          : <ChevronDown className="w-3 h-3 mr-1" />
+                        }
+                        {Math.abs(count.rankChange)}
+                      </Badge>
+                    )}
                   </div>
                   <div className="ml-auto flex items-center">
                     <div className="w-24 bg-gray-200 rounded-full h-2.5">
                       <div 
-                        className={`${count.status === 'removed' ? 'bg-gray-400' : 'bg-indigo-600'} h-2.5 rounded-full`} 
+                        className={`${count.status === 'removed' ? 'bg-gray-400' : 'bg-primary'} h-2.5 rounded-full`} 
                         style={{ width: `${Math.min(100, count.value * 2)}%` }}
                       ></div>
                     </div>
                     <span className={`ml-2 font-semibold ${
-                      count.status === 'removed' ? 'text-gray-400' : 'text-indigo-600'
+                      count.status === 'removed' ? 'text-gray-400' : 'text-primary'
                     }`}>
                       {count.value}
                     </span>
