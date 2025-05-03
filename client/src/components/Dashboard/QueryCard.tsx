@@ -437,27 +437,114 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                 </Dialog>
                 
                 {/* 간략한 변화 정보 */}
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="flex items-center">
-                    <span className="text-emerald-500 mr-1">+</span>
-                    <span>추가됨:</span>
-                    <span className="ml-auto font-medium">{countChangesByStatus(comparedData?.keywords || [], 'added') + countChangesByStatus(comparedData?.tags || [], 'added')}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="text-red-500 mr-1">-</span>
-                    <span>제거됨:</span>
-                    <span className="ml-auto font-medium">{countChangesByStatus(comparedData?.keywords || [], 'removed') + countChangesByStatus(comparedData?.tags || [], 'removed')}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="text-blue-500 mr-1">↑</span>
-                    <span>증가함:</span>
-                    <span className="ml-auto font-medium">{countChangesByStatus(comparedData?.keywords || [], 'increased') + countChangesByStatus(comparedData?.tags || [], 'increased')}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="text-amber-500 mr-1">↓</span>
-                    <span>감소함:</span>
-                    <span className="ml-auto font-medium">{countChangesByStatus(comparedData?.keywords || [], 'decreased') + countChangesByStatus(comparedData?.tags || [], 'decreased')}</span>
-                  </div>
+                <div className="space-y-3">
+                  {/* 키워드 섹션 */}
+                  {comparedData?.keywords?.some(k => k.status !== 'unchanged') && (
+                    <div>
+                      <h5 className="text-sm font-semibold mb-1 text-gray-700">주요 키워드 변화:</h5>
+                      <ul className="text-sm space-y-1.5 pl-1">
+                        {comparedData?.keywords
+                          .filter(k => k.status !== 'unchanged')
+                          .slice(0, 2)
+                          .map((k, idx) => (
+                            <li key={idx} className="flex items-start">
+                              <span className={`mr-1 ${
+                                k.status === 'added' ? 'text-emerald-500' : 
+                                k.status === 'removed' ? 'text-red-500' : 
+                                k.status === 'increased' ? 'text-blue-500' : 'text-amber-500'
+                              }`}>
+                                {k.status === 'added' ? '+' : 
+                                 k.status === 'removed' ? '-' : 
+                                 k.status === 'increased' ? '↑' : '↓'}
+                              </span>
+                              {k.status === 'added' ? (
+                                <>"{k.key}"가 <span className="font-medium">새로 추가</span>되어 {k.currentRank}위에 진입했습니다.</>
+                              ) : k.status === 'removed' ? (
+                                <>"{k.key}"가 <span className="font-medium">순위에서 제외</span>되었습니다. (이전 {k.previousRank}위)</>
+                              ) : k.rankChange !== undefined && k.rankChange !== 0 ? (
+                                <>"{k.key}"의 순위가 {Math.abs(k.rankChange)}위 {k.rankChange > 0 ? '상승' : '하락'}했습니다. ({k.previousRank}위 → {k.currentRank}위)</>
+                              ) : (
+                                <>"{k.key}"의 값이 {k.status === 'increased' ? 
+                                  <>({k.value - (k.change || 0)} → {k.value})</> : 
+                                  <>({k.value + (k.change || 0)} → {k.value})</>} 변경되었습니다.</>
+                              )}
+                            </li>
+                          ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {/* 키워드 개수 섹션 */}
+                  {comparedData?.keywordCounts?.some(k => k.status !== 'unchanged') && (
+                    <div>
+                      <h5 className="text-sm font-semibold mb-1 text-gray-700">키워드 개수 변화:</h5>
+                      <ul className="text-sm space-y-1.5 pl-1">
+                        {comparedData?.keywordCounts
+                          .filter(k => k.status !== 'unchanged')
+                          .slice(0, 1)
+                          .map((k, idx) => (
+                            <li key={idx} className="flex items-start">
+                              <span className={`mr-1 ${
+                                k.status === 'added' ? 'text-emerald-500' : 
+                                k.status === 'removed' ? 'text-red-500' : 
+                                k.status === 'increased' ? 'text-blue-500' : 'text-amber-500'
+                              }`}>
+                                {k.status === 'added' ? '+' : 
+                                 k.status === 'removed' ? '-' : 
+                                 k.status === 'increased' ? '↑' : '↓'}
+                              </span>
+                              {k.status === 'added' ? (
+                                <>"{k.key}"가 <span className="font-medium">새로 추가</span>되어 {k.currentRank}위에 진입했습니다.</>
+                              ) : k.status === 'removed' ? (
+                                <>"{k.key}"가 <span className="font-medium">순위에서 제외</span>되었습니다. (이전 {k.previousRank}위)</>
+                              ) : k.rankChange !== undefined && k.rankChange !== 0 ? (
+                                <>"{k.key}"의 순위가 {Math.abs(k.rankChange)}위 {k.rankChange > 0 ? '상승' : '하락'}했습니다. ({k.previousRank}위 → {k.currentRank}위)</>
+                              ) : (
+                                <>"{k.key}"의 값이 {k.status === 'increased' ? 
+                                  <>({k.value - (k.change || 0)} → {k.value})</> : 
+                                  <>({k.value + (k.change || 0)} → {k.value})</>} 변경되었습니다.</>
+                              )}
+                            </li>
+                          ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {/* 태그 섹션 */}
+                  {comparedData?.tags?.some(k => k.status !== 'unchanged') && (
+                    <div>
+                      <h5 className="text-sm font-semibold mb-1 text-gray-700">태그 변화:</h5>
+                      <ul className="text-sm space-y-1.5 pl-1">
+                        {comparedData?.tags
+                          .filter(k => k.status !== 'unchanged')
+                          .slice(0, 1)
+                          .map((k, idx) => (
+                            <li key={idx} className="flex items-start">
+                              <span className={`mr-1 ${
+                                k.status === 'added' ? 'text-emerald-500' : 
+                                k.status === 'removed' ? 'text-red-500' : 
+                                k.status === 'increased' ? 'text-blue-500' : 'text-amber-500'
+                              }`}>
+                                {k.status === 'added' ? '+' : 
+                                 k.status === 'removed' ? '-' : 
+                                 k.status === 'increased' ? '↑' : '↓'}
+                              </span>
+                              {k.status === 'added' ? (
+                                <>"{k.key}"가 <span className="font-medium">새로 추가</span>되어 {k.currentRank}위에 진입했습니다.</>
+                              ) : k.status === 'removed' ? (
+                                <>"{k.key}"가 <span className="font-medium">순위에서 제외</span>되었습니다. (이전 {k.previousRank}위)</>
+                              ) : k.rankChange !== undefined && k.rankChange !== 0 ? (
+                                <>"{k.key}"의 순위가 {Math.abs(k.rankChange)}위 {k.rankChange > 0 ? '상승' : '하락'}했습니다. ({k.previousRank}위 → {k.currentRank}위)</>
+                              ) : (
+                                <>"{k.key}"의 값이 {k.status === 'increased' ? 
+                                  <>({k.value - (k.change || 0)} → {k.value})</> : 
+                                  <>({k.value + (k.change || 0)} → {k.value})</>} 변경되었습니다.</>
+                              )}
+                            </li>
+                          ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -525,6 +612,9 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                     </div>
                     {renderChangeIndicator(keyword)}
                     <span className="text-sm font-medium">{keyword.key}</span>
+                    {keyword.status === 'added' && (
+                      <Badge className="ml-2 bg-emerald-500 text-white">NEW</Badge>
+                    )}
                     {keyword.rankChange !== undefined && keyword.rankChange !== 0 && (
                       <Badge className={`ml-2 ${
                         keyword.rankChange > 0 
@@ -532,10 +622,9 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                         : 'bg-amber-100 text-amber-800 border-amber-300'
                       } hover:bg-blue-200 border`}>
                         {keyword.rankChange > 0 
-                          ? <ChevronUp className="w-3 h-3 mr-1" /> 
-                          : <ChevronDown className="w-3 h-3 mr-1" />
+                          ? `${Math.abs(keyword.rankChange)}위 상승` 
+                          : `${Math.abs(keyword.rankChange)}위 하락`
                         }
-                        {Math.abs(keyword.rankChange)}
                       </Badge>
                     )}
                     {hasChanges && selectedCompareDate && selectedCompareDate !== "none" && keyword.status && keyword.status !== 'unchanged' && (
@@ -680,10 +769,9 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                         : 'bg-amber-100 text-amber-800 border-amber-300'
                       } hover:bg-blue-200 border`}>
                         {count.rankChange > 0 
-                          ? <ChevronUp className="w-3 h-3 mr-1" /> 
-                          : <ChevronDown className="w-3 h-3 mr-1" />
+                          ? `${Math.abs(count.rankChange)}위 상승` 
+                          : `${Math.abs(count.rankChange)}위 하락`
                         }
-                        {Math.abs(count.rankChange)}
                       </Badge>
                     )}
                   </div>
@@ -736,10 +824,9 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                           : 'bg-amber-100 text-amber-800 border-amber-300'
                         } hover:bg-blue-200 border`}>
                           {tag.rankChange > 0 
-                            ? <ChevronUp className="w-3 h-3 mr-1" /> 
-                            : <ChevronDown className="w-3 h-3 mr-1" />
+                            ? `${Math.abs(tag.rankChange)}위 상승` 
+                            : `${Math.abs(tag.rankChange)}위 하락`
                           }
-                          {Math.abs(tag.rankChange)}
                         </Badge>
                       )}
                     </div>
