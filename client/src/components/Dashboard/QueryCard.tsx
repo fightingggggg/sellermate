@@ -567,14 +567,14 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                 >
                   <div className="flex items-center">
                     <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs mr-2">
-                      {keyword.currentRank || index + 1}
+                      {keyword.previousRank || index + 1}
                     </div>
-                    {renderChangeIndicator(keyword)}
                     <span className="text-sm font-medium">{keyword.key}</span>
-                    {keyword.status === 'added' && (
+                    {keyword.status === 'added' ? (
                       <Badge className="ml-2 bg-emerald-500 text-white">NEW</Badge>
-                    )}
-                    {keyword.rankChange !== undefined && keyword.rankChange !== 0 && (
+                    ) : keyword.status === 'removed' ? (
+                      <Badge className="ml-2 bg-red-500 text-white">OUT</Badge>
+                    ) : keyword.rankChange !== undefined && keyword.rankChange !== 0 ? (
                       <Badge className={`ml-2 ${
                         keyword.rankChange > 0 
                         ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
@@ -582,12 +582,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                       } hover:bg-blue-200 border`}>
                         {Math.abs(keyword.rankChange)}위 {keyword.rankChange > 0 ? '상승' : '하락'}
                       </Badge>
-                    )}
-                    {hasChanges && selectedCompareDate && selectedCompareDate !== "none" && keyword.status && keyword.status !== 'unchanged' && (
-                      <Badge className="ml-2 bg-blue-100 text-blue-800 hover:bg-blue-200 border border-blue-300">
-                        <AlertCircle className="w-3 h-3 mr-1" />
-                      </Badge>
-                    )}
+                    ) : null}
                   </div>
                   <div className="ml-auto flex items-center">
                     <div className="w-20 bg-gray-200 rounded-full h-2.5">
