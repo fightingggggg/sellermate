@@ -66,12 +66,7 @@ export default function Dashboard() {
             <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">스마트스토어 SEO 분석 대시보드</h2>
             <p className="text-muted-foreground mt-1">상품 순위 변화와 검색 트렌드를 확인하세요</p>
           </div>
-          <Button 
-            onClick={() => setIsAddModalOpen(true)}
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-          >
-            새 상품 추가
-          </Button>
+
         </div>
         
         <StatsOverview stats={stats} />
