@@ -41,57 +41,39 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
   async function analyzeQuery(queryText: string) {
     setIsLoading(true);
     try {
-      // In a real app, this would call the Chrome extension API
-      // For now, we'll fetch from an existing document if possible or create minimal data
-      
       if (!queryText) {
         throw new Error("검색어가 없습니다");
       }
       
-      // In a real implementation, this would call the Chrome extension API
-      // For now we're creating a very minimal dataset with the query text
-      const searchWords = queryText.split(/\s+/).filter(word => word.length > 0);
+      if (!currentUser) {
+        throw new Error("로그인이 필요합니다");
+      }
       
-      // Generate unique and relevant keywords based on the search query
-      const keywords = searchWords.map((word, i) => {
-        return { 
-          key: word, 
-          value: Math.max(5, 30 - i * 3) // Decreasing importance
+      // 이 함수는 원래 Chrome 확장 프로그램을 통해 외부 데이터를 가져오는 로직입니다
+      // 여기서는 Firebase에 저장된 실제 데이터만 사용합니다
+      
+      // Firebase에서 기존 데이터를 찾아보기
+      const userEmail = currentUser.email || '';
+      const userQueriesRef = collection(db, "analysisLogs", userEmail, "queries");
+      const existingQueryQuery = firestoreQuery(userQueriesRef, where("text", "==", queryText));
+      const existingQuerySnapshot = await getDocs(existingQueryQuery);
+      
+      // 기존 데이터가 있으면 그 데이터를 반환
+      if (!existingQuerySnapshot.empty) {
+        const docData = existingQuerySnapshot.docs[0].data();
+        return {
+          keywords: docData.keywords || [],
+          keywordCounts: docData.keywordCounts || [],
+          tags: docData.tags || []
         };
-      });
+      }
       
-      // Keep only unique keywords
-      const uniqueKeywords = Array.from(
-        keywords.reduce((map, item) => {
-          if (!map.has(item.key)) {
-            map.set(item.key, item);
-          }
-          return map;
-        }, new Map()).values()
-      );
-      
-      // Generate keyword counts based on the search query
-      const keywordCounts = searchWords.map((word, i) => {
-        const count = Math.max(10, 80 - i * 5);
-        return { 
-          key: `${word} 상품`, 
-          value: count
-        };
-      });
-      
-      // Generate tags based on the search query
-      const possibleTags = ["#인기", "#추천", "#신상", "#할인", "#베스트"];
-      const tags = possibleTags.map((tag, i) => {
-        return { 
-          key: tag, 
-          value: Math.max(10, 45 - i * 5) 
-        };
-      });
-      
+      // 새 분석 데이터 생성 로직은 Chrome 확장프로그램에서 처리됩니다.
+      // 이 웹 앱에서는 빈 데이터 반환
       return {
-        keywords: uniqueKeywords,
-        keywordCounts,
-        tags
+        keywords: [],
+        keywordCounts: [],
+        tags: []
       };
     } catch (error) {
       console.error("Error analyzing product:", error);
@@ -154,29 +136,14 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
         return false;
       }
 
-      // Create new query document
-      const newQueryRef = doc(userQueriesRef);
-      const today = new Date().toISOString().split('T')[0];
-      
-      const newQueryData = {
-        text: queryText,
-        lastUpdated: today,
-        keywords: analysisData.keywords,
-        keywordCounts: analysisData.keywordCounts,
-        tags: analysisData.tags,
-        email: userEmail,
-        savedAt: new Date().toISOString()
-      };
-
-      // Save to Firestore
-      await setDoc(newQueryRef, newQueryData);
-      
+      // 이 웹 앱에서는 Chrome 확장프로그램을 통해서만 데이터 추가 가능
+      // Firebase의 실제 데이터만 표시하고, 예시 데이터는 생성하지 않습니다.
       toast({
-        title: "상품 추가 성공",
-        description: "새 상품이 성공적으로 추가되었습니다.",
+        title: "기능 제한",
+        description: "이 기능은 Chrome 확장프로그램에서만 사용 가능합니다.",
+        variant: "destructive"
       });
-      
-      return true;
+      return false;
     } catch (error: any) {
       console.error("Error adding product:", error);
       
@@ -259,32 +226,13 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       
       const existingQuery = queryDoc.data() as Omit<Query, 'id'> & { text: string };
       
-      // Re-analyze query
-      const newAnalysisData = await analyzeQuery(existingQuery.text);
-      
-      if (!newAnalysisData) {
-        return;
-      }
-
-      const today = new Date().toISOString().split('T')[0];
-      
-      // Compare and mark changes
-      const updatedKeywords = compareAndMarkChanges(existingQuery.keywords || [], newAnalysisData.keywords);
-      const updatedKeywordCounts = compareAndMarkChanges(existingQuery.keywordCounts || [], newAnalysisData.keywordCounts);
-      const updatedTags = compareAndMarkChanges(existingQuery.tags || [], newAnalysisData.tags);
-
-      // Update query
-      await setDoc(queryRef, {
-        lastUpdated: today,
-        keywords: updatedKeywords,
-        keywordCounts: updatedKeywordCounts,
-        tags: updatedTags,
-      }, { merge: true });
-      
+      // 이 기능도 Chrome 확장프로그램에서만 가능하도록 제한
       toast({
-        title: "상품 새로고침 성공",
-        description: "상품이 성공적으로 새로고침되었습니다.",
+        title: "기능 제한",
+        description: "이 기능은 Chrome 확장프로그램에서만 사용 가능합니다.",
+        variant: "destructive"
       });
+      return;
     } catch (error: any) {
       console.error("Error refreshing product:", error);
       
