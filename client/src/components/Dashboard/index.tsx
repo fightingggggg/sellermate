@@ -13,7 +13,6 @@ export default function Dashboard() {
   const { refreshQuery, error } = useQueryContext();
   const { currentUser } = useAuth();
   
-  // 상품 추가는 크롬 확장프로그램을 통해서만 가능
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedQuery, setSelectedQuery] = useState<{ id: string; text: string } | null>(null);
 

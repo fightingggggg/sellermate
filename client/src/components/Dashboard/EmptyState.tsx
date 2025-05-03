@@ -64,12 +64,13 @@ export default function EmptyState() {
               쉽고 빠르게 상품의 SEO 성과를 확인할 수 있습니다.
             </p>
             
-            <Button 
-              onClick={onAddQuery}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-            >
-              로그인하고 시작하기
-            </Button>
+            <a href="/login">
+              <Button 
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+              >
+                로그인하고 시작하기
+              </Button>
+            </a>
             
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
               <div className="p-4 rounded-lg bg-white/80 border border-blue-100">
