@@ -19,15 +19,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // 회원가입 스키마
 const signupSchema = z.object({
-  email: z.string().email("올바른 이메일 형식을 입력해주세요"),
-  password: z.string().min(6, "비밀번호는 최소 6자 이상이어야 합니다"),
-  confirmPassword: z.string().min(6, "비밀번호 확인을 입력해주세요"),
   businessName: z.string().min(1, "스마트스토어 상호명을 입력해주세요"),
   businessLink: z.string().url("올바른 URL 형식을 입력해주세요"),
   number: z.string().min(1, "휴대폰 번호를 입력해주세요"),
+  email: z.string().email("올바른 이메일 형식을 입력해주세요"),
+  password: z.string().min(6, "비밀번호는 최소 6자 이상이어야 합니다"),
+  confirmPassword: z.string().min(6, "비밀번호 확인을 입력해주세요"),
+  terms: z.literal(true, {
+    errorMap: () => ({ message: "이용약관과 개인정보처리방침에 동의해야 합니다" }),
+  }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "비밀번호가 일치하지 않습니다",
   path: ["confirmPassword"],
@@ -37,18 +41,20 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
   const [loading, setLoading] = useState(false);
-  const { signUp, error: authError } = useAuth();
+  const { signUp, sendPasswordReset, error: authError } = useAuth();
   const [, navigate] = useLocation();
+  const [alertMessage, setAlertMessage] = useState<{message: string, type: 'success' | 'error'} | null>(null);
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      email: "",
-      password: "",
-      confirmPassword: "",
       businessName: "",
       businessLink: "",
       number: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      terms: false,
     },
   });
 
@@ -62,66 +68,158 @@ export default function SignupPage() {
         data.businessLink,
         data.number
       );
-      navigate("/login");
-    } catch (error) {
+      setAlertMessage({
+        message: "회원가입 성공! 이메일 인증을 완료해주세요.",
+        type: "success"
+      });
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+    } catch (error: any) {
       console.error("Signup error:", error);
+      if (error.code === "auth/email-already-exists") {
+        setAlertMessage({
+          message: "이미 가입된 이메일입니다.",
+          type: "error"
+        });
+      } else if (error.code === "auth/invalid-email") {
+        setAlertMessage({
+          message: "올바른 이메일 형식을 입력해주세요.",
+          type: "error"
+        });
+      } else if (error.code === "auth/invalid-password") {
+        setAlertMessage({
+          message: "비밀번호는 소문자와 특수문자를 포함하고 6자 이상이어야 합니다.",
+          type: "error"
+        });
+      } else {
+        setAlertMessage({
+          message: "회원가입 실패: " + (error.message || "알 수 없는 오류 발생"),
+          type: "error"
+        });
+      }
     } finally {
       setLoading(false);
     }
   };
 
+  const handlePasswordReset = async () => {
+    const email = prompt('비밀번호를 재설정할 이메일을 입력하세요:');
+    if (!email) return;
+    
+    try {
+      const success = await sendPasswordReset(email);
+      if (success) {
+        alert('비밀번호 재설정 이메일이 발송되었습니다. 이메일을 확인해주세요.');
+      }
+    } catch (error: any) {
+      alert('비밀번호 재설정 요청 실패: ' + error.message);
+    }
+  };
+
   return (
-    <div className="flex justify-center items-center min-h-screen py-12 px-4">
-      <Card className="w-full max-w-md">
+    <div className="flex justify-center items-center min-h-screen py-12 px-4" style={{backgroundColor: '#f4f4f9'}}>
+      <Card className="w-full max-w-md border-none shadow-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">회원가입</CardTitle>
-          <CardDescription>
-            스마트스토어 SEO 분석을 위한 계정을 만듭니다.
-          </CardDescription>
+          <CardTitle className="text-2xl font-bold text-center">회원가입</CardTitle>
         </CardHeader>
         
         <CardContent>
-          {authError && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{authError}</AlertDescription>
+          {(alertMessage || authError) && (
+            <Alert 
+              variant={alertMessage?.type === "success" ? "default" : "destructive"} 
+              className={`mb-4 ${alertMessage?.type === "success" ? "bg-[#d4edda] text-[#155724] border-[#c3e6cb]" : "bg-[#f8d7da] text-[#721c24] border-[#f5c6cb]"}`}
+            >
+              <AlertDescription>{alertMessage?.message || authError}</AlertDescription>
             </Alert>
           )}
           
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              {/* 이메일 입력 */}
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="businessName"
+                render={({ field }) => (
+                  <FormItem className="mb-6">
+                    <FormLabel className="text-[#555] font-bold text-sm">스마트스토어 상호</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="상호명을 입력하세요" 
+                        className="border border-[#ccc] rounded-md p-3 font-normal focus:border-[#007BFF]"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="businessLink"
+                render={({ field }) => (
+                  <FormItem className="mb-6">
+                    <FormLabel className="text-[#555] font-bold text-sm">스마트스토어 홈 링크</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="https://smartstore.naver.com/..." 
+                        className="border border-[#ccc] rounded-md p-3 font-normal focus:border-[#007BFF]"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="number"
+                render={({ field }) => (
+                  <FormItem className="mb-6">
+                    <FormLabel className="text-[#555] font-bold text-sm">휴대폰 번호</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="연락 가능한 번호를 입력하세요" 
+                        className="border border-[#ccc] rounded-md p-3 font-normal focus:border-[#007BFF]"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>이메일</FormLabel>
+                  <FormItem className="mb-6">
+                    <FormLabel className="text-[#555] font-bold text-sm">이메일</FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="이메일 주소" 
                         type="email" 
+                        className="border border-[#ccc] rounded-md p-3 font-normal focus:border-[#007BFF]"
                         {...field} 
                       />
                     </FormControl>
-                    <FormDescription>
-                      이메일은 로그인 아이디로 사용됩니다.
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               
-              {/* 비밀번호 입력 */}
               <FormField
                 control={form.control}
                 name="password"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>비밀번호</FormLabel>
+                  <FormItem className="mb-6">
+                    <FormLabel className="text-[#555] font-bold text-sm">비밀번호</FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="비밀번호" 
-                        type="password" 
+                        type="password"
+                        className="border border-[#ccc] rounded-md p-3 font-normal focus:border-[#007BFF]"
                         {...field} 
                       />
                     </FormControl>
@@ -130,17 +228,17 @@ export default function SignupPage() {
                 )}
               />
               
-              {/* 비밀번호 확인 */}
               <FormField
                 control={form.control}
                 name="confirmPassword"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>비밀번호 확인</FormLabel>
+                  <FormItem className="mb-6">
+                    <FormLabel className="text-[#555] font-bold text-sm">비밀번호 확인</FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="비밀번호 확인" 
-                        type="password" 
+                        type="password"
+                        className="border border-[#ccc] rounded-md p-3 font-normal focus:border-[#007BFF]"
                         {...field} 
                       />
                     </FormControl>
@@ -149,70 +247,35 @@ export default function SignupPage() {
                 )}
               />
               
-              {/* 스마트스토어 정보 */}
-              <div className="pt-4">
-                <h3 className="text-sm font-medium mb-2">스마트스토어 정보</h3>
-                
-                <FormField
-                  control={form.control}
-                  name="businessName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>상호명</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="스마트스토어 상호명" 
-                          {...field} 
-                        />
-                      </FormControl>
+              <FormField
+                control={form.control}
+                name="terms"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 mb-6">
+                    <FormControl>
+                      <Checkbox 
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="text-sm">
+                        스마트스토어 SEO 최적화 도구 <a href="https://chambray-midnight-e7f.notion.site/18678708053f806a9955f0f5375cdbdd?pvs=4" target="_blank" className="text-[#007BFF] hover:underline">이용약관 및 개인정보처리방침</a>에 동의합니다.
+                      </FormLabel>
                       <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="businessLink"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>스마트스토어 URL</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="https://smartstore.naver.com/..." 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="number"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>휴대폰 번호</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="연락 가능한 번호" 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                    </div>
+                  </FormItem>
+                )}
+              />
               
               <Button 
                 type="submit" 
-                className="w-full" 
+                className="w-full py-3 bg-[#007BFF] hover:bg-[#0056b3] text-white font-bold rounded-md" 
                 disabled={loading}
               >
                 {loading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 가입 중...
+                    회원가입 <span className="inline-block w-4 h-4 ml-2 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                   </>
                 ) : (
                   "회원가입"
@@ -220,12 +283,18 @@ export default function SignupPage() {
               </Button>
             </form>
           </Form>
+          
+          <div className="mt-4 text-center">
+            <Button variant="link" onClick={handlePasswordReset} className="text-sm text-[#007BFF] p-0 mt-4">
+              비밀번호 찾기
+            </Button>
+          </div>
         </CardContent>
         
         <CardFooter className="flex justify-center">
           <div className="text-sm text-muted-foreground">
             이미 계정이 있으신가요?{" "}
-            <Button variant="link" className="p-0" onClick={() => navigate("/login")}>
+            <Button variant="link" className="p-0 text-[#007BFF]" onClick={() => navigate("/login")}>
               로그인
             </Button>
           </div>
