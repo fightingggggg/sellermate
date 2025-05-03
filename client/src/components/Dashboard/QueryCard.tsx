@@ -349,6 +349,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                   비교 날짜
                 </label>
                 <Select 
+                  value={selectedCompareDate || "none"}
                   onValueChange={(value) => setSelectedCompareDate(value)}
                 >
                   <SelectTrigger className="w-full">
