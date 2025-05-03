@@ -2,10 +2,20 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Query, KeywordItem, AnalysisSnapshot } from "@/types";
-import { RefreshCcw, Trash2, ArrowUp, ArrowDown, Star, Calendar, Clock } from "lucide-react";
+import { 
+  RefreshCcw, Trash2, ArrowUp, ArrowDown, Star, Calendar, Clock, 
+  AlertCircle, ChevronDown, ChevronUp, BarChart, PieChart
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog";
 
 interface QueryCardProps {
   query: Query;
@@ -173,13 +183,49 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
     return item.status === 'added' || 
            (item.status === 'increased' && item.change && item.change > 5);
   };
+  
+  // 변화가 있는지 확인하는 함수
+  const hasChanges = () => {
+    if (!comparedData || !selectedCompareDate || selectedCompareDate === "none") {
+      return false;
+    }
+    
+    const hasKeywordChanges = comparedData.keywords.some(k => 
+      k.status === 'added' || k.status === 'removed' || 
+      k.status === 'increased' || k.status === 'decreased'
+    );
+    
+    const hasKeywordCountChanges = comparedData.keywordCounts.some(k => 
+      k.status === 'added' || k.status === 'removed' || 
+      k.status === 'increased' || k.status === 'decreased'
+    );
+    
+    const hasTagChanges = comparedData.tags.some(k => 
+      k.status === 'added' || k.status === 'removed' || 
+      k.status === 'increased' || k.status === 'decreased'
+    );
+    
+    return hasKeywordChanges || hasKeywordCountChanges || hasTagChanges;
+  };
+  
+  // 상태별 변화 개수 계산
+  const countChangesByStatus = (items: KeywordItem[], status: KeywordItem['status']) => {
+    return items.filter(item => item.status === status).length;
+  };
 
   return (
     <Card className="mb-6">
       <CardContent className="p-6">
         <div className="flex justify-between items-start mb-4">
           <div>
-            <h3 className="text-lg font-medium text-text-primary">{query.text}</h3>
+            <div className="flex items-center">
+              <h3 className="text-lg font-medium text-text-primary">{query.text}</h3>
+              {hasChanges() && (
+                <Badge className="ml-2 bg-blue-100 text-blue-800 hover:bg-blue-200 border border-blue-300">
+                  <AlertCircle className="w-3 h-3 mr-1" /> 변화 있음
+                </Badge>
+              )}
+            </div>
             <p className="text-sm text-text-secondary">마지막 업데이트: {query.lastUpdated}</p>
           </div>
           <div>
@@ -197,49 +243,168 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
         
         {/* Date comparison selectors */}
         {availableDates.length >= 2 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 bg-slate-50 rounded-lg">
-            <div>
-              <label className="flex items-center mb-2 text-sm font-medium text-gray-700">
-                <Calendar className="w-4 h-4 mr-1" />
-                현재 날짜
-              </label>
-              <Select 
-                defaultValue={availableDates[0]} 
-                onValueChange={(value) => setSelectedCurrentDate(value)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="날짜 선택" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableDates.map(date => (
-                    <SelectItem key={date} value={date}>
-                      {format(new Date(date), 'yyyy년 MM월 dd일')}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <div className="mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-lg">
+              <div>
+                <label className="flex items-center mb-2 text-sm font-medium text-gray-700">
+                  <Calendar className="w-4 h-4 mr-1" />
+                  현재 날짜
+                </label>
+                <Select 
+                  defaultValue={availableDates[0]} 
+                  onValueChange={(value) => setSelectedCurrentDate(value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="날짜 선택" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableDates.map(date => (
+                      <SelectItem key={date} value={date}>
+                        {format(new Date(date), 'yyyy년 MM월 dd일')}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="flex items-center mb-2 text-sm font-medium text-gray-700">
+                  <Clock className="w-4 h-4 mr-1" />
+                  비교 날짜
+                </label>
+                <Select 
+                  onValueChange={(value) => setSelectedCompareDate(value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="이전 날짜 선택 (선택 사항)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">선택 안함</SelectItem>
+                    {availableDates.filter(d => d !== selectedCurrentDate).map(date => (
+                      <SelectItem key={date} value={date}>
+                        {format(new Date(date), 'yyyy년 MM월 dd일')}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div>
-              <label className="flex items-center mb-2 text-sm font-medium text-gray-700">
-                <Clock className="w-4 h-4 mr-1" />
-                비교 날짜
-              </label>
-              <Select 
-                onValueChange={(value) => setSelectedCompareDate(value)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="이전 날짜 선택 (선택 사항)" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">선택 안함</SelectItem>
-                  {availableDates.filter(d => d !== selectedCurrentDate).map(date => (
-                    <SelectItem key={date} value={date}>
-                      {format(new Date(date), 'yyyy년 MM월 dd일')}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            
+            {/* 변화 요약 정보 */}
+            {hasChanges() && selectedCompareDate && selectedCompareDate !== "none" && (
+              <div className="mt-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h4 className="text-sm font-medium text-blue-800 mb-2 flex items-center">
+                  <BarChart className="h-4 w-4 mr-1" /> 변화 요약
+                </h4>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="mb-2 text-blue-600 bg-white border-blue-200 hover:bg-blue-50 w-full justify-between">
+                      자세한 변화 보기
+                      <ChevronDown className="h-4 w-4 ml-2" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="text-center">변경사항 요약</DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="p-3 bg-white rounded-lg border">
+                          <h5 className="text-sm font-medium mb-2">키워드 변화</h5>
+                          <div className="space-y-1 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-emerald-500 flex items-center">
+                                <span className="mr-1">+</span> 추가됨
+                              </span>
+                              <span className="font-medium">{countChangesByStatus(comparedData?.keywords || [], 'added')}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-red-500 flex items-center">
+                                <span className="mr-1">-</span> 제거됨
+                              </span>
+                              <span className="font-medium">{countChangesByStatus(comparedData?.keywords || [], 'removed')}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-blue-500 flex items-center">
+                                <span className="mr-1">↑</span> 증가함
+                              </span>
+                              <span className="font-medium">{countChangesByStatus(comparedData?.keywords || [], 'increased')}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-amber-500 flex items-center">
+                                <span className="mr-1">↓</span> 감소함
+                              </span>
+                              <span className="font-medium">{countChangesByStatus(comparedData?.keywords || [], 'decreased')}</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="p-3 bg-white rounded-lg border">
+                          <h5 className="text-sm font-medium mb-2">태그 변화</h5>
+                          <div className="space-y-1 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-emerald-500 flex items-center">
+                                <span className="mr-1">+</span> 추가됨
+                              </span>
+                              <span className="font-medium">{countChangesByStatus(comparedData?.tags || [], 'added')}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-red-500 flex items-center">
+                                <span className="mr-1">-</span> 제거됨
+                              </span>
+                              <span className="font-medium">{countChangesByStatus(comparedData?.tags || [], 'removed')}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-blue-500 flex items-center">
+                                <span className="mr-1">↑</span> 증가함
+                              </span>
+                              <span className="font-medium">{countChangesByStatus(comparedData?.tags || [], 'increased')}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-amber-500 flex items-center">
+                                <span className="mr-1">↓</span> 감소함
+                              </span>
+                              <span className="font-medium">{countChangesByStatus(comparedData?.tags || [], 'decreased')}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-4 text-sm text-gray-500">
+                        <p>
+                          {selectedCurrentDate && typeof selectedCurrentDate === 'string' && format(new Date(selectedCurrentDate), 'yyyy년 MM월 dd일')}과(와) 
+                          {selectedCompareDate && selectedCompareDate !== "none" && typeof selectedCompareDate === 'string' && format(new Date(selectedCompareDate), 'yyyy년 MM월 dd일')} 사이의 
+                          변화를 보여줍니다.
+                        </p>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+                
+                {/* 간략한 변화 정보 */}
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div className="flex items-center">
+                    <span className="text-emerald-500 mr-1">+</span>
+                    <span>추가됨:</span>
+                    <span className="ml-auto font-medium">{countChangesByStatus(comparedData?.keywords || [], 'added') + countChangesByStatus(comparedData?.tags || [], 'added')}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-red-500 mr-1">-</span>
+                    <span>제거됨:</span>
+                    <span className="ml-auto font-medium">{countChangesByStatus(comparedData?.keywords || [], 'removed') + countChangesByStatus(comparedData?.tags || [], 'removed')}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-blue-500 mr-1">↑</span>
+                    <span>증가함:</span>
+                    <span className="ml-auto font-medium">{countChangesByStatus(comparedData?.keywords || [], 'increased') + countChangesByStatus(comparedData?.tags || [], 'increased')}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-amber-500 mr-1">↓</span>
+                    <span>감소함:</span>
+                    <span className="ml-auto font-medium">{countChangesByStatus(comparedData?.keywords || [], 'decreased') + countChangesByStatus(comparedData?.tags || [], 'decreased')}</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
         
@@ -285,36 +450,124 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
             {(comparedData ? 
                 (Array.isArray(comparedData.keywords) ? [...comparedData.keywords] : []) : 
                 (Array.isArray(query.keywords) ? [...query.keywords] : [])
-             ).sort((a, b) => b.value - a.value).map((keyword, index) => (
-              <div 
-                key={index} 
-                className={`flex items-center p-3 bg-gray-50 rounded-lg ${
-                  keyword.status === 'removed' ? 'text-gray-400' : ''
-                }`}
-              >
-                <div className="flex items-center">
-                  <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs mr-2">
-                    {index + 1}
+             ).sort((a, b) => b.value - a.value).map((keyword, index) => {
+              // 변화가 있는 항목인지 확인
+              const hasChanges = keyword.status && keyword.status !== 'unchanged';
+              
+              // 키워드 카드 컴포넌트
+              const KeywordCard = (
+                <div 
+                  key={index} 
+                  className={`flex items-center p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                    keyword.status === 'removed' ? 'text-gray-400 bg-gray-100' :
+                    hasChanges ? 'bg-blue-50 hover:bg-blue-100 border border-blue-200' : 'bg-gray-50 hover:bg-gray-100'
+                  }`}
+                >
+                  <div className="flex items-center">
+                    <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs mr-2">
+                      {index + 1}
+                    </div>
+                    {renderChangeIndicator(keyword)}
+                    <span className="text-sm font-medium">{keyword.key}</span>
+                    {hasChanges && selectedCompareDate && selectedCompareDate !== "none" && (
+                      <Badge className="ml-2 bg-blue-100 text-blue-800 hover:bg-blue-200 border border-blue-300">
+                        <AlertCircle className="w-3 h-3 mr-1" />
+                      </Badge>
+                    )}
                   </div>
-                  {renderChangeIndicator(keyword)}
-                  <span className="text-sm font-medium">{keyword.key}</span>
-                </div>
-                <div className="ml-auto flex items-center">
-                  <div className="w-20 bg-gray-200 rounded-full h-2.5">
-                    <div 
-                      className={`${keyword.status === 'removed' ? 'bg-gray-400' : 'bg-blue-600'} h-2.5 rounded-full`} 
-                      style={{ width: `${Math.min(100, keyword.value * 3)}%` }}
-                    ></div>
+                  <div className="ml-auto flex items-center">
+                    <div className="w-20 bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        className={`${keyword.status === 'removed' ? 'bg-gray-400' : 'bg-blue-600'} h-2.5 rounded-full`} 
+                        style={{ width: `${Math.min(100, keyword.value * 3)}%` }}
+                      ></div>
+                    </div>
+                    <span className={`ml-2 font-semibold ${
+                      keyword.status === 'removed' ? 'text-gray-400' : 'text-blue-600'
+                    }`}>
+                      {keyword.value}
+                    </span>
+                    {renderChangeAmount(keyword)}
                   </div>
-                  <span className={`ml-2 font-semibold ${
-                    keyword.status === 'removed' ? 'text-gray-400' : 'text-blue-600'
-                  }`}>
-                    {keyword.value}
-                  </span>
-                  {renderChangeAmount(keyword)}
                 </div>
-              </div>
-            ))}
+              );
+              
+              // 변화가 있으면 Dialog로 감싸서 반환, 없으면 카드만 반환
+              return hasChanges && keyword.status !== 'unchanged' && selectedCompareDate && selectedCompareDate !== "none" ? (
+                <Dialog key={index}>
+                  <DialogTrigger asChild>
+                    {KeywordCard}
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="text-center">
+                        {keyword.key} <span className="text-sm text-gray-500">키워드 변화</span>
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4">
+                      <div className="p-4 bg-gray-50 rounded-lg">
+                        <div className="flex justify-between mb-4">
+                          <div>
+                            <h5 className="text-sm font-medium text-gray-600 mb-1">이전 값</h5>
+                            {keyword.status === 'added' ? (
+                              <span className="text-2xl font-bold text-gray-400">-</span>
+                            ) : (
+                              <div className="flex items-center">
+                                <span className="text-2xl font-bold">
+                                  {keyword.status === 'increased' && keyword.change ? keyword.value - keyword.change : 
+                                   keyword.status === 'decreased' && keyword.change ? keyword.value + keyword.change : 
+                                   keyword.value}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="text-center mt-2">
+                            <span className="text-4xl">
+                              {keyword.status === 'added' ? (
+                                <span className="text-emerald-500">→</span>
+                              ) : keyword.status === 'removed' ? (
+                                <span className="text-red-500">→</span>
+                              ) : keyword.status === 'increased' ? (
+                                <span className="text-blue-500">↑</span>
+                              ) : (
+                                <span className="text-amber-500">↓</span>
+                              )}
+                            </span>
+                          </div>
+                          <div className="text-right">
+                            <h5 className="text-sm font-medium text-gray-600 mb-1">현재 값</h5>
+                            {keyword.status === 'removed' ? (
+                              <span className="text-2xl font-bold text-gray-400">-</span>
+                            ) : (
+                              <div className="flex items-center justify-end">
+                                <span className="text-2xl font-bold">{keyword.value}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className="text-center my-4">
+                          <span className="text-sm font-medium">
+                            {keyword.status === 'added' ? '새로 추가된 키워드입니다.' : 
+                            keyword.status === 'removed' ? '제거된 키워드입니다.' : 
+                            keyword.status === 'increased' ? `값이 ${keyword.change}만큼 증가했습니다.` : 
+                            `값이 ${keyword.change}만큼 감소했습니다.`}
+                          </span>
+                        </div>
+                        
+                        <div className="mt-4 text-sm text-gray-500">
+                          <p>
+                            {selectedCurrentDate && format(new Date(selectedCurrentDate), 'yyyy년 MM월 dd일')}과(와) 
+                            {selectedCompareDate && selectedCompareDate !== "none" && format(new Date(selectedCompareDate), 'yyyy년 MM월 dd일')} 사이의 
+                            변화입니다.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              ) : KeywordCard;
+             })}
           </div>
         )}
         
