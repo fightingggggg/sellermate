@@ -734,7 +734,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                     count.status === 'added' ? 'bg-emerald-50 border border-emerald-200' :
                     count.rankChange !== undefined && count.rankChange !== 0 ? 
                       (count.rankChange > 0 ? 'bg-green-50 border border-green-200' : 'bg-amber-50 border border-amber-200') :
-                    count.status === 'unchanged' ? 'bg-gray-50' :
+                    count.status === 'unchanged' ? 'bg-blue-50' :
                     'bg-indigo-50 border border-indigo-200'
                   }`}
                 >
@@ -796,7 +796,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                       tag.status === 'added' ? 'bg-emerald-50 border border-emerald-200' :
                       tag.rankChange !== undefined && tag.rankChange !== 0 ? 
                         (tag.rankChange > 0 ? 'bg-green-50 border border-green-200' : 'bg-amber-50 border border-amber-200') :
-                      tag.status === 'unchanged' ? 'bg-gray-50' :
+                      tag.status === 'unchanged' ? 'bg-blue-50' :
                       'bg-purple-50 border border-purple-200'
                     }`}
                   >
