@@ -47,6 +47,15 @@ export interface User {
   photoURL: string | null;
 }
 
+// User Profile type with additional information
+export interface UserProfile extends User {
+  businessName?: string;
+  businessLink?: string;
+  number?: string;
+  emailVerified?: boolean;
+  createdAt?: string;
+}
+
 // Stats type
 export interface DashboardStats {
   queryCount: number;

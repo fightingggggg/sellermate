@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+    <style>
+      body {
+          font-family: Arial, sans-serif;
+          background-color: #f4f4f9;
+          margin: 0;
+          padding: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+      }
+      .signup-container {
+          background: #fff;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          width: 100%;
+          max-width: 400px;
+          box-sizing: border-box;
+          display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+      .signup-container h1 {
+          text-align: center;
+          margin-bottom: 20px;
+          font-size: 24px;
+          color: #333;
+      }
+      .form-group {
+    margin-bottom: 30px;
+    width: 100%;
+    text-align: left;  /* 라벨을 왼쪽에 정렬 */
+}
+      .form-group label {
+          display: block;
+          margin-bottom: 5px;
+          font-weight: bold;
+          color: #555;
+          font-size: 10pt;
+       
+      }
+      .form-group input {
+          width: 100%;
+          padding: 10px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          font-size: 14px;
+          box-sizing: border-box;
+          
+          
+      }
+      .form-group input:focus {
+          border-color: #007BFF;
+          outline: none;
+      }
+      .submit-btn {
+          width: 100%;
+          padding: 10px;
+          background-color: #007BFF;
+          border: none;
+          border-radius: 4px;
+          color: #fff;
+          font-size: 16px;
+          font-weight: bold;
+          cursor: pointer;
+      }
+      .submit-btn:hover {
+          background-color: #0056b3;
+      }
+      
+ 
+      .forgot-password-link a{
+        color: #007BFF;
+        text-decoration: none;
+        display: flex;
+    margin-top: 15px;
+    font-size: 10pt;
+    padding-top: 10px;
+      }
+      .forgot-password-link a:hover {
+          text-decoration: underline;
+      }
+ 
+      .alert {
+          display: none;
+          padding: 10px;
+          margin-bottom: 10px;
+          border-radius: 4px;
+          font-size: 14px;
+      }
+      .alert-success {
+          background-color: #d4edda;
+          color: #155724;
+      }
+      .alert-error {
+          background-color: #f8d7da;
+          color: #721c24;
+      }
+
+      .checkbox-group {
+          display: flex;
+          align-items: center;
+          margin-bottom: 15px;
+          font-size: 10pt;
+      }
+      .checkbox-group input {
+          margin-right: 8px;
+      }
+      .checkbox-group a {
+          color: #007BFF;
+          text-decoration: none;
+      }
+      .checkbox-group a:hover {
+          text-decoration: underline;
+      }
+      .logo-img {
+          width: 100%; /* 이미지 너비를 부모 컨테이너에 맞게 조정 */
+          height: auto; /* 비율에 맞게 높이를 자동으로 조정 */
+          max-width: 60px; /* 최대 너비 설정 (필요에 따라 조정) */
+          display: block;
+          margin: 0 auto; /* 가운데 정렬 */
+      }
+      .spinner {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+      
+  </style>
+</head>
+<body>
+    <div class="signup-container">
+      <h1>회원가입</h1>
+        <div id="alert-message" class="alert"></div>
+        <form id="signup-form">
+            <div class="form-group">
+                <label for="business-name">스마트스토어 상호</label>
+                <input type="text" id="business-name" name="business-name" required>
+            </div>
+            <div class="form-group">
+                <label for="business-link">스마트스토어 홈 링크</label>
+                <input type="url" id="business-link" name="business-link"  required>
+            </div>
+            <div class="form-group">
+                <label for="number">휴대폰 번호</label>
+                <input type="tel" id="number" name="number" required>
+            </div>
+            <div class="form-group">
+                <label for="email">이메일</label>
+                <input type="email" id="email" name="email"  required>
+            </div>
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" name="password"  required>
+            </div>
+            <div class="form-group">
+                <label for="confirm-password">비밀번호 확인</label>
+                <input type="password" id="confirm-password" name="confirm-password" required>
+            </div>
+
+            <!-- 동의 체크박스 추가 -->
+            <div class="checkbox-group">
+              <input type="checkbox" id="terms" required>
+              <label for="terms">
+                  <span>스마트스토어 SEO 최적화 도구 <a href="https://chambray-midnight-e7f.notion.site/18678708053f806a9955f0f5375cdbdd?pvs=4" target="_blank">이용약관 및 개인정보처리방침</a></span>
+                 에 동의합니다.
+              </label>
+          </div>
+
+            <button type="submit" class="submit-btn">회원가입</button>
+        </form>
+        <div class="link-container">
+          <div class="forgot-password-link">
+              <a href="#" id="forgot-password">비밀번호 찾기</a>
+          </div>
+        
+      </div>
+      
+    </div>
+
+    <script src="./signup.js"></script>
+</body>
+</html>
