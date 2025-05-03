@@ -96,8 +96,8 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       
       if (userQueriesSnapshot.size >= 3) {
         toast({
-          title: "쿼리 한도 초과",
-          description: "최대 3개의 쿼리만 저장할 수 있습니다.",
+          title: "상품 한도 초과",
+          description: "최대 3개의 상품만 저장할 수 있습니다.",
           variant: "destructive"
         });
         return false;
@@ -109,8 +109,8 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       
       if (!existingQuerySnapshot.empty) {
         toast({
-          title: "중복된 쿼리",
-          description: "이미 동일한 쿼리가 저장되어 있습니다.",
+          title: "중복된 상품",
+          description: "이미 동일한 상품이 저장되어 있습니다.",
           variant: "destructive"
         });
         return false;
@@ -141,16 +141,16 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       await setDoc(doc(db, "analysisLogs", currentUser.email!, "queries", newQueryId), newQuery);
       
       toast({
-        title: "쿼리 추가 성공",
-        description: "새 쿼리가 성공적으로 추가되었습니다.",
+        title: "상품 추가 성공",
+        description: "새 상품이 성공적으로 추가되었습니다.",
       });
       
       return true;
     } catch (error) {
-      console.error("Error adding query:", error);
+      console.error("Error adding product:", error);
       toast({
-        title: "쿼리 추가 오류",
-        description: "쿼리를 추가하는 중 오류가 발생했습니다.",
+        title: "상품 추가 오류",
+        description: "상품을 추가하는 중 오류가 발생했습니다.",
         variant: "destructive"
       });
       return false;
@@ -175,14 +175,14 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       await deleteDoc(doc(db, "analysisLogs", currentUser.email!, "queries", queryId));
       
       toast({
-        title: "쿼리 삭제 성공",
-        description: "쿼리가 성공적으로 삭제되었습니다.",
+        title: "상품 삭제 성공",
+        description: "상품이 성공적으로 삭제되었습니다.",
       });
     } catch (error) {
-      console.error("Error deleting query:", error);
+      console.error("Error deleting product:", error);
       toast({
-        title: "쿼리 삭제 오류",
-        description: "쿼리를 삭제하는 중 오류가 발생했습니다.",
+        title: "상품 삭제 오류",
+        description: "상품을 삭제하는 중 오류가 발생했습니다.",
         variant: "destructive"
       });
     } finally {
@@ -215,8 +215,8 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       
       if (!existingQuery) {
         toast({
-          title: "쿼리 조회 오류",
-          description: "쿼리를 찾을 수 없습니다.",
+          title: "상품 조회 오류",
+          description: "상품을 찾을 수 없습니다.",
           variant: "destructive"
         });
         return;
@@ -246,14 +246,14 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       }, { merge: true });
       
       toast({
-        title: "쿼리 새로고침 성공",
-        description: "쿼리가 성공적으로 새로고침되었습니다.",
+        title: "상품 새로고침 성공",
+        description: "상품이 성공적으로 새로고침되었습니다.",
       });
     } catch (error) {
-      console.error("Error refreshing query:", error);
+      console.error("Error refreshing product:", error);
       toast({
-        title: "쿼리 새로고침 오류",
-        description: "쿼리를 새로고침하는 중 오류가 발생했습니다.",
+        title: "상품 새로고침 오류",
+        description: "상품을 새로고침하는 중 오류가 발생했습니다.",
         variant: "destructive"
       });
     } finally {
