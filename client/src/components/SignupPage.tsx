@@ -30,6 +30,9 @@ const signupSchema = z.object({
   terms: z.literal(true, {
     errorMap: () => ({ message: "이용약관과 개인정보처리방침에 동의해야 합니다" }),
   }),
+  terms: z.literal(true, {
+    errorMap: () => ({ message: "이용약관과 개인정보처리방침에 동의해야 합니다" }),
+  }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "비밀번호가 일치하지 않습니다",
   path: ["confirmPassword"],
@@ -52,6 +55,7 @@ export default function SignupPage() {
       email: "",
       password: "",
       confirmPassword: "",
+      terms: false,
       terms: false as any, // 타입 에러 해결을 위한 임시 처리
     },
   });
@@ -238,6 +242,27 @@ export default function SignupPage() {
                     />
                   </FormControl>
                   <FormMessage className="text-xs text-red-500 mt-1" />
+                </div>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="terms"
+              render={({ field }) => (
+                <div className="flex items-center space-x-2">
+                  <FormControl>
+                    <Checkbox 
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel className="text-xs">
+                      스마트스토어 SEO 최적화 도구 <a href="https://chambray-midnight-e7f.notion.site/18678708053f806a9955f0f5375cdbdd?pvs=4" target="_blank" className="text-[#007BFF] hover:underline">이용약관 및 개인정보처리방침</a>에 동의합니다.
+                    </FormLabel>
+                    <FormMessage className="text-xs text-red-500" />
+                  </div>
                 </div>
               )}
             />
