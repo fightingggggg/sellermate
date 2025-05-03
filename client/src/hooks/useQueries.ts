@@ -96,17 +96,42 @@ export function useQueries() {
             else {
               // 문서의 필드 중 날짜 형식(YYYY-MM-DD)을 가진 필드들을 찾아서 처리
               Object.keys(docData).forEach(key => {
-                if (/^\d{4}-\d{2}-\d{2}$/.test(key) && typeof docData[key] === 'object') {
+                console.log("검사 중인 필드:", key, typeof docData[key]);
+                
+                if (/^\d{4}-\d{2}-\d{2}$/.test(key)) {
+                  // 날짜 형식의 필드를 발견
+                  console.log("날짜 형식의 필드 발견:", key);
                   const dateData = docData[key];
-                  dates[key] = {
-                    keywords: processKeywordItems(dateData.keywords || []),
-                    keywordCounts: processKeywordItems(dateData.keywordCounts || []),
-                    tags: processKeywordItems(dateData.tags || []),
-                    lastUpdated: dateData.lastUpdated || key,
-                    savedAt: dateData.savedAt || new Date().toISOString()
-                  };
+                  
+                  // Firebase에서 가져온 데이터가 객체인지 확인
+                  if (dateData && typeof dateData === 'object') {
+                    console.log("날짜 데이터 내용:", dateData);
+                    dates[key] = {
+                      keywords: processKeywordItems(dateData.keywords || []),
+                      keywordCounts: processKeywordItems(dateData.keywordCounts || []),
+                      tags: processKeywordItems(dateData.tags || []),
+                      lastUpdated: dateData.lastUpdated || key,
+                      savedAt: dateData.savedAt || new Date().toISOString()
+                    };
+                  }
                 }
               });
+              
+              // 날짜 형식 필드가 하나도 없으면 기본 데이터 사용
+              if (Object.keys(dates).length === 0) {
+                // 날짜 형식의 필드를 찾지 못한 경우, text와 lastUpdated 필드는 있다고 가정하고 그냥 빈 데이터 생성
+                const defaultDate = docData.lastUpdated || new Date().toISOString().split('T')[0];
+                console.log("날짜 형식 필드 없음, 기본 데이터 사용:", defaultDate);
+                
+                dates[defaultDate] = {
+                  keywords: [],
+                  keywordCounts: [],
+                  tags: [],
+                  lastUpdated: defaultDate,
+                  savedAt: new Date().toISOString()
+                };
+                currentSnapshot = dates[defaultDate];
+              }
             }
             
             // 날짜순으로 정렬하여 최신 데이터와 이전 데이터 결정
@@ -210,8 +235,11 @@ export function useQueries() {
   function processKeywordItems(items: any[]): KeywordItem[] {
     // If items is null, undefined, or not an array, return empty array
     if (!items || !Array.isArray(items) || items.length === 0) {
+      console.log("빈 아이템 배열 받음");
       return [];
     }
+    
+    console.log("처리 중인 아이템 배열:", items);
     
     return items.map(item => {
       if (typeof item === 'object' && item !== null) {
@@ -231,6 +259,13 @@ export function useQueries() {
             status: item.status as KeywordItem['status']
           };
         }
+      } else if (typeof item === 'string') {
+        // 문자열만 있는 경우 (키만 있는 경우)
+        return {
+          key: item,
+          value: 1,
+          status: 'unchanged'
+        };
       }
       return null;
     }).filter(item => item !== null) as KeywordItem[];

@@ -24,9 +24,14 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
   } | null>(null);
   
   // Sort dates for the selectors
-  const availableDates = Object.keys(query.dates).sort((a, b) => 
+  const availableDates = Object.keys(query.dates || {}).sort((a, b) => 
     new Date(b).getTime() - new Date(a).getTime()
   );
+  
+  // 디버깅 출력
+  console.log("쿼리 데이터:", query);
+  console.log("날짜 정보:", query.dates);
+  console.log("사용 가능한 날짜:", availableDates);
   
   // Helper function to compare data between two dates
   const compareAnalysisData = (currentDate: string, compareDate: string | null) => {
@@ -269,7 +274,10 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
         {/* Keywords Tab Panel */}
         {activeTab === 'keywords' && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {(comparedData ? [...comparedData.keywords] : [...query.keywords]).sort((a, b) => b.value - a.value).map((keyword, index) => (
+            {(comparedData ? 
+                (Array.isArray(comparedData.keywords) ? [...comparedData.keywords] : []) : 
+                (Array.isArray(query.keywords) ? [...query.keywords] : [])
+             ).sort((a, b) => b.value - a.value).map((keyword, index) => (
               <div 
                 key={index} 
                 className={`flex items-center p-3 bg-gray-50 rounded-lg ${
@@ -308,8 +316,10 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
             <div className="mb-4">
               <h4 className="text-sm font-medium text-gray-500 mb-2">키워드 개수 순위 (상위 12개)</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {(comparedData ? [...comparedData.keywordCounts] : [...query.keywordCounts])
-                  .sort((a, b) => b.value - a.value)
+                {(comparedData ? 
+                    (Array.isArray(comparedData.keywordCounts) ? [...comparedData.keywordCounts] : []) : 
+                    (Array.isArray(query.keywordCounts) ? [...query.keywordCounts] : [])
+                  ).sort((a, b) => b.value - a.value)
                   .slice(0, 12)
                   .map((count, index) => (
                   <div 
@@ -353,7 +363,10 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
             
             <h4 className="text-sm font-medium text-gray-500 mb-2">모든 키워드 개수</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {(comparedData ? [...comparedData.keywordCounts] : [...query.keywordCounts]).sort((a, b) => b.value - a.value).map((count, index) => (
+              {(comparedData ? 
+                  (Array.isArray(comparedData.keywordCounts) ? [...comparedData.keywordCounts] : []) : 
+                  (Array.isArray(query.keywordCounts) ? [...query.keywordCounts] : [])
+              ).sort((a, b) => b.value - a.value).map((count, index) => (
                 <div 
                   key={index} 
                   className={`flex items-center p-3 bg-gray-50 rounded-lg ${
@@ -393,7 +406,10 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
             <div className="mb-4">
               <h4 className="text-sm font-medium text-gray-500 mb-2">태그 순위</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                {(comparedData ? [...comparedData.tags] : [...query.tags]).sort((a, b) => b.value - a.value).map((tag, index) => (
+                {(comparedData ? 
+                    (Array.isArray(comparedData.tags) ? [...comparedData.tags] : []) : 
+                    (Array.isArray(query.tags) ? [...query.tags] : [])
+                ).sort((a, b) => b.value - a.value).map((tag, index) => (
                   <div 
                     key={index} 
                     className={`flex items-center p-3 bg-gray-50 rounded-lg ${
