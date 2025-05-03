@@ -188,13 +188,21 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
     });
   };
   
-  // Initialize with default selection (latest date)
+  // Initialize with default selection (latest date and previous date)
   useEffect(() => {
     if (availableDates.length > 0) {
       const currentDate = availableDates[0];
       setSelectedCurrentDate(currentDate);
-      // Initialize with no comparison
-      compareAnalysisData(currentDate, null);
+      
+      // Automatically select previous date for comparison if available
+      if (availableDates.length > 1) {
+        const compareDate = availableDates[1];
+        setSelectedCompareDate(compareDate);
+        compareAnalysisData(currentDate, compareDate);
+      } else {
+        // If no previous date available, initialize with no comparison
+        compareAnalysisData(currentDate, null);
+      }
     }
   }, []);
   
@@ -703,14 +711,14 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                 >
                   <div className="flex items-center">
                     <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs mr-2">
-                      {count.currentRank || index + 1}
+                      {count.previousRank || index + 1}
                     </div>
-                    {renderChangeIndicator(count)}
                     <span className="text-sm font-medium">{count.key}</span>
-                    {isNewlyRanked(count, index) && index < 12 && (
+                    {count.status === 'added' ? (
                       <Badge className="ml-2 bg-emerald-500 text-white">NEW</Badge>
-                    )}
-                    {count.rankChange !== undefined && count.rankChange !== 0 && (
+                    ) : count.status === 'removed' ? (
+                      <Badge className="ml-2 bg-red-500 text-white">OUT</Badge>
+                    ) : count.rankChange !== undefined && count.rankChange !== 0 ? (
                       <Badge className={`ml-2 ${
                         count.rankChange > 0 
                         ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
@@ -718,7 +726,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                       } hover:bg-blue-200 border`}>
                         {Math.abs(count.rankChange)}위 {count.rankChange > 0 ? '상승' : '하락'}
                       </Badge>
-                    )}
+                    ) : null}
                   </div>
                   <div className="ml-auto flex items-center">
                     <div className="w-24 bg-gray-200 rounded-full h-2.5">
@@ -758,11 +766,14 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                   >
                     <div className="flex items-center">
                       <div className="w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs mr-2">
-                        {tag.currentRank || index + 1}
+                        {tag.previousRank || index + 1}
                       </div>
-                      {renderChangeIndicator(tag)}
                       <span className="text-sm font-medium">{tag.key}</span>
-                      {tag.rankChange !== undefined && tag.rankChange !== 0 && (
+                      {tag.status === 'added' ? (
+                        <Badge className="ml-2 bg-emerald-500 text-white">NEW</Badge>
+                      ) : tag.status === 'removed' ? (
+                        <Badge className="ml-2 bg-red-500 text-white">OUT</Badge>
+                      ) : tag.rankChange !== undefined && tag.rankChange !== 0 ? (
                         <Badge className={`ml-2 ${
                           tag.rankChange > 0 
                           ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
@@ -770,7 +781,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                         } hover:bg-blue-200 border`}>
                           {Math.abs(tag.rankChange)}위 {tag.rankChange > 0 ? '상승' : '하락'}
                         </Badge>
-                      )}
+                      ) : null}
                     </div>
                     <div className="ml-auto flex items-center">
                       <div className="w-20 bg-gray-200 rounded-full h-2.5">
@@ -808,13 +819,25 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                     fontSize: `${Math.max(0.8, Math.min(1.3, tag.value / 20))}rem`
                   }}
                 >
-                  {renderChangeIndicator(tag)}
                   {tag.key}
                   <span className={`ml-1 text-xs ${
                     tag.status === 'removed' ? 'text-gray-500' : 'text-blue-800'
                   }`}>
                     {tag.value}
                   </span>
+                  {tag.status === 'added' ? (
+                    <Badge className="ml-1 px-1 py-0 text-xs bg-emerald-100 text-emerald-800 border border-emerald-200">NEW</Badge>
+                  ) : tag.status === 'removed' ? (
+                    <Badge className="ml-1 px-1 py-0 text-xs bg-red-100 text-red-800 border border-red-200">OUT</Badge>
+                  ) : tag.rankChange !== undefined && tag.rankChange !== 0 ? (
+                    <Badge className={`ml-1 px-1 py-0 text-xs ${
+                      tag.rankChange > 0 
+                      ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
+                      : 'bg-amber-100 text-amber-800 border-amber-300'
+                    } border`}>
+                      {Math.abs(tag.rankChange)}위 {tag.rankChange > 0 ? '상승' : '하락'}
+                    </Badge>
+                  ) : null}
                   {renderChangeAmount(tag)}
                 </div>
               ))}
