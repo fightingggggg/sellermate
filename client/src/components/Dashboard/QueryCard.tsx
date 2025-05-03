@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Query, KeywordItem } from "@/types";
-import { RefreshCcw, Trash2, ArrowUp, ArrowDown, Star } from "lucide-react";
+import { Query, KeywordItem, AnalysisSnapshot } from "@/types";
+import { RefreshCcw, Trash2, ArrowUp, ArrowDown, Star, Calendar, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { format } from "date-fns";
 
 interface QueryCardProps {
   query: Query;
@@ -13,6 +15,116 @@ interface QueryCardProps {
 
 export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps) {
   const [activeTab, setActiveTab] = useState<'keywords' | 'keywordCounts' | 'tags'>('keywords');
+  const [selectedCurrentDate, setSelectedCurrentDate] = useState<string | null>(null);
+  const [selectedCompareDate, setSelectedCompareDate] = useState<string | null>(null);
+  const [comparedData, setComparedData] = useState<{
+    keywords: KeywordItem[];
+    keywordCounts: KeywordItem[];
+    tags: KeywordItem[];
+  } | null>(null);
+  
+  // Sort dates for the selectors
+  const availableDates = Object.keys(query.dates).sort((a, b) => 
+    new Date(b).getTime() - new Date(a).getTime()
+  );
+  
+  // Helper function to compare data between two dates
+  const compareAnalysisData = (currentDate: string, compareDate: string | null) => {
+    const currentData = query.dates[currentDate];
+    
+    // If no comparison date or current data doesn't exist, just use the current data
+    if (!compareDate || !currentData) {
+      setComparedData({
+        keywords: currentData?.keywords || [],
+        keywordCounts: currentData?.keywordCounts || [],
+        tags: currentData?.tags || []
+      });
+      return;
+    }
+    
+    const compareData = query.dates[compareDate];
+    if (!compareData) {
+      setComparedData({
+        keywords: currentData.keywords || [],
+        keywordCounts: currentData.keywordCounts || [],
+        tags: currentData.tags || []
+      });
+      return;
+    }
+    
+    // Compare data and mark changes
+    const compareAndMarkChanges = (oldItems: KeywordItem[], newItems: KeywordItem[]): KeywordItem[] => {
+      // Create maps for efficient lookup
+      const oldItemMap = new Map<string, number>();
+      oldItems.forEach(item => oldItemMap.set(item.key, item.value));
+      
+      const newItemMap = new Map<string, number>();
+      newItems.forEach(item => newItemMap.set(item.key, item.value));
+      
+      // Mark added, removed, or changed items
+      const result: KeywordItem[] = [];
+      
+      // Check for new or changed items
+      newItemMap.forEach((value, key) => {
+        if (!oldItemMap.has(key)) {
+          // New item
+          result.push({ key, value, status: 'added' });
+        } else {
+          const oldValue = oldItemMap.get(key)!;
+          if (value > oldValue) {
+            // Increased
+            result.push({ key, value, change: value - oldValue, status: 'increased' });
+          } else if (value < oldValue) {
+            // Decreased
+            result.push({ key, value, change: oldValue - value, status: 'decreased' });
+          } else {
+            // Unchanged
+            result.push({ key, value, status: 'unchanged' });
+          }
+        }
+      });
+      
+      // Check for removed items
+      oldItemMap.forEach((value, key) => {
+        if (!newItemMap.has(key)) {
+          // Removed item
+          result.push({ key, value, status: 'removed' });
+        }
+      });
+      
+      // Sort by value (higher first) then by status (added first, removed last)
+      result.sort((a, b) => {
+        if (a.status === 'removed' && b.status !== 'removed') return 1;
+        if (a.status !== 'removed' && b.status === 'removed') return -1;
+        return b.value - a.value;
+      });
+      
+      return result;
+    };
+    
+    setComparedData({
+      keywords: compareAndMarkChanges(compareData.keywords, currentData.keywords),
+      keywordCounts: compareAndMarkChanges(compareData.keywordCounts, currentData.keywordCounts),
+      tags: compareAndMarkChanges(compareData.tags, currentData.tags)
+    });
+  };
+  
+  // Initialize with default selection (latest date)
+  useEffect(() => {
+    if (availableDates.length > 0) {
+      const currentDate = availableDates[0];
+      setSelectedCurrentDate(currentDate);
+      // Initialize with no comparison
+      compareAnalysisData(currentDate, null);
+    }
+  }, []);
+  
+  // Update compared data when dates change
+  useEffect(() => {
+    if (selectedCurrentDate) {
+      compareAnalysisData(selectedCurrentDate, selectedCompareDate);
+    }
+  }, [selectedCurrentDate, selectedCompareDate]);
 
   // Helper function to render change indicator
   const renderChangeIndicator = (item: KeywordItem) => {
@@ -70,6 +182,54 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
           </div>
         </div>
         
+        {/* Date comparison selectors */}
+        {availableDates.length >= 2 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 bg-slate-50 rounded-lg">
+            <div>
+              <label className="flex items-center mb-2 text-sm font-medium text-gray-700">
+                <Calendar className="w-4 h-4 mr-1" />
+                현재 날짜
+              </label>
+              <Select 
+                defaultValue={availableDates[0]} 
+                onValueChange={(value) => setSelectedCurrentDate(value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="날짜 선택" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableDates.map(date => (
+                    <SelectItem key={date} value={date}>
+                      {format(new Date(date), 'yyyy년 MM월 dd일')}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="flex items-center mb-2 text-sm font-medium text-gray-700">
+                <Clock className="w-4 h-4 mr-1" />
+                비교 날짜
+              </label>
+              <Select 
+                onValueChange={(value) => setSelectedCompareDate(value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="이전 날짜 선택 (선택 사항)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">선택 안함</SelectItem>
+                  {availableDates.filter(d => d !== selectedCurrentDate).map(date => (
+                    <SelectItem key={date} value={date}>
+                      {format(new Date(date), 'yyyy년 MM월 dd일')}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )}
+        
         {/* Product Analysis Tabs */}
         <div className="border-b border-gray-200 mb-4">
           <nav className="-mb-px flex space-x-8">
@@ -109,7 +269,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
         {/* Keywords Tab Panel */}
         {activeTab === 'keywords' && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {[...query.keywords].sort((a, b) => b.value - a.value).map((keyword, index) => (
+            {(comparedData ? [...comparedData.keywords] : [...query.keywords]).sort((a, b) => b.value - a.value).map((keyword, index) => (
               <div 
                 key={index} 
                 className={`flex items-center p-3 bg-gray-50 rounded-lg ${
@@ -148,7 +308,10 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
             <div className="mb-4">
               <h4 className="text-sm font-medium text-gray-500 mb-2">키워드 개수 순위 (상위 12개)</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {sortedByFrequency.map((count, index) => (
+                {(comparedData ? [...comparedData.keywordCounts] : [...query.keywordCounts])
+                  .sort((a, b) => b.value - a.value)
+                  .slice(0, 12)
+                  .map((count, index) => (
                   <div 
                     key={index} 
                     className={`flex items-center p-3 ${

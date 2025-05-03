@@ -12,7 +12,7 @@ import {
   QueryDocumentSnapshot 
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { Query, DashboardStats, KeywordItem } from "@/types";
+import { Query, DashboardStats, KeywordItem, AnalysisSnapshot } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
