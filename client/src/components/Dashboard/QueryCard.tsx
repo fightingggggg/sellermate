@@ -738,8 +738,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                     count.status === 'added' ? 'bg-emerald-50 border border-emerald-200' :
                     count.rankChange !== undefined && count.rankChange !== 0 ? 
                       (count.rankChange > 0 ? 'bg-green-50 border border-green-200' : 'bg-amber-50 border border-amber-200') :
-                    count.status === 'unchanged' ? 'bg-gray-50' :
-                    'bg-indigo-50 border border-indigo-200'
+                    'bg-gray-50 hover:bg-gray-100'
                   }`}
                 >
                   <div className="flex items-center">
@@ -800,8 +799,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                       tag.status === 'added' ? 'bg-emerald-50 border border-emerald-200' :
                       tag.rankChange !== undefined && tag.rankChange !== 0 ? 
                         (tag.rankChange > 0 ? 'bg-green-50 border border-green-200' : 'bg-amber-50 border border-amber-200') :
-                      tag.status === 'unchanged' ? 'bg-gray-50' :
-                      'bg-purple-50 border border-purple-200'
+                      'bg-gray-50 hover:bg-gray-100'
                     }`}
                   >
                     <div className="flex items-center">
@@ -857,7 +855,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                     tag.status === 'added' ? 'bg-emerald-100 text-emerald-800' :
                     tag.rankChange !== undefined && tag.rankChange !== 0 ? 
                       (tag.rankChange > 0 ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800') :
-                    'bg-gray-100 text-gray-800'
+                    'bg-blue-100 text-blue-800'
                   }`}
                   style={{ 
                     fontSize: `${Math.max(0.8, Math.min(1.3, tag.value / 20))}rem`
@@ -865,7 +863,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                 >
                   {tag.key}
                   <span className={`ml-1 text-xs ${
-                    tag.status === 'removed' ? 'text-gray-500' : 'text-gray-700'
+                    tag.status === 'removed' ? 'text-gray-500' : 'text-blue-800'
                   }`}>
                     {tag.value}
                   </span>
