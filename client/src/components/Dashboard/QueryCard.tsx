@@ -243,7 +243,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
   // Helper function to render change amount
   const renderChangeAmount = (item: KeywordItem) => {
     if (item.status === 'increased' && item.change) {
-      return <span className="ml-1 text-xs text-emerald-500">{item.change}</span>;
+      return <span className="ml-1 text-xs text-emerald-500">+{item.change}</span>;
     } else if (item.status === 'decreased' && item.change) {
       return <span className="ml-1 text-xs text-red-500">-{item.change}</span>;
     }
@@ -380,7 +380,9 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                   {/* 키워드 섹션 */}
                   {comparedData?.keywords?.some(k => k.status !== 'unchanged') && (
                     <div className="bg-white p-3 rounded-lg border border-blue-100 shadow-sm">
-                      <h5 className="text-sm font-semibold mb-2 text-blue-700 border-b pb-1 border-blue-100">주요 키워드 변화</h5>
+                      <h5 className="text-sm font-semibold mb-2 text-blue-700 border-b pb-1 border-blue-100">
+                        주요 키워드 변화 <span className="font-normal text-blue-500">({comparedData?.keywords.filter(k => k.status !== 'unchanged').length}건)</span>
+                      </h5>
                       <ul className="text-sm space-y-2.5">
                         {comparedData?.keywords
                           .filter(k => k.status !== 'unchanged')
@@ -423,7 +425,9 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                   {/* 키워드 개수 섹션 */}
                   {comparedData?.keywordCounts?.some(k => k.status !== 'unchanged') && (
                     <div className="bg-white p-3 rounded-lg border border-indigo-100 shadow-sm">
-                      <h5 className="text-sm font-semibold mb-2 text-indigo-700 border-b pb-1 border-indigo-100">키워드 개수 변화</h5>
+                      <h5 className="text-sm font-semibold mb-2 text-indigo-700 border-b pb-1 border-indigo-100">
+                        키워드 개수 변화 <span className="font-normal text-indigo-500">({comparedData?.keywordCounts.filter(k => k.status !== 'unchanged').length}건)</span>
+                      </h5>
                       <ul className="text-sm space-y-2.5">
                         {comparedData?.keywordCounts
                           .filter(k => k.status !== 'unchanged')
@@ -466,7 +470,9 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                   {/* 태그 섹션 */}
                   {comparedData?.tags?.some(k => k.status !== 'unchanged') && (
                     <div className="bg-white p-3 rounded-lg border border-purple-100 shadow-sm">
-                      <h5 className="text-sm font-semibold mb-2 text-purple-700 border-b pb-1 border-purple-100">태그 변화</h5>
+                      <h5 className="text-sm font-semibold mb-2 text-purple-700 border-b pb-1 border-purple-100">
+                        태그 변화 <span className="font-normal text-purple-500">({comparedData?.tags.filter(k => k.status !== 'unchanged').length}건)</span>
+                      </h5>
                       <ul className="text-sm space-y-2.5">
                         {comparedData?.tags
                           .filter(k => k.status !== 'unchanged')
@@ -568,7 +574,9 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                 >
                   <div className="flex items-center">
                     <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs mr-2">
-                      {keyword.previousRank || index + 1}
+                      {keyword.status === 'removed' ? 
+                        (keyword.previousRank || index + 1) : 
+                        (keyword.currentRank || index + 1)}
                     </div>
                     <span className="text-sm font-medium">{keyword.key}</span>
                     {keyword.status === 'added' ? (
@@ -707,7 +715,9 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                 >
                   <div className="flex items-center">
                     <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs mr-2">
-                      {count.previousRank || index + 1}
+                      {count.status === 'removed' ? 
+                        (count.previousRank || index + 1) : 
+                        (count.currentRank || index + 1)}
                     </div>
                     <span className="text-sm font-medium">{count.key}</span>
                     {count.status === 'added' ? (
@@ -762,7 +772,9 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                   >
                     <div className="flex items-center">
                       <div className="w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs mr-2">
-                        {tag.previousRank || index + 1}
+                        {tag.status === 'removed' ? 
+                          (tag.previousRank || index + 1) : 
+                          (tag.currentRank || index + 1)}
                       </div>
                       <span className="text-sm font-medium">{tag.key}</span>
                       {tag.status === 'added' ? (
