@@ -1,9 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Query, KeywordItem } from "@/types";
-import { RefreshCcw, Trash2, ArrowUp, ArrowDown, Star } from "lucide-react";
+import { Query, KeywordItem, DateAnalysis } from "@/types";
+import { RefreshCcw, Trash2, ArrowUp, ArrowDown, Star, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useQueryContext } from "@/contexts/QueryContext";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface QueryCardProps {
   query: Query;
@@ -13,6 +21,20 @@ interface QueryCardProps {
 
 export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps) {
   const [activeTab, setActiveTab] = useState<'keywords' | 'keywordCounts' | 'tags'>('keywords');
+  const [compareMode, setCompareMode] = useState<boolean>(false);
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [availableDates, setAvailableDates] = useState<string[]>([]);
+  const [comparedData, setComparedData] = useState<{
+    keywords: KeywordItem[];
+    keywordCounts: KeywordItem[];
+    tags: KeywordItem[];
+  }>({
+    keywords: query.keywords,
+    keywordCounts: query.keywordCounts,
+    tags: query.tags
+  });
+  
+  const { compareAndMarkChanges } = useQueryContext();
 
   // Helper function to render change indicator
   const renderChangeIndicator = (item: KeywordItem) => {
@@ -49,6 +71,52 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
            (item.status === 'increased' && item.change && item.change > 5);
   };
 
+  // 날짜별 데이터 비교를 위한 useEffect
+  useEffect(() => {
+    if (!query?.dates) return;
+    
+    // 사용 가능한 날짜 목록 추출
+    const dateKeys = Object.keys(query.dates).sort().reverse();
+    setAvailableDates(dateKeys);
+    
+    // 현재 날짜가 없으면 가장 최근 날짜 선택
+    if (dateKeys.length > 0 && !selectedDate) {
+      setSelectedDate(dateKeys[0]);
+    }
+  }, [query.dates]);
+  
+  // 선택한 날짜가 변경될 때 데이터 비교
+  useEffect(() => {
+    if (!compareMode || !selectedDate || !query?.dates) return;
+    
+    const currentData = {
+      keywords: query.keywords,
+      keywordCounts: query.keywordCounts,
+      tags: query.tags
+    };
+    
+    // 선택한 날짜의 데이터가 있는지 확인
+    const selectedDateData = query.dates[selectedDate];
+    if (!selectedDateData) {
+      setComparedData(currentData);
+      return;
+    }
+    
+    // 현재 데이터와 과거 데이터 비교
+    setComparedData({
+      keywords: compareAndMarkChanges(selectedDateData.keywords, query.keywords),
+      keywordCounts: compareAndMarkChanges(selectedDateData.keywordCounts, query.keywordCounts),
+      tags: compareAndMarkChanges(selectedDateData.tags, query.tags)
+    });
+  }, [compareMode, selectedDate, query.dates, compareAndMarkChanges]);
+
+  // 표시할 데이터 결정
+  const displayData = compareMode ? comparedData : {
+    keywords: query.keywords,
+    keywordCounts: query.keywordCounts,
+    tags: query.tags
+  };
+  
   return (
     <Card className="mb-6">
       <CardContent className="p-6">
@@ -56,6 +124,39 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
           <div>
             <h3 className="text-lg font-medium text-text-primary">{query.text}</h3>
             <p className="text-sm text-text-secondary">마지막 업데이트: {query.lastUpdated}</p>
+            
+            {/* 날짜별 비교 UI */}
+            {query.dates && Object.keys(query.dates).length > 1 && (
+              <div className="mt-2 flex items-center space-x-2">
+                <Button 
+                  variant={compareMode ? "secondary" : "outline"} 
+                  size="sm"
+                  onClick={() => setCompareMode(!compareMode)}
+                  className="text-xs h-8"
+                >
+                  <Calendar className="h-3.5 w-3.5 mr-1" />
+                  {compareMode ? "비교 중지" : "날짜별 비교"}
+                </Button>
+                
+                {compareMode && (
+                  <Select
+                    value={selectedDate}
+                    onValueChange={(value) => setSelectedDate(value)}
+                  >
+                    <SelectTrigger className="w-[180px] h-8 text-xs">
+                      <SelectValue placeholder="날짜 선택" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableDates.map((date) => (
+                        <SelectItem key={date} value={date}>
+                          {date} 데이터와 비교
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+            )}
           </div>
           <div>
             <Button 
@@ -109,7 +210,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
         {/* Keywords Tab Panel */}
         {activeTab === 'keywords' && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {[...query.keywords].sort((a, b) => b.value - a.value).map((keyword, index) => (
+            {[...displayData.keywords].sort((a, b) => b.value - a.value).map((keyword, index) => (
               <div 
                 key={index} 
                 className={`flex items-center p-3 bg-gray-50 rounded-lg ${

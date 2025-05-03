@@ -12,7 +12,7 @@ import {
   QueryDocumentSnapshot 
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { Query, DashboardStats, KeywordItem } from "@/types";
+import { Query, DashboardStats, KeywordItem, DateAnalysis } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
@@ -101,13 +101,14 @@ export function useQueries() {
             if (docData.dates && typeof docData.dates === 'object') {
               // dates 객체의 각 날짜 처리
               Object.entries(docData.dates).forEach(([dateKey, dateData]) => {
-                if (typeof dateData === 'object') {
+                if (typeof dateData === 'object' && dateData !== null) {
+                  const data = dateData as any;
                   dateAnalyses[dateKey] = {
-                    keywords: processKeywordItems(dateData.keywords || []),
-                    keywordCounts: processKeywordItems(dateData.keywordCounts || []),
-                    tags: processKeywordItems(dateData.tags || []),
-                    lastUpdated: dateData.lastUpdated || dateKey,
-                    savedAt: dateData.savedAt || new Date().toISOString()
+                    keywords: processKeywordItems(data.keywords || []),
+                    keywordCounts: processKeywordItems(data.keywordCounts || []),
+                    tags: processKeywordItems(data.tags || []),
+                    lastUpdated: data.lastUpdated || dateKey,
+                    savedAt: data.savedAt || new Date().toISOString()
                   };
                   
                   // 가장 최근 날짜 추적

@@ -25,7 +25,8 @@ const QueryContext = createContext<QueryContextProps>({
   addQuery: async () => false,
   deleteQuery: async () => {},
   refreshQuery: async () => {},
-  analyzeQuery: async () => null
+  analyzeQuery: async () => null,
+  compareAndMarkChanges: () => []
 });
 
 export function useQueryContext() {
@@ -325,7 +326,8 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
     addQuery,
     deleteQuery,
     refreshQuery,
-    analyzeQuery
+    analyzeQuery,
+    compareAndMarkChanges
   };
 
   return (
