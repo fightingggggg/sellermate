@@ -225,7 +225,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
     if (item.status === 'increased' && item.change) {
       return <span className="ml-1 text-xs text-emerald-500">{item.change}</span>;
     } else if (item.status === 'decreased' && item.change) {
-      return <span className="ml-1 text-xs text-red-500">{item.change}</span>;
+      return <span className="ml-1 text-xs text-red-500">-{item.change}</span>;
     }
     return null;
   };
@@ -704,10 +704,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                         ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
                         : 'bg-amber-100 text-amber-800 border-amber-300'
                       } hover:bg-blue-200 border`}>
-                        {count.rankChange > 0 
-                          ? `${Math.abs(count.rankChange)}위 상승` 
-                          : `${Math.abs(count.rankChange)}위 하락`
-                        }
+                        {Math.abs(count.rankChange)}위 {count.rankChange > 0 ? '상승' : '하락'}
                       </Badge>
                     )}
                   </div>
@@ -759,10 +756,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                           ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
                           : 'bg-amber-100 text-amber-800 border-amber-300'
                         } hover:bg-blue-200 border`}>
-                          {tag.rankChange > 0 
-                            ? `${Math.abs(tag.rankChange)}위 상승` 
-                            : `${Math.abs(tag.rankChange)}위 하락`
-                          }
+                          {Math.abs(tag.rankChange)}위 {tag.rankChange > 0 ? '상승' : '하락'}
                         </Badge>
                       )}
                     </div>
