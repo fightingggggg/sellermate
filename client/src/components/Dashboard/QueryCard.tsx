@@ -444,7 +444,10 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
             
             <h4 className="text-sm font-medium text-gray-500 mb-2">태그 구름</h4>
             <div className="flex flex-wrap gap-2">
-              {(comparedData ? [...comparedData.tags] : [...query.tags]).sort((a, b) => b.value - a.value).map((tag, index) => (
+              {(comparedData ? 
+                  (Array.isArray(comparedData.tags) ? [...comparedData.tags] : []) : 
+                  (Array.isArray(query.tags) ? [...query.tags] : [])
+              ).sort((a, b) => b.value - a.value).map((tag, index) => (
                 <div 
                   key={index} 
                   className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${

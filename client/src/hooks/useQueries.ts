@@ -94,34 +94,40 @@ export function useQueries() {
             } 
             // 새 형식의 날짜별 데이터 처리
             else {
-              // 문서의 필드 중 날짜 형식(YYYY-MM-DD)을 가진 필드들을 찾아서 처리
-              Object.keys(docData).forEach(key => {
-                console.log("검사 중인 필드:", key, typeof docData[key]);
+              console.log("새 형식 데이터 처리 - 문서 내용:", docData);
+              
+              // 문서의 필드 중 날짜 형식(YYYY-MM-DD)을 가진 필드들만 추출
+              const dateFields = Object.keys(docData).filter(key => 
+                /^\d{4}-\d{2}-\d{2}$/.test(key)
+              );
+              
+              console.log("발견된 날짜 필드:", dateFields);
+              
+              // 각 날짜 필드에 대해 데이터 처리
+              dateFields.forEach(dateKey => {
+                const dateData = docData[dateKey];
+                console.log(`날짜 [${dateKey}]의 데이터:`, dateData);
                 
-                if (/^\d{4}-\d{2}-\d{2}$/.test(key)) {
-                  // 날짜 형식의 필드를 발견
-                  console.log("날짜 형식의 필드 발견:", key);
-                  const dateData = docData[key];
-                  
-                  // Firebase에서 가져온 데이터가 객체인지 확인
-                  if (dateData && typeof dateData === 'object') {
-                    console.log("날짜 데이터 내용:", dateData);
-                    dates[key] = {
-                      keywords: processKeywordItems(dateData.keywords || []),
-                      keywordCounts: processKeywordItems(dateData.keywordCounts || []),
-                      tags: processKeywordItems(dateData.tags || []),
-                      lastUpdated: dateData.lastUpdated || key,
-                      savedAt: dateData.savedAt || new Date().toISOString()
-                    };
-                  }
+                // Firebase에서 가져온 데이터가 객체인지 확인
+                if (dateData && typeof dateData === 'object') {
+                  dates[dateKey] = {
+                    keywords: processKeywordItems(dateData.keywords || []),
+                    keywordCounts: processKeywordItems(dateData.keywordCounts || []),
+                    tags: processKeywordItems(dateData.tags || []),
+                    lastUpdated: dateData.lastUpdated || dateKey,
+                    savedAt: dateData.savedAt || new Date().toISOString()
+                  };
                 }
               });
               
+              console.log("처리된 날짜 데이터:", dates);
+              
               // 날짜 형식 필드가 하나도 없으면 기본 데이터 사용
               if (Object.keys(dates).length === 0) {
-                // 날짜 형식의 필드를 찾지 못한 경우, text와 lastUpdated 필드는 있다고 가정하고 그냥 빈 데이터 생성
-                const defaultDate = docData.lastUpdated || new Date().toISOString().split('T')[0];
-                console.log("날짜 형식 필드 없음, 기본 데이터 사용:", defaultDate);
+                console.log("날짜 필드가 없습니다. 기본 데이터를 생성합니다.");
+                
+                // 기본 날짜 사용 (오늘 날짜)
+                const defaultDate = new Date().toISOString().split('T')[0];
                 
                 dates[defaultDate] = {
                   keywords: [],
@@ -130,6 +136,7 @@ export function useQueries() {
                   lastUpdated: defaultDate,
                   savedAt: new Date().toISOString()
                 };
+                
                 currentSnapshot = dates[defaultDate];
               }
             }
