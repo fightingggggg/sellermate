@@ -215,9 +215,21 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
     
     if (item.status === 'removed') {
       return <Badge className="mr-2 px-1.5 py-0 text-xs bg-red-100 text-red-800 border border-red-200">OUT</Badge>;
-    } 
+    }
     
-    return null; // 그 외 상태(증가, 감소)의 경우 아이콘 표시 안함
+    if (item.rankChange !== undefined && item.rankChange !== 0) {
+      return (
+        <Badge className={`mr-2 px-1.5 py-0 text-xs ${
+          item.rankChange > 0 
+          ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
+          : 'bg-amber-100 text-amber-800 border-amber-300'
+        } border`}>
+          {Math.abs(item.rankChange)}위 {item.rankChange > 0 ? '상승' : '하락'}
+        </Badge>
+      );
+    }
+    
+    return null; // 그 외 상태의 경우 아이콘 표시 안함
   };
 
   // Helper function to render change amount
