@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface QueryContextProps {
   isLoading: boolean;
+  error: string | null;
   addQuery: (queryText: string) => Promise<boolean>;
   deleteQuery: (queryId: string) => Promise<void>;
   refreshQuery: (queryId: string) => Promise<void>;
@@ -19,6 +20,7 @@ interface QueryContextProps {
 
 const QueryContext = createContext<QueryContextProps>({
   isLoading: false,
+  error: null,
   addQuery: async () => false,
   deleteQuery: async () => {},
   refreshQuery: async () => {},
@@ -31,6 +33,7 @@ export function useQueryContext() {
 
 export function QueryProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { currentUser } = useAuth();
   const { toast } = useToast();
 
@@ -308,8 +311,25 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
     return result;
   }
 
+  // Effect to handle Firebase permission errors from the useQueries hook
+  useEffect(() => {
+    const handleFirebaseError = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.code === 'permission-denied') {
+        setError('permission-denied');
+      }
+    };
+    
+    window.addEventListener('firebase-error', handleFirebaseError);
+    
+    return () => {
+      window.removeEventListener('firebase-error', handleFirebaseError);
+    };
+  }, []);
+
   const value = {
     isLoading,
+    error,
     addQuery,
     deleteQuery,
     refreshQuery,

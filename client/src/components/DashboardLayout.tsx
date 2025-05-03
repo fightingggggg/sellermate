@@ -58,13 +58,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="flex items-center">
               {currentUser ? (
                 <>
-                  <Button 
-                    onClick={() => navigate("/dashboard")}
-                    className="hidden sm:flex mr-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                  >
-                    <PlusCircle className="h-4 w-4 mr-1" />
-                    새 상품 추가
-                  </Button>
+
                   
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild className="cursor-pointer">
@@ -122,14 +116,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <Link href="/dashboard" className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-700">
                 대시보드
               </Link>
-              {currentUser && (
-                <a 
-                  onClick={() => navigate("/dashboard")}
-                  className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-700 cursor-pointer"
-                >
-                  새 상품 추가
-                </a>
-              )}
+
             </div>
           )}
         </div>

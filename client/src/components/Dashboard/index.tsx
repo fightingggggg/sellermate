@@ -12,7 +12,7 @@ import { AlertTriangle, Loader2, Lock } from "lucide-react";
 
 export default function Dashboard() {
   const { queries, stats, loading } = useQueries();
-  const { refreshQuery } = useQueryContext();
+  const { refreshQuery, error } = useQueryContext();
   const { currentUser } = useAuth();
   
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -36,8 +36,24 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="text-center py-12">
-        <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
+        <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto" />
         <p className="mt-4 text-muted-foreground">데이터 로딩 중...</p>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <div className="w-16 h-16 mx-auto mb-5 flex items-center justify-center rounded-full bg-red-100">
+          <AlertTriangle className="h-8 w-8 text-red-600" />
+        </div>
+        <h3 className="text-xl font-semibold mb-2 text-red-600">데이터 접근 오류</h3>
+        <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+          {error === "permission-denied" 
+            ? "Firebase 데이터베이스 접근 권한이 없습니다. Firebase 보안 규칙을 확인해주세요." 
+            : "데이터를 불러오는 중 오류가 발생했습니다."}
+        </p>
       </div>
     );
   }
