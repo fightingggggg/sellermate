@@ -35,10 +35,17 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
   
   // Helper function to compare data between two dates
   const compareAnalysisData = (currentDate: string, compareDate: string | null) => {
+    if (!query.dates || !currentDate || !query.dates[currentDate]) {
+      console.log("현재 날짜의 데이터가 없습니다:", currentDate);
+      setComparedData(null);
+      return;
+    }
+    
     const currentData = query.dates[currentDate];
     
-    // If no comparison date or current data doesn't exist, just use the current data
-    if (!compareDate || !currentData) {
+    // 만약 비교 날짜가 "none"이거나 null이면 비교 안함, 현재 데이터만 표시
+    if (!compareDate || compareDate === "none" || !query.dates[compareDate]) {
+      console.log("비교 날짜가 없거나 none입니다. 현재 데이터만 사용합니다.");
       setComparedData({
         keywords: currentData?.keywords || [],
         keywordCounts: currentData?.keywordCounts || [],
@@ -49,6 +56,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
     
     const compareData = query.dates[compareDate];
     if (!compareData) {
+      console.log("비교 날짜의 데이터가 없습니다:", compareDate);
       setComparedData({
         keywords: currentData.keywords || [],
         keywordCounts: currentData.keywordCounts || [],
@@ -223,7 +231,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                   <SelectValue placeholder="이전 날짜 선택 (선택 사항)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">선택 안함</SelectItem>
+                  <SelectItem value="none">선택 안함</SelectItem>
                   {availableDates.filter(d => d !== selectedCurrentDate).map(date => (
                     <SelectItem key={date} value={date}>
                       {format(new Date(date), 'yyyy년 MM월 dd일')}

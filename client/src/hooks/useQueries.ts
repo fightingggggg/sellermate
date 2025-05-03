@@ -39,7 +39,10 @@ export function useQueries() {
     // Create reference to user's queries collection based on the provided DB structure
     const userEmail = currentUser.email;
     const userQueriesRef = collection(db, "analysisLogs", userEmail, "queries");
-    const q = firestoreQuery(userQueriesRef, orderBy("savedAt", "desc"));
+    // 날짜별 구조로 저장되어 있으므로 정렬 없이 모든 문서 가져오기
+    const q = firestoreQuery(userQueriesRef);
+    
+    console.log(`쿼리 실행: analysisLogs/${userEmail}/queries`);
     
     // Subscribe to changes
     const unsubscribe = onSnapshot(q, async (snapshot) => {
@@ -64,11 +67,9 @@ export function useQueries() {
           try {
             const docData = docSnapshot.data();
             
-            // Ensure the document has the required fields
-            if (!docData.text) {
-              // Use document ID as text if missing
-              docData.text = docSnapshot.id;
-            }
+            // Document ID가 실제 검색어 쿼리 문자열이 됨
+            docData.text = docSnapshot.id;
+            console.log("문서 ID (검색어):", docSnapshot.id);
             
             if (!docData.lastUpdated) {
               // Use current date as lastUpdated if missing
