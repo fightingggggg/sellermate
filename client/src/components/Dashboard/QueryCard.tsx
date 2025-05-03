@@ -57,15 +57,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
             <h3 className="text-lg font-medium text-text-primary">{query.text}</h3>
             <p className="text-sm text-text-secondary">마지막 업데이트: {query.lastUpdated}</p>
           </div>
-          <div className="flex space-x-2">
-            <Button 
-              variant="outline" 
-              size="icon" 
-              onClick={() => onRefresh(query.id)}
-              title="상품 새로고침"
-            >
-              <RefreshCcw className="h-5 w-5" />
-            </Button>
+          <div>
             <Button 
               variant="outline" 
               size="icon" 
@@ -99,7 +91,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
               }`}
               onClick={() => setActiveTab('keywordCounts')}
             >
-              빈도 순위
+              키워드 개수
             </button>
             <button 
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
@@ -116,22 +108,35 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
         
         {/* Keywords Tab Panel */}
         {activeTab === 'keywords' && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {query.keywords.map((keyword, index) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[...query.keywords].sort((a, b) => b.value - a.value).map((keyword, index) => (
               <div 
                 key={index} 
                 className={`flex items-center p-3 bg-gray-50 rounded-lg ${
                   keyword.status === 'removed' ? 'text-gray-400' : ''
                 }`}
               >
-                {renderChangeIndicator(keyword)}
-                <span className="text-sm font-medium">{keyword.key}</span>
-                <span className={`ml-auto font-semibold ${
-                  keyword.status === 'removed' ? 'text-gray-400' : 'text-primary'
-                }`}>
-                  {keyword.value}
-                </span>
-                {renderChangeAmount(keyword)}
+                <div className="flex items-center">
+                  <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs mr-2">
+                    {index + 1}
+                  </div>
+                  {renderChangeIndicator(keyword)}
+                  <span className="text-sm font-medium">{keyword.key}</span>
+                </div>
+                <div className="ml-auto flex items-center">
+                  <div className="w-20 bg-gray-200 rounded-full h-2.5">
+                    <div 
+                      className={`${keyword.status === 'removed' ? 'bg-gray-400' : 'bg-blue-600'} h-2.5 rounded-full`} 
+                      style={{ width: `${Math.min(100, keyword.value * 3)}%` }}
+                    ></div>
+                  </div>
+                  <span className={`ml-2 font-semibold ${
+                    keyword.status === 'removed' ? 'text-gray-400' : 'text-blue-600'
+                  }`}>
+                    {keyword.value}
+                  </span>
+                  {renderChangeAmount(keyword)}
+                </div>
               </div>
             ))}
           </div>
@@ -141,7 +146,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
         {activeTab === 'keywordCounts' && (
           <>
             <div className="mb-4">
-              <h4 className="text-sm font-medium text-gray-500 mb-2">빈도 기준 순위 (상위 12개)</h4>
+              <h4 className="text-sm font-medium text-gray-500 mb-2">키워드 개수 순위 (상위 12개)</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {sortedByFrequency.map((count, index) => (
                   <div 
@@ -183,28 +188,33 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
               </div>
             </div>
             
-            <h4 className="text-sm font-medium text-gray-500 mb-2">모든 키워드 빈도</h4>
+            <h4 className="text-sm font-medium text-gray-500 mb-2">모든 키워드 개수</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {query.keywordCounts.map((count, index) => (
+              {[...query.keywordCounts].sort((a, b) => b.value - a.value).map((count, index) => (
                 <div 
                   key={index} 
                   className={`flex items-center p-3 bg-gray-50 rounded-lg ${
                     count.status === 'removed' ? 'text-gray-400' : ''
                   }`}
                 >
-                  {renderChangeIndicator(count)}
-                  <span className="text-sm font-medium">{count.key}</span>
+                  <div className="flex items-center">
+                    <div className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs mr-2">
+                      {index + 1}
+                    </div>
+                    {renderChangeIndicator(count)}
+                    <span className="text-sm font-medium">{count.key}</span>
+                  </div>
                   <div className="ml-auto flex items-center">
                     <div className="w-24 bg-gray-200 rounded-full h-2.5">
                       <div 
-                        className={`${count.status === 'removed' ? 'bg-gray-400' : 'bg-primary'} h-2.5 rounded-full`} 
-                        style={{ width: `${count.value}%` }}
+                        className={`${count.status === 'removed' ? 'bg-gray-400' : 'bg-indigo-600'} h-2.5 rounded-full`} 
+                        style={{ width: `${Math.min(100, count.value * 2)}%` }}
                       ></div>
                     </div>
                     <span className={`ml-2 font-semibold ${
-                      count.status === 'removed' ? 'text-gray-400' : 'text-primary'
+                      count.status === 'removed' ? 'text-gray-400' : 'text-indigo-600'
                     }`}>
-                      {count.value}%
+                      {count.value}
                     </span>
                     {renderChangeAmount(count)}
                   </div>
@@ -216,27 +226,69 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
         
         {/* Tags Tab Panel */}
         {activeTab === 'tags' && (
-          <div className="flex flex-wrap gap-2">
-            {query.tags.map((tag, index) => (
-              <div 
-                key={index} 
-                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                  tag.status === 'removed' 
-                    ? 'bg-gray-100 text-gray-600' 
-                    : 'bg-blue-100 text-blue-800'
-                }`}
-              >
-                {renderChangeIndicator(tag)}
-                {tag.key}
-                <span className={`ml-1 text-xs ${
-                  tag.status === 'removed' ? 'text-gray-500' : 'text-primary'
-                }`}>
-                  {tag.value}
-                </span>
-                {renderChangeAmount(tag)}
+          <>
+            <div className="mb-4">
+              <h4 className="text-sm font-medium text-gray-500 mb-2">태그 순위</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                {[...query.tags].sort((a, b) => b.value - a.value).map((tag, index) => (
+                  <div 
+                    key={index} 
+                    className={`flex items-center p-3 bg-gray-50 rounded-lg ${
+                      tag.status === 'removed' ? 'text-gray-400' : ''
+                    }`}
+                  >
+                    <div className="flex items-center">
+                      <div className="w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs mr-2">
+                        {index + 1}
+                      </div>
+                      {renderChangeIndicator(tag)}
+                      <span className="text-sm font-medium">{tag.key}</span>
+                    </div>
+                    <div className="ml-auto flex items-center">
+                      <div className="w-20 bg-gray-200 rounded-full h-2.5">
+                        <div 
+                          className={`${tag.status === 'removed' ? 'bg-gray-400' : 'bg-purple-600'} h-2.5 rounded-full`} 
+                          style={{ width: `${Math.min(100, tag.value * 2)}%` }}
+                        ></div>
+                      </div>
+                      <span className={`ml-2 font-semibold ${
+                        tag.status === 'removed' ? 'text-gray-400' : 'text-purple-600'
+                      }`}>
+                        {tag.value}
+                      </span>
+                      {renderChangeAmount(tag)}
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+            
+            <h4 className="text-sm font-medium text-gray-500 mb-2">태그 구름</h4>
+            <div className="flex flex-wrap gap-2">
+              {[...query.tags].sort((a, b) => b.value - a.value).map((tag, index) => (
+                <div 
+                  key={index} 
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                    tag.status === 'removed' 
+                      ? 'bg-gray-100 text-gray-600' 
+                      : 'bg-blue-100 text-blue-800'
+                  }`}
+                  style={{ 
+                    fontSize: `${Math.max(0.8, Math.min(1.3, tag.value / 20))}rem`
+                  }}
+                >
+                  {renderChangeIndicator(tag)}
+                  {tag.key}
+                  <span className={`ml-1 text-xs ${
+                    tag.status === 'removed' ? 'text-gray-500' : 'text-blue-800'
+                  }`}>
+                    {tag.value}
+                  </span>
+                  {renderChangeAmount(tag)}
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </CardContent>
     </Card>
