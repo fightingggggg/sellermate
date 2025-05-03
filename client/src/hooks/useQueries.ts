@@ -144,33 +144,32 @@ export function useQueries() {
 
   // Helper function to process keyword items from Firestore
   function processKeywordItems(items: any[]): KeywordItem[] {
-    // If items is null, undefined, or not an array, return default placeholder data
+    // If items is null, undefined, or not an array, return empty array
     if (!items || !Array.isArray(items) || items.length === 0) {
-      // Return sample placeholder data for better UI experience
-      return [
-        { key: '샘플 데이터', value: 10 },
-        { key: '임시 항목', value: 8 }
-      ];
+      return [];
     }
     
     return items.map(item => {
       if (typeof item === 'object' && item !== null) {
         // Extract key and value, with fallbacks
         const key = typeof item.key === 'string' ? item.key : 
-                   (typeof item === 'string' ? item : '기타');
+                   (typeof item === 'string' ? item : '');
         
         const value = typeof item.value === 'number' ? item.value : 
                      (typeof item === 'number' ? item : 0);
                      
-        return {
-          key: key || '항목',
-          value: value,
-          change: typeof item.change === 'number' ? item.change : undefined,
-          status: item.status as KeywordItem['status']
-        };
+        // Only return valid items with real data
+        if (key) {
+          return {
+            key: key,
+            value: value,
+            change: typeof item.change === 'number' ? item.change : undefined,
+            status: item.status as KeywordItem['status']
+          };
+        }
       }
-      return { key: '항목', value: 0 };
-    }).filter(item => item.key !== '');
+      return null;
+    }).filter(item => item !== null) as KeywordItem[];
   }
 
   // Helper function to count changes in a query

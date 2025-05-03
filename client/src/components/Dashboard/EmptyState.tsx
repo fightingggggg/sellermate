@@ -3,11 +3,7 @@ import { Search, ShoppingBag, TrendingUp } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 
-interface EmptyStateProps {
-  onAddQuery: () => void;
-}
-
-export default function EmptyState({ onAddQuery }: EmptyStateProps) {
+export default function EmptyState() {
   const { currentUser } = useAuth();
 
   return (
@@ -25,13 +21,10 @@ export default function EmptyState({ onAddQuery }: EmptyStateProps) {
               상위 노출된 상품 정보와 순위 변화를 추적할 수 있습니다.
             </p>
             
-            <Button 
-              onClick={onAddQuery}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-            >
-              <ShoppingBag className="mr-2 h-4 w-4" />
-              상품 추가하기
-            </Button>
+            <div className="inline-block py-2 px-4 text-blue-600 font-medium text-sm bg-blue-50 rounded-md border border-blue-100">
+              <ShoppingBag className="inline-block mr-2 h-4 w-4" />
+              크롬 확장프로그램을 이용해 상품을 분석하세요
+            </div>
             
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
               <div className="p-4 rounded-lg bg-white border border-blue-100">

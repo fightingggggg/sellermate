@@ -3,19 +3,17 @@ import { useQueries } from "@/hooks/useQueries";
 import StatsOverview from "./StatsOverview";
 import QueryCard from "./QueryCard";
 import EmptyState from "./EmptyState";
-import AddQueryModal from "./AddQueryModal";
 import DeleteQueryModal from "./DeleteQueryModal";
-import { Button } from "@/components/ui/button";
 import { useQueryContext } from "@/contexts/QueryContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { AlertTriangle, Loader2, Lock } from "lucide-react";
+import { AlertTriangle, Loader2 } from "lucide-react";
 
 export default function Dashboard() {
   const { queries, stats, loading } = useQueries();
   const { refreshQuery, error } = useQueryContext();
   const { currentUser } = useAuth();
   
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  // 상품 추가는 크롬 확장프로그램을 통해서만 가능
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedQuery, setSelectedQuery] = useState<{ id: string; text: string } | null>(null);
 
@@ -80,7 +78,7 @@ export default function Dashboard() {
           </div>
           
           {queries.length === 0 ? (
-            <EmptyState onAddQuery={() => setIsAddModalOpen(true)} />
+            <EmptyState />
           ) : (
             <div className="space-y-6">
               {queries.map((query) => (
@@ -95,12 +93,6 @@ export default function Dashboard() {
           )}
         </div>
       </div>
-      
-      <AddQueryModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        queriesCount={queries.length}
-      />
       
       {selectedQuery && (
         <DeleteQueryModal

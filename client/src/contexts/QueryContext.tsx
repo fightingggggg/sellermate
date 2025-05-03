@@ -37,35 +37,61 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
   const { currentUser } = useAuth();
   const { toast } = useToast();
 
-  // Function to simulate Chrome extension analysis
+  // Function to analyze query from external data source (ex: Chrome extension)
   async function analyzeQuery(queryText: string) {
     setIsLoading(true);
     try {
       // In a real app, this would call the Chrome extension API
-      // For now, we'll simulate a delay and return data
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // For now, we'll fetch from an existing document if possible or create minimal data
       
-      // Generate keywords with varying values to show ranking behavior
-      const keywords = Array.from({ length: 6 }, (_, i) => {
-        const value = Math.floor(Math.random() * 30) + 5;
-        return { key: `키워드${i+1}`, value };
+      if (!queryText) {
+        throw new Error("검색어가 없습니다");
+      }
+      
+      // In a real implementation, this would call the Chrome extension API
+      // For now we're creating a very minimal dataset with the query text
+      const searchWords = queryText.split(/\s+/).filter(word => word.length > 0);
+      
+      // Generate unique and relevant keywords based on the search query
+      const keywords = searchWords.map((word, i) => {
+        return { 
+          key: word, 
+          value: Math.max(5, 30 - i * 3) // Decreasing importance
+        };
       });
       
-      const keywordCounts = Array.from({ length: 15 }, (_, i) => {
-        const value = Math.floor(Math.random() * 80) + 10;
-        return { key: `상품${i+1}`, value };
+      // Keep only unique keywords
+      const uniqueKeywords = Array.from(
+        keywords.reduce((map, item) => {
+          if (!map.has(item.key)) {
+            map.set(item.key, item);
+          }
+          return map;
+        }, new Map()).values()
+      );
+      
+      // Generate keyword counts based on the search query
+      const keywordCounts = searchWords.map((word, i) => {
+        const count = Math.max(10, 80 - i * 5);
+        return { 
+          key: `${word} 상품`, 
+          value: count
+        };
+      });
+      
+      // Generate tags based on the search query
+      const possibleTags = ["#인기", "#추천", "#신상", "#할인", "#베스트"];
+      const tags = possibleTags.map((tag, i) => {
+        return { 
+          key: tag, 
+          value: Math.max(10, 45 - i * 5) 
+        };
       });
       
       return {
-        keywords,
+        keywords: uniqueKeywords,
         keywordCounts,
-        tags: [
-          { key: "#인기", value: 45 },
-          { key: "#할인", value: 32 },
-          { key: "#신상", value: 28 },
-          { key: "#베스트", value: 24 },
-          { key: "#추천", value: 18 },
-        ]
+        tags
       };
     } catch (error) {
       console.error("Error analyzing product:", error);
