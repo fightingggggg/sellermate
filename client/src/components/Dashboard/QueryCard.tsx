@@ -386,7 +386,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                       <ul className="text-sm space-y-2.5">
                         {comparedData?.keywords
                           .filter(k => k.status !== 'unchanged')
-                          .slice(0, 2)
+                          .slice(0, 5)
                           .map((k, idx) => (
                             <li key={idx} className="flex items-start py-1 px-2 rounded-md hover:bg-blue-50">
                               {k.status === 'added' ? (
@@ -439,7 +439,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                       <ul className="text-sm space-y-2.5">
                         {comparedData?.keywordCounts
                           .filter(k => k.status !== 'unchanged')
-                          .slice(0, 1)
+                          .slice(0, 3)
                           .map((k, idx) => (
                             <li key={idx} className="flex items-start py-1 px-2 rounded-md hover:bg-indigo-50">
                               {k.status === 'added' ? (
@@ -492,7 +492,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                       <ul className="text-sm space-y-2.5">
                         {comparedData?.tags
                           .filter(k => k.status !== 'unchanged')
-                          .slice(0, 1)
+                          .slice(0, 3)
                           .map((k, idx) => (
                             <li key={idx} className="flex items-start py-1 px-2 rounded-md hover:bg-purple-50">
                               {k.status === 'added' ? (
@@ -729,12 +729,13 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
               ).sort((a, b) => b.value - a.value).map((count, index) => (
                 <div 
                   key={index} 
-                  className={`flex items-center p-3 ${
-                    isNewlyRanked(count, index) && index < 12
-                      ? 'bg-emerald-50 border border-emerald-200' 
-                      : 'bg-gray-50'
-                  } rounded-lg ${
-                    count.status === 'removed' ? 'text-gray-400' : ''
+                  className={`flex items-center p-3 rounded-lg ${
+                    count.status === 'removed' ? 'text-gray-400 bg-gray-100' :
+                    count.status === 'added' ? 'bg-emerald-50 border border-emerald-200' :
+                    count.rankChange !== undefined && count.rankChange !== 0 ? 
+                      (count.rankChange > 0 ? 'bg-green-50 border border-green-200' : 'bg-amber-50 border border-amber-200') :
+                    count.status === 'unchanged' ? 'bg-gray-50' :
+                    'bg-indigo-50 border border-indigo-200'
                   }`}
                 >
                   <div className="flex items-center">
