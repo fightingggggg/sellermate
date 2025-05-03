@@ -43,28 +43,33 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       // Return sample structure (in real app, this would come from Chrome extension)
+      // Generate more keywords with varying values to show ranking behavior
+      const keywords = Array.from({ length: 6 }, (_, i) => {
+        const value = Math.floor(Math.random() * 30) + 5;
+        return { key: `키워드${i+1}`, value };
+      });
+      
+      const keywordCounts = Array.from({ length: 15 }, (_, i) => {
+        const value = Math.floor(Math.random() * 80) + 10;
+        return { key: `상품${i+1}`, value };
+      });
+      
       return {
-        keywords: [
-          { key: "검색어1", value: 25 },
-          { key: "검색어2", value: 18 },
-          { key: "검색어3", value: 15 },
-        ],
-        keywordCounts: [
-          { key: "2-3단어", value: 65 },
-          { key: "1단어", value: 25 },
-          { key: "4단어 이상", value: 10 },
-        ],
+        keywords,
+        keywordCounts,
         tags: [
-          { key: "#태그1", value: 45 },
-          { key: "#태그2", value: 32 },
-          { key: "#태그3", value: 28 },
+          { key: "#인기", value: 45 },
+          { key: "#할인", value: 32 },
+          { key: "#신상", value: 28 },
+          { key: "#베스트", value: 24 },
+          { key: "#추천", value: 18 },
         ]
       };
     } catch (error) {
-      console.error("Error analyzing query:", error);
+      console.error("Error analyzing product:", error);
       toast({
-        title: "쿼리 분석 오류",
-        description: "쿼리를 분석하는 중 오류가 발생했습니다.",
+        title: "상품 분석 오류",
+        description: "상품을 분석하는 중 오류가 발생했습니다.",
         variant: "destructive"
       });
       return null;

@@ -49,14 +49,14 @@ export default function Dashboard() {
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-xl font-semibold text-text-primary">SEO 분석 대시보드</h2>
           <Button onClick={() => setIsAddModalOpen(true)}>
-            새 쿼리 추가
+            새 상품 추가
           </Button>
         </div>
         
         <StatsOverview stats={stats} />
         
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-text-primary mb-2">저장된 쿼리 분석</h2>
+          <h2 className="text-xl font-semibold text-text-primary mb-2">저장된 상품 분석</h2>
           
           {queries.length === 0 ? (
             <EmptyState onAddQuery={() => setIsAddModalOpen(true)} />
