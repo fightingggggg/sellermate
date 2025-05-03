@@ -15,22 +15,20 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, CheckCircle2, AlertCircle, UserRound, ShieldAlert } from "lucide-react";
+import { Loader2, UserRound } from "lucide-react";
 import { 
   Dialog, 
   DialogContent, 
   DialogDescription, 
   DialogFooter, 
   DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
+  DialogTitle
 } from "@/components/ui/dialog";
 
 // 프로필 업데이트 스키마
@@ -38,22 +36,6 @@ const profileSchema = z.object({
   businessName: z.string().min(1, "스마트스토어 상호명을 입력해주세요"),
   businessLink: z.string().url("올바른 URL 형식을 입력해주세요"),
   number: z.string().min(1, "휴대폰 번호를 입력해주세요"),
-});
-
-// 이메일 업데이트 스키마
-const emailSchema = z.object({
-  email: z.string().email("올바른 이메일 형식을 입력해주세요"),
-  password: z.string().min(1, "비밀번호를 입력해주세요"),
-});
-
-// 비밀번호 업데이트 스키마
-const passwordSchema = z.object({
-  currentPassword: z.string().min(1, "현재 비밀번호를 입력해주세요"),
-  newPassword: z.string().min(6, "새 비밀번호는 최소 6자 이상이어야 합니다"),
-  confirmPassword: z.string().min(6, "비밀번호 확인을 입력해주세요"),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "새 비밀번호가 일치하지 않습니다",
-  path: ["confirmPassword"],
 });
 
 // 회원탈퇴 스키마
@@ -65,8 +47,6 @@ const deleteAccountSchema = z.object({
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
-type EmailFormValues = z.infer<typeof emailSchema>;
-type PasswordFormValues = z.infer<typeof passwordSchema>;
 type DeleteAccountFormValues = z.infer<typeof deleteAccountSchema>;
 
 export default function ProfilePage() {
@@ -75,19 +55,13 @@ export default function ProfilePage() {
     userProfile, 
     profileLoading, 
     updateUserProfile, 
-    updateUserEmail, 
-    updateUserPassword, 
     deleteUserAccount, 
-    verifyEmail,
     logout,
     error: authError 
   } = useAuth();
   
   const [isProfileLoading, setIsProfileLoading] = useState(false);
-  const [isEmailLoading, setIsEmailLoading] = useState(false);
-  const [isPasswordLoading, setIsPasswordLoading] = useState(false);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
-  const [isVerifyEmailLoading, setIsVerifyEmailLoading] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { toast } = useToast();
 
@@ -98,25 +72,6 @@ export default function ProfilePage() {
       businessName: userProfile?.businessName || "",
       businessLink: userProfile?.businessLink || "",
       number: userProfile?.number || "",
-    },
-  });
-
-  // 이메일 폼
-  const emailForm = useForm<EmailFormValues>({
-    resolver: zodResolver(emailSchema),
-    defaultValues: {
-      email: userProfile?.email || "",
-      password: "",
-    },
-  });
-
-  // 비밀번호 폼
-  const passwordForm = useForm<PasswordFormValues>({
-    resolver: zodResolver(passwordSchema),
-    defaultValues: {
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
     },
   });
 
@@ -151,54 +106,6 @@ export default function ProfilePage() {
     }
   };
 
-  // 이메일 폼 제출 핸들러
-  const onEmailSubmit = async (data: EmailFormValues) => {
-    setIsEmailLoading(true);
-    try {
-      const success = await updateUserEmail(data.email, data.password);
-      if (success) {
-        toast({
-          title: "이메일 업데이트 성공",
-          description: "새로운 이메일 주소로 인증 메일이 발송되었습니다.",
-        });
-        // 폼 리셋
-        emailForm.reset({ email: data.email, password: "" });
-      }
-    } catch (error: any) {
-      toast({
-        title: "이메일 업데이트 실패",
-        description: error.message || "이메일 업데이트 중 오류가 발생했습니다.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsEmailLoading(false);
-    }
-  };
-
-  // 비밀번호 폼 제출 핸들러
-  const onPasswordSubmit = async (data: PasswordFormValues) => {
-    setIsPasswordLoading(true);
-    try {
-      const success = await updateUserPassword(data.currentPassword, data.newPassword);
-      if (success) {
-        toast({
-          title: "비밀번호 변경 성공",
-          description: "비밀번호가 성공적으로 변경되었습니다.",
-        });
-        // 폼 리셋
-        passwordForm.reset();
-      }
-    } catch (error: any) {
-      toast({
-        title: "비밀번호 변경 실패",
-        description: error.message || "비밀번호 변경 중 오류가 발생했습니다.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsPasswordLoading(false);
-    }
-  };
-
   // 회원탈퇴 폼 제출 핸들러
   const onDeleteSubmit = async (data: DeleteAccountFormValues) => {
     setIsDeleteLoading(true);
@@ -223,28 +130,6 @@ export default function ProfilePage() {
     }
   };
 
-  // 이메일 인증 핸들러
-  const handleVerifyEmail = async () => {
-    setIsVerifyEmailLoading(true);
-    try {
-      const success = await verifyEmail();
-      if (success) {
-        toast({
-          title: "인증 이메일 발송 성공",
-          description: "이메일 주소로 인증 메일이 발송되었습니다.",
-        });
-      }
-    } catch (error: any) {
-      toast({
-        title: "인증 이메일 발송 실패",
-        description: error.message || "인증 이메일 발송 중 오류가 발생했습니다.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsVerifyEmailLoading(false);
-    }
-  };
-
   // 로그아웃 처리
   const handleLogout = async () => {
     try {
@@ -266,11 +151,6 @@ export default function ProfilePage() {
         businessName: userProfile.businessName || "",
         businessLink: userProfile.businessLink || "",
         number: userProfile.number || "",
-      });
-      
-      emailForm.reset({
-        email: userProfile.email || "",
-        password: "",
       });
     }
   }, [userProfile]);
@@ -297,10 +177,7 @@ export default function ProfilePage() {
           <Tabs defaultValue="profile">
             <TabsList className="mb-6 w-full">
               <TabsTrigger value="profile" className="flex-1">
-                <UserRound className="h-4 w-4 mr-2" /> 기본 정보
-              </TabsTrigger>
-              <TabsTrigger value="security" className="flex-1">
-                <ShieldAlert className="h-4 w-4 mr-2" /> 보안 설정
+                <UserRound className="h-4 w-4 mr-2" /> 내 정보
               </TabsTrigger>
               <TabsTrigger value="danger" className="flex-1">
                 계정 관리
@@ -318,6 +195,12 @@ export default function ProfilePage() {
                 </CardHeader>
                 
                 <CardContent>
+                  <div className="mb-6 p-4 bg-blue-50 rounded-md text-blue-800">
+                    <p className="text-sm font-medium">기본 정보</p>
+                    <p className="text-sm">이메일: {userProfile?.email}</p>
+                    <p className="text-sm">가입일: {userProfile?.createdAt ? new Date(userProfile.createdAt).toLocaleDateString('ko-KR') : '-'}</p>
+                  </div>
+                
                   <Form {...profileForm}>
                     <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
                       <FormField
@@ -395,198 +278,6 @@ export default function ProfilePage() {
               </Card>
             </TabsContent>
             
-            {/* 보안 설정 탭 */}
-            <TabsContent value="security">
-              <div className="grid gap-6">
-                {/* 이메일 정보 */}
-                <Card className="border-none shadow-sm">
-                  <CardHeader>
-                    <CardTitle>이메일 주소</CardTitle>
-                    <CardDescription>
-                      계정에 사용되는 이메일 주소를 관리합니다.
-                    </CardDescription>
-                  </CardHeader>
-                  
-                  <CardContent>
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="text-sm font-medium">현재 이메일:</div>
-                      <div className="text-sm">{userProfile?.email}</div>
-                      
-                      {userProfile?.emailVerified ? (
-                        <div className="flex items-center text-xs text-green-600">
-                          <CheckCircle2 className="h-3 w-3 mr-1" /> 인증됨
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center text-xs text-amber-600">
-                            <AlertCircle className="h-3 w-3 mr-1" /> 미인증
-                          </div>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={handleVerifyEmail}
-                            disabled={isVerifyEmailLoading}
-                          >
-                            {isVerifyEmailLoading ? (
-                              <span className="inline-block w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
-                            ) : (
-                              "인증 메일 발송"
-                            )}
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <Form {...emailForm}>
-                      <form onSubmit={emailForm.handleSubmit(onEmailSubmit)} className="space-y-4">
-                        <FormField
-                          control={emailForm.control}
-                          name="email"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-[#555] font-bold text-sm">새 이메일</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="email" 
-                                  placeholder="새 이메일 주소" 
-                                  className="border border-[#ccc] rounded-md p-3 font-normal focus:border-[#007BFF]"
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormDescription>
-                                새 이메일로 변경 시 인증 메일이 발송됩니다.
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={emailForm.control}
-                          name="password"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-[#555] font-bold text-sm">현재 비밀번호</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="password" 
-                                  placeholder="보안을 위해 현재 비밀번호를 입력하세요" 
-                                  className="border border-[#ccc] rounded-md p-3 font-normal focus:border-[#007BFF]"
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <Button 
-                          type="submit" 
-                          className="py-2 bg-[#007BFF] hover:bg-[#0056b3] text-white font-bold rounded-md"
-                          disabled={isEmailLoading}
-                        >
-                          {isEmailLoading ? (
-                            <>
-                              <span className="inline-block w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></span> 처리 중...
-                            </>
-                          ) : (
-                            "이메일 변경"
-                          )}
-                        </Button>
-                      </form>
-                    </Form>
-                  </CardContent>
-                </Card>
-                
-                {/* 비밀번호 변경 */}
-                <Card className="border-none shadow-sm">
-                  <CardHeader>
-                    <CardTitle>비밀번호 변경</CardTitle>
-                    <CardDescription>
-                      계정 비밀번호를 변경합니다.
-                    </CardDescription>
-                  </CardHeader>
-                  
-                  <CardContent>
-                    <Form {...passwordForm}>
-                      <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-4">
-                        <FormField
-                          control={passwordForm.control}
-                          name="currentPassword"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-[#555] font-bold text-sm">현재 비밀번호</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="password" 
-                                  placeholder="현재 비밀번호"
-                                  className="border border-[#ccc] rounded-md p-3 font-normal focus:border-[#007BFF]"
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={passwordForm.control}
-                          name="newPassword"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-[#555] font-bold text-sm">새 비밀번호</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="password" 
-                                  placeholder="새 비밀번호"
-                                  className="border border-[#ccc] rounded-md p-3 font-normal focus:border-[#007BFF]"
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={passwordForm.control}
-                          name="confirmPassword"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-[#555] font-bold text-sm">새 비밀번호 확인</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="password" 
-                                  placeholder="새 비밀번호 확인"
-                                  className="border border-[#ccc] rounded-md p-3 font-normal focus:border-[#007BFF]"
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <Button 
-                          type="submit" 
-                          className="py-2 bg-[#007BFF] hover:bg-[#0056b3] text-white font-bold rounded-md"
-                          disabled={isPasswordLoading}
-                        >
-                          {isPasswordLoading ? (
-                            <>
-                              <span className="inline-block w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></span> 처리 중...
-                            </>
-                          ) : (
-                            "비밀번호 변경"
-                          )}
-                        </Button>
-                      </form>
-                    </Form>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-            
             {/* 계정 관리 탭 */}
             <TabsContent value="danger">
               <Card className="border-none shadow-sm">
@@ -649,9 +340,9 @@ export default function ProfilePage() {
                               render={({ field }) => (
                                 <FormItem>
                                   <FormLabel className="text-[#555] font-bold text-sm">확인</FormLabel>
-                                  <FormDescription>
+                                  <p className="text-sm text-gray-500 mb-2">
                                     계정 삭제를 확인하려면 아래에 "탈퇴합니다"라고 입력하세요.
-                                  </FormDescription>
+                                  </p>
                                   <FormControl>
                                     <Input 
                                       placeholder="이 곳에 입력하세요" 

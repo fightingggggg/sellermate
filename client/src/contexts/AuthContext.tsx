@@ -66,6 +66,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function fetchUserProfile(uid: string) {
     setProfileLoading(true);
     try {
+      // 현재 인증된 사용자만 프로필에 접근할 수 있도록 함
+      if (!auth.currentUser) {
+        throw new Error("인증된 사용자만 프로필에 접근할 수 있습니다.");
+      }
+
       const userDocRef = doc(db, "userInfo", uid);
       const userDoc = await getDoc(userDocRef);
       
@@ -77,10 +82,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           emailVerified: auth.currentUser?.emailVerified || false
         });
       } else {
-        setUserProfile(currentUser as UserProfile);
+        // 사용자 기본 프로필 설정 (프로필 문서가 없는 경우)
+        const basicProfile: UserProfile = {
+          ...(currentUser as User),
+          businessName: "",
+          businessLink: "",
+          number: "",
+          emailVerified: auth.currentUser?.emailVerified || false,
+          createdAt: new Date().toISOString()
+        };
+        setUserProfile(basicProfile);
+        
+        // 기본 프로필 문서 생성
+        await setDoc(userDocRef, {
+          businessName: "",
+          businessLink: "",
+          number: "",
+          emailVerified: auth.currentUser?.emailVerified || false,
+          createdAt: new Date().toISOString()
+        });
       }
     } catch (error: any) {
       console.error("Error fetching user profile", error);
+      // 오류가 발생해도 최소한의 프로필 정보를 설정 (UI가 작동하도록)
+      if (currentUser) {
+        setUserProfile({
+          ...currentUser,
+          businessName: "",
+          businessLink: "",
+          number: "",
+          emailVerified: auth.currentUser?.emailVerified || false
+        });
+      }
       setError("사용자 정보를 불러오는 중 오류가 발생했습니다.");
     } finally {
       setProfileLoading(false);
