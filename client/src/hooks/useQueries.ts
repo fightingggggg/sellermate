@@ -186,6 +186,7 @@ export function useQueries() {
             
             // Count changes in this query
             const changesInQuery = countChanges(query);
+            console.log(`상품 "${query.text}"의 변화 건수: ${changesInQuery}`);
             totalChanges += changesInQuery;
             
             // Track latest update date
@@ -282,40 +283,85 @@ export function useQueries() {
   // Helper function to compare two sets of keyword items and mark changes
   function compareAndMarkChanges(oldItems: KeywordItem[], newItems: KeywordItem[]): KeywordItem[] {
     // Create maps for efficient lookup
-    const oldItemMap = new Map<string, number>();
-    oldItems.forEach(item => oldItemMap.set(item.key, item.value));
+    const oldItemMap = new Map<string, KeywordItem>();
+    const oldItemsWithRank = [...oldItems].sort((a, b) => b.value - a.value);
+    oldItemsWithRank.forEach((item, index) => {
+      oldItemMap.set(item.key, { ...item, previousRank: index + 1 });
+    });
     
-    const newItemMap = new Map<string, number>();
-    newItems.forEach(item => newItemMap.set(item.key, item.value));
+    const newItemMap = new Map<string, KeywordItem>();
+    const newItemsWithRank = [...newItems].sort((a, b) => b.value - a.value);
+    newItemsWithRank.forEach((item, index) => {
+      newItemMap.set(item.key, { ...item, currentRank: index + 1 });
+    });
     
     // Mark added, removed, or changed items
     const result: KeywordItem[] = [];
     
     // Check for new or changed items
-    newItemMap.forEach((value, key) => {
+    newItemsWithRank.forEach((item, newIndex) => {
+      const key = item.key;
+      const value = item.value;
+      const currentRank = newIndex + 1;
+      
       if (!oldItemMap.has(key)) {
         // New item
-        result.push({ key, value, status: 'added' });
+        result.push({ key, value, status: 'added', currentRank });
       } else {
-        const oldValue = oldItemMap.get(key)!;
+        const oldItem = oldItemMap.get(key)!;
+        const oldValue = oldItem.value;
+        const previousRank = oldItemsWithRank.findIndex(i => i.key === key) + 1;
+        
         if (value > oldValue) {
           // Increased
-          result.push({ key, value, change: value - oldValue, status: 'increased' });
+          result.push({ 
+            key, 
+            value, 
+            change: value - oldValue, 
+            status: 'increased',
+            previousRank,
+            currentRank,
+            rankChange: previousRank - currentRank
+          });
         } else if (value < oldValue) {
           // Decreased
-          result.push({ key, value, change: oldValue - value, status: 'decreased' });
+          result.push({ 
+            key, 
+            value, 
+            change: oldValue - value, 
+            status: 'decreased',
+            previousRank,
+            currentRank,
+            rankChange: previousRank - currentRank 
+          });
         } else {
-          // Unchanged
-          result.push({ key, value, status: 'unchanged' });
+          // Unchanged but rank may have changed
+          const rankChange = previousRank - currentRank;
+          result.push({ 
+            key, 
+            value, 
+            status: 'unchanged',
+            previousRank,
+            currentRank,
+            rankChange
+          });
         }
       }
     });
     
     // Check for removed items
-    oldItemMap.forEach((value, key) => {
+    oldItemsWithRank.forEach((item, oldIndex) => {
+      const key = item.key;
+      const value = item.value;
+      
       if (!newItemMap.has(key)) {
         // Removed item
-        result.push({ key, value, status: 'removed' });
+        result.push({ 
+          key, 
+          value, 
+          status: 'removed', 
+          previousRank: oldIndex + 1
+        });
       }
     });
     
@@ -341,7 +387,8 @@ export function useQueries() {
         k?.status === 'added' || 
         k?.status === 'removed' || 
         k?.status === 'increased' || 
-        k?.status === 'decreased'
+        k?.status === 'decreased' ||
+        (k?.rankChange !== undefined && k?.rankChange !== 0)
       ).length;
     };
     
