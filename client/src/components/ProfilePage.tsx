@@ -80,7 +80,7 @@ export default function ProfilePage() {
     resolver: zodResolver(deleteAccountSchema),
     defaultValues: {
       password: "",
-      confirmation: "",
+      confirmation: "" as any, // 타입 에러 해결을 위한 임시 처리
     },
   });
 

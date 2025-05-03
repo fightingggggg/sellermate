@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,11 +12,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -54,7 +52,7 @@ export default function SignupPage() {
       email: "",
       password: "",
       confirmPassword: "",
-      terms: false,
+      terms: false as any, // 타입 에러 해결을 위한 임시 처리
     },
   });
 
@@ -119,187 +117,174 @@ export default function SignupPage() {
 
   return (
     <div className="flex justify-center items-center min-h-screen py-12 px-4" style={{backgroundColor: '#f4f4f9'}}>
-      <Card className="w-full max-w-md border-none shadow-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">회원가입</CardTitle>
-        </CardHeader>
+      <div className="w-full max-w-md bg-white p-5 rounded-lg shadow-sm">
+        <h1 className="text-2xl font-bold text-center mb-5">회원가입</h1>
         
-        <CardContent>
-          {(alertMessage || authError) && (
-            <Alert 
-              variant={alertMessage?.type === "success" ? "default" : "destructive"} 
-              className={`mb-4 ${alertMessage?.type === "success" ? "bg-[#d4edda] text-[#155724] border-[#c3e6cb]" : "bg-[#f8d7da] text-[#721c24] border-[#f5c6cb]"}`}
+        {(alertMessage || authError) && (
+          <Alert 
+            variant={alertMessage?.type === "success" ? "default" : "destructive"} 
+            className={`mb-4 ${alertMessage?.type === "success" ? "bg-[#d4edda] text-[#155724] border-[#c3e6cb]" : "bg-[#f8d7da] text-[#721c24] border-[#f5c6cb]"}`}
+          >
+            <AlertDescription>{alertMessage?.message || authError}</AlertDescription>
+          </Alert>
+        )}
+        
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="businessName"
+              render={({ field }) => (
+                <div className="form-group">
+                  <FormLabel className="text-[#555] font-bold text-xs block mb-1">스마트스토어 상호</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="상호명을 입력하세요" 
+                      className="w-full p-3 border border-[#ccc] rounded-md text-sm focus:border-[#007BFF] focus:outline-none"
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage className="text-xs text-red-500 mt-1" />
+                </div>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="businessLink"
+              render={({ field }) => (
+                <div className="form-group">
+                  <FormLabel className="text-[#555] font-bold text-xs block mb-1">스마트스토어 홈 링크</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="https://smartstore.naver.com/..." 
+                      className="w-full p-3 border border-[#ccc] rounded-md text-sm focus:border-[#007BFF] focus:outline-none"
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage className="text-xs text-red-500 mt-1" />
+                </div>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="number"
+              render={({ field }) => (
+                <div className="form-group">
+                  <FormLabel className="text-[#555] font-bold text-xs block mb-1">휴대폰 번호</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="연락 가능한 번호를 입력하세요" 
+                      className="w-full p-3 border border-[#ccc] rounded-md text-sm focus:border-[#007BFF] focus:outline-none"
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage className="text-xs text-red-500 mt-1" />
+                </div>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <div className="form-group">
+                  <FormLabel className="text-[#555] font-bold text-xs block mb-1">이메일</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="이메일 주소" 
+                      type="email" 
+                      className="w-full p-3 border border-[#ccc] rounded-md text-sm focus:border-[#007BFF] focus:outline-none"
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage className="text-xs text-red-500 mt-1" />
+                </div>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <div className="form-group">
+                  <FormLabel className="text-[#555] font-bold text-xs block mb-1">비밀번호</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="비밀번호" 
+                      type="password"
+                      className="w-full p-3 border border-[#ccc] rounded-md text-sm focus:border-[#007BFF] focus:outline-none"
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage className="text-xs text-red-500 mt-1" />
+                </div>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <div className="form-group">
+                  <FormLabel className="text-[#555] font-bold text-xs block mb-1">비밀번호 확인</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="비밀번호 확인" 
+                      type="password"
+                      className="w-full p-3 border border-[#ccc] rounded-md text-sm focus:border-[#007BFF] focus:outline-none"
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage className="text-xs text-red-500 mt-1" />
+                </div>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="terms"
+              render={({ field }) => (
+                <div className="flex items-center space-x-2 mb-4">
+                  <FormControl>
+                    <Checkbox 
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel className="text-xs">
+                      스마트스토어 SEO 최적화 도구 <a href="https://chambray-midnight-e7f.notion.site/18678708053f806a9955f0f5375cdbdd?pvs=4" target="_blank" className="text-[#007BFF] hover:underline">이용약관 및 개인정보처리방침</a>에 동의합니다.
+                    </FormLabel>
+                    <FormMessage className="text-xs text-red-500" />
+                  </div>
+                </div>
+              )}
+            />
+            
+            <Button 
+              type="submit" 
+              className="w-full py-3 bg-[#007BFF] hover:bg-[#0056b3] text-white font-bold rounded-md" 
+              disabled={loading}
             >
-              <AlertDescription>{alertMessage?.message || authError}</AlertDescription>
-            </Alert>
-          )}
-          
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="businessName"
-                render={({ field }) => (
-                  <FormItem className="mb-6">
-                    <FormLabel className="text-[#555] font-bold text-sm">스마트스토어 상호</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="상호명을 입력하세요" 
-                        className="border border-[#ccc] rounded-md p-3 font-normal focus:border-[#007BFF]"
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="businessLink"
-                render={({ field }) => (
-                  <FormItem className="mb-6">
-                    <FormLabel className="text-[#555] font-bold text-sm">스마트스토어 홈 링크</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="https://smartstore.naver.com/..." 
-                        className="border border-[#ccc] rounded-md p-3 font-normal focus:border-[#007BFF]"
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="number"
-                render={({ field }) => (
-                  <FormItem className="mb-6">
-                    <FormLabel className="text-[#555] font-bold text-sm">휴대폰 번호</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="연락 가능한 번호를 입력하세요" 
-                        className="border border-[#ccc] rounded-md p-3 font-normal focus:border-[#007BFF]"
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem className="mb-6">
-                    <FormLabel className="text-[#555] font-bold text-sm">이메일</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="이메일 주소" 
-                        type="email" 
-                        className="border border-[#ccc] rounded-md p-3 font-normal focus:border-[#007BFF]"
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem className="mb-6">
-                    <FormLabel className="text-[#555] font-bold text-sm">비밀번호</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="비밀번호" 
-                        type="password"
-                        className="border border-[#ccc] rounded-md p-3 font-normal focus:border-[#007BFF]"
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem className="mb-6">
-                    <FormLabel className="text-[#555] font-bold text-sm">비밀번호 확인</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="비밀번호 확인" 
-                        type="password"
-                        className="border border-[#ccc] rounded-md p-3 font-normal focus:border-[#007BFF]"
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="terms"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 mb-6">
-                    <FormControl>
-                      <Checkbox 
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel className="text-sm">
-                        스마트스토어 SEO 최적화 도구 <a href="https://chambray-midnight-e7f.notion.site/18678708053f806a9955f0f5375cdbdd?pvs=4" target="_blank" className="text-[#007BFF] hover:underline">이용약관 및 개인정보처리방침</a>에 동의합니다.
-                      </FormLabel>
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
-              
-              <Button 
-                type="submit" 
-                className="w-full py-3 bg-[#007BFF] hover:bg-[#0056b3] text-white font-bold rounded-md" 
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    회원가입 <span className="inline-block w-4 h-4 ml-2 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                  </>
-                ) : (
-                  "회원가입"
-                )}
-              </Button>
-            </form>
-          </Form>
-          
-          <div className="mt-4 text-center">
-            <Button variant="link" onClick={handlePasswordReset} className="text-sm text-[#007BFF] p-0 mt-4">
-              비밀번호 찾기
+              {loading ? (
+                <>
+                  <span className="inline-block w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></span> 회원가입 중...
+                </>
+              ) : (
+                "회원가입"
+              )}
             </Button>
-          </div>
-        </CardContent>
+          </form>
+        </Form>
         
-        <CardFooter className="flex justify-center">
-          <div className="text-sm text-muted-foreground">
-            이미 계정이 있으신가요?{" "}
-            <Button variant="link" className="p-0 text-[#007BFF]" onClick={() => navigate("/login")}>
-              로그인
-            </Button>
-          </div>
-        </CardFooter>
-      </Card>
+        <div className="flex justify-center mt-4">
+          <button onClick={handlePasswordReset} className="text-[#007BFF] text-xs hover:underline mt-3">
+            비밀번호 찾기
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

@@ -71,47 +71,63 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error("인증된 사용자만 프로필에 접근할 수 있습니다.");
       }
 
-      const userDocRef = doc(db, "userInfo", uid);
+      // 컬렉션 이름 정정: userInfo -> usersInfo
+      const userDocRef = doc(db, "usersInfo", uid);
       const userDoc = await getDoc(userDocRef);
       
       if (userDoc.exists()) {
-        const userData = userDoc.data() as Omit<UserProfile, 'uid' | 'email' | 'displayName' | 'photoURL'>;
+        const userData = userDoc.data();
         setUserProfile({
-          ...(currentUser as User),
-          ...userData,
-          emailVerified: auth.currentUser?.emailVerified || false
+          uid: userData.uid || auth.currentUser.uid,
+          email: userData.email || auth.currentUser.email,
+          displayName: auth.currentUser.displayName,
+          photoURL: auth.currentUser.photoURL,
+          businessName: userData.businessName || "",
+          businessLink: userData.businessLink || "",
+          number: userData.number || "",
+          emailVerified: userData.emailVerified || auth.currentUser.emailVerified || false,
+          createdAt: userData.createdAt || new Date().toISOString()
         });
       } else {
         // 사용자 기본 프로필 설정 (프로필 문서가 없는 경우)
         const basicProfile: UserProfile = {
-          ...(currentUser as User),
+          uid: auth.currentUser.uid,
+          email: auth.currentUser.email,
+          displayName: auth.currentUser.displayName,
+          photoURL: auth.currentUser.photoURL,
           businessName: "",
           businessLink: "",
           number: "",
-          emailVerified: auth.currentUser?.emailVerified || false,
+          emailVerified: auth.currentUser.emailVerified || false,
           createdAt: new Date().toISOString()
         };
         setUserProfile(basicProfile);
         
         // 기본 프로필 문서 생성
         await setDoc(userDocRef, {
+          uid: auth.currentUser.uid,
+          email: auth.currentUser.email,
           businessName: "",
           businessLink: "",
           number: "",
-          emailVerified: auth.currentUser?.emailVerified || false,
+          emailVerified: auth.currentUser.emailVerified || false,
           createdAt: new Date().toISOString()
         });
       }
     } catch (error: any) {
       console.error("Error fetching user profile", error);
       // 오류가 발생해도 최소한의 프로필 정보를 설정 (UI가 작동하도록)
-      if (currentUser) {
+      if (auth.currentUser) {
         setUserProfile({
-          ...currentUser,
+          uid: auth.currentUser.uid,
+          email: auth.currentUser.email,
+          displayName: auth.currentUser.displayName,
+          photoURL: auth.currentUser.photoURL,
           businessName: "",
           businessLink: "",
           number: "",
-          emailVerified: auth.currentUser?.emailVerified || false
+          emailVerified: auth.currentUser.emailVerified || false,
+          createdAt: new Date().toISOString()
         });
       }
       setError("사용자 정보를 불러오는 중 오류가 발생했습니다.");
@@ -137,16 +153,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await sendEmailVerification(user);
       
       // 사용자 추가 정보 저장
-      if (user && (businessName || businessLink || number)) {
-        const userProfile: Partial<UserProfile> = {
-          businessName,
-          businessLink,
-          number,
+      if (user) {
+        const userProfile = {
+          uid: user.uid,
+          email: user.email,
+          businessName: businessName || "",
+          businessLink: businessLink || "",
+          number: number || "",
           createdAt: new Date().toISOString(),
           emailVerified: false
         };
         
-        await setDoc(doc(db, "userInfo", user.uid), userProfile);
+        // usersInfo 컬렉션에 사용자 정보 저장
+        await setDoc(doc(db, "usersInfo", user.uid), userProfile);
       }
     } catch (error: any) {
       console.error("Error signing up", error);
@@ -189,7 +208,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const userDocRef = doc(db, "userInfo", currentUser.uid);
+      // usersInfo 컬렉션 사용
+      const userDocRef = doc(db, "usersInfo", currentUser.uid);
       
       // 해당 문서가 존재하는지 확인
       const docSnap = await getDoc(userDocRef);
@@ -200,6 +220,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         // 문서가 없으면 새로 생성
         await setDoc(userDocRef, {
+          uid: currentUser.uid,
+          email: currentUser.email,
           ...profileData,
           createdAt: new Date().toISOString(),
           emailVerified: auth.currentUser?.emailVerified || false
@@ -292,8 +314,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       );
       await reauthenticateWithCredential(auth.currentUser, credential);
       
-      // Firestore에서 사용자 정보 삭제
-      await deleteDoc(doc(db, "userInfo", currentUser.uid));
+      // Firestore에서 사용자 정보 삭제 (usersInfo 컬렉션 사용)
+      await deleteDoc(doc(db, "usersInfo", currentUser.uid));
       
       // Firebase Auth에서 사용자 삭제
       await deleteUser(auth.currentUser);
