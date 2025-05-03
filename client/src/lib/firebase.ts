@@ -3,11 +3,11 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "",
-  authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebaseapp.com`,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "",
-  storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.appspot.com`,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "",
+  apiKey: "AIzaSyAxZ0lTXab1JALiNnHKAx2_N7hlr84YSN0",
+  authDomain: "smartstoreseo.firebaseapp.com",
+  projectId: "smartstoreseo",
+  storageBucket:  "smartstoreseo.firebasestorage.app",
+  appId:"1:1034657335294:web:c3d36cc05995a9f078e2af",
 };
 
 // Initialize Firebase

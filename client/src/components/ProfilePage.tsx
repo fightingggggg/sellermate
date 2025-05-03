@@ -196,9 +196,9 @@ export default function ProfilePage() {
                 
                 <CardContent>
                   <div className="mb-6 p-4 bg-blue-50 rounded-md text-blue-800">
-                    <p className="text-sm font-medium">기본 정보</p>
+              
                     <p className="text-sm">이메일: {userProfile?.email}</p>
-                    <p className="text-sm">가입일: {userProfile?.createdAt ? new Date(userProfile.createdAt).toLocaleDateString('ko-KR') : '-'}</p>
+               
                   </div>
                 
                   <Form {...profileForm}>

@@ -18,16 +18,17 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
   const { signIn, signUp, loading, error, currentUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");  // 비밀번호 확인 추가
+  const [businessName, setStoreName] = useState("");
+  const [businessLink, setStoreUrl] = useState("");
+  const [number, setPhoneNumber] = useState("");
   const [tab, setTab] = useState("login");
   const [, navigate] = useLocation();
-  
+
   useEffect(() => {
-    // If user is logged in and this is not a modal, redirect to dashboard
     if (currentUser && !isModal) {
       navigate("/dashboard");
     }
-    
-    // If user is logged in and this is a modal, call the onLoginSuccess callback
     if (currentUser && isModal && onLoginSuccess) {
       onLoginSuccess();
     }
@@ -36,21 +37,20 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
   const handleLogin = async () => {
     if (!email || !password) return;
     const success = await signIn(email, password);
-    
     if (success && onLoginSuccess) {
       onLoginSuccess();
     }
   };
-  
+
   const handleSignUp = async () => {
-    if (!email || !password) return;
-    await signUp(email, password);
+    if (!email || !password || password !== passwordConfirm || !businessName || !businessLink || !number) return;
+    await signUp(email, password, businessName, businessLink, number);
     setTab("login");
   };
-  
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      if (tab === 'login') {
+    if (e.key === "Enter") {
+      if (tab === "login") {
         handleLogin();
       } else {
         handleSignUp();
@@ -59,11 +59,11 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
   };
 
   const content = (
-    <Card className={`w-full max-w-md ${isModal ? 'shadow-xl' : ''}`}>
+    <Card className={`w-full max-w-md ${isModal ? "shadow-xl" : ""}`}>
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">스마트스토어 SEO 대시보드</CardTitle>
         <CardDescription>
-          크롬 확장프로그램 데이터를 분석하고 관리하는 대시보드에 로그인하세요
+          상품 데이터를 분석하고 관리하는 대시보드에 로그인하세요
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -73,6 +73,7 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
             <TabsTrigger value="register">회원가입</TabsTrigger>
           </TabsList>
 
+          {/* 로그인 탭 */}
           <TabsContent value="login">
             <div className="space-y-4">
               <p className="text-sm text-center text-gray-600 mb-4">
@@ -127,6 +128,7 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
             </div>
           </TabsContent>
 
+          {/* 회원가입 탭 */}
           <TabsContent value="register">
             <div className="space-y-4">
               <p className="text-sm text-center text-gray-600 mb-4">
@@ -164,10 +166,55 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
                 />
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="register-password-confirm">비밀번호 확인</Label>
+                <Input
+                  id="register-password-confirm"
+                  type="password"
+                  placeholder="비밀번호를 한 번 더 입력하세요"
+                  value={passwordConfirm}
+                  onChange={(e) => setPasswordConfirm(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="businessName">스마트스토어 상호</Label>
+                <Input
+                  id="businessName"
+                  placeholder="스마트스토어 상호를 입력하세요"
+                  value={businessName}
+                  onChange={(e) => setStoreName(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="businessLink">스마트스토어 링크</Label>
+                <Input
+                  id="businessLink"
+                  placeholder="https://smartstore.naver.com/..."
+                  value={businessLink}
+                  onChange={(e) => setStoreUrl(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="number">핸드폰 번호</Label>
+                <Input
+                  id="number"
+                  placeholder=""
+                  value={number}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                />
+              </div>
+
               <Button 
                 onClick={handleSignUp} 
                 className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                disabled={loading || !email || !password}
+                disabled={loading || !email || !password || password !== passwordConfirm || !businessName || !businessLink || !number}
               >
                 {loading ? (
                   <>
@@ -181,7 +228,7 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
             </div>
           </TabsContent>
         </Tabs>
-        
+
         <p className="text-xs text-center text-gray-500 mt-4">
           로그인하면 크롬 확장프로그램과 연동되어 상품 분석 데이터를 확인할 수 있습니다.
         </p>
