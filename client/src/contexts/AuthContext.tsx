@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { 
   User as FirebaseUser, 
-  GoogleAuthProvider, 
-  signInWithPopup,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged
 } from "firebase/auth";
@@ -12,15 +12,19 @@ import { User } from "@/types";
 interface AuthContextProps {
   currentUser: User | null;
   loading: boolean;
-  signInWithGoogle: () => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
+  error: string | null;
 }
 
 const AuthContext = createContext<AuthContextProps>({
   currentUser: null,
   loading: true,
-  signInWithGoogle: async () => {},
-  logout: async () => {}
+  signUp: async () => {},
+  signIn: async () => false,
+  logout: async () => {},
+  error: null
 });
 
 export function useAuth() {
@@ -30,21 +34,37 @@ export function useAuth() {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  async function signInWithGoogle() {
-    const provider = new GoogleAuthProvider();
+  async function signUp(email: string, password: string) {
+    setError(null);
     try {
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error("Error signing in with Google", error);
+      await createUserWithEmailAndPassword(auth, email, password);
+    } catch (error: any) {
+      console.error("Error signing up", error);
+      setError(error.message || "회원가입 중 오류가 발생했습니다.");
+    }
+  }
+
+  async function signIn(email: string, password: string): Promise<boolean> {
+    setError(null);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      return true;
+    } catch (error: any) {
+      console.error("Error signing in", error);
+      setError(error.message || "로그인 중 오류가 발생했습니다.");
+      return false;
     }
   }
 
   async function logout() {
+    setError(null);
     try {
       await signOut(auth);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error logging out", error);
+      setError(error.message || "로그아웃 중 오류가 발생했습니다.");
     }
   }
 
@@ -69,8 +89,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const value = {
     currentUser,
     loading,
-    signInWithGoogle,
-    logout
+    signUp,
+    signIn,
+    logout,
+    error
   };
 
   return (

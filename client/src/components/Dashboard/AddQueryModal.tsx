@@ -38,23 +38,23 @@ export default function AddQueryModal({ isOpen, onClose, queriesCount }: AddQuer
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>새 쿼리 추가</DialogTitle>
+          <DialogTitle>새 상품 추가</DialogTitle>
           <DialogDescription>
-            크롬 확장프로그램을 통해 새로운 쿼리를 분석하여 추가합니다. 최대 3개까지 저장할 수 있습니다.
+            크롬 확장프로그램을 통해 새로운 상품을 분석하여 추가합니다. 최대 3개까지 저장할 수 있습니다.
           </DialogDescription>
         </DialogHeader>
 
         {isLimitReached && (
-          <Alert variant="warning" className="bg-yellow-50 border border-yellow-200">
+          <Alert className="bg-yellow-50 border border-yellow-200">
             <AlertTriangle className="h-4 w-4 text-yellow-400" />
             <AlertDescription>
-              쿼리 제한에 도달했습니다. 새 쿼리를 추가하려면 기존 쿼리를 삭제하세요.
+              상품 제한에 도달했습니다. 새 상품을 추가하려면 기존 상품을 삭제하세요.
             </AlertDescription>
           </Alert>
         )}
         
         <div className="mb-4">
-          <label htmlFor="queryInput" className="block text-sm font-medium text-text-secondary mb-1">쿼리 검색어</label>
+          <label htmlFor="queryInput" className="block text-sm font-medium text-text-secondary mb-1">상품 검색어</label>
           <Input
             id="queryInput"
             value={queryText}

@@ -29,9 +29,9 @@ export default function DeleteQueryModal({ isOpen, onClose, queryId, queryText }
     <AlertDialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>쿼리 삭제 확인</AlertDialogTitle>
+          <AlertDialogTitle>상품 삭제 확인</AlertDialogTitle>
           <AlertDialogDescription>
-            정말 "{queryText}" 쿼리를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+            정말 "{queryText}" 상품을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

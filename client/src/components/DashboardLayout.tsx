@@ -33,7 +33,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     onClick={() => navigate("/dashboard")}
                     className="ml-3"
                   >
-                    새 쿼리 추가
+                    새 상품 추가
                   </Button>
                   <div className="ml-4 flex items-center">
                     {currentUser.photoURL ? (
