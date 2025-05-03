@@ -1,20 +1,111 @@
 import { Button } from "@/components/ui/button";
+import { Search, ShoppingBag, TrendingUp } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface EmptyStateProps {
   onAddQuery: () => void;
 }
 
 export default function EmptyState({ onAddQuery }: EmptyStateProps) {
+  const { currentUser } = useAuth();
+
   return (
-    <div className="bg-surface shadow rounded-lg p-8 text-center">
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-secondary mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
-      </svg>
-      <h3 className="text-lg font-medium text-text-primary mb-1">저장된 상품이 없습니다</h3>
-      <p className="text-text-secondary mb-4">크롬 확장프로그램을 사용하여 새로운 상품을 분석하고 저장해보세요.</p>
-      <Button onClick={onAddQuery}>
-        상품 추가하기
-      </Button>
-    </div>
+    <Card className="border border-muted bg-gradient-to-b from-white to-blue-50">
+      <CardContent className="p-8 text-center">
+        {currentUser ? (
+          <>
+            <div className="w-16 h-16 mx-auto mb-5 flex items-center justify-center rounded-full bg-gradient-to-br from-blue-100 to-indigo-100">
+              <Search className="h-8 w-8 text-blue-600" />
+            </div>
+            
+            <h3 className="text-xl font-semibold mb-2">저장된 상품이 없습니다</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              크롬 확장프로그램을 사용하여 새로운 상품을 분석하고 저장해보세요.
+              상위 노출된 상품 정보와 순위 변화를 추적할 수 있습니다.
+            </p>
+            
+            <Button 
+              onClick={onAddQuery}
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+            >
+              <ShoppingBag className="mr-2 h-4 w-4" />
+              상품 추가하기
+            </Button>
+            
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+              <div className="p-4 rounded-lg bg-white border border-blue-100">
+                <div className="flex items-center text-blue-600 mb-2">
+                  <Search className="h-4 w-4 mr-1" />
+                  <h4 className="font-medium">상품 검색 분석</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">상품의 키워드 순위와 검색 결과 추이를 확인하세요</p>
+              </div>
+              
+              <div className="p-4 rounded-lg bg-white border border-blue-100">
+                <div className="flex items-center text-blue-600 mb-2">
+                  <ShoppingBag className="h-4 w-4 mr-1" />
+                  <h4 className="font-medium">상위 노출 상품</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">어떤 상품이 검색 결과 상위에 노출되고 있는지 분석합니다</p>
+              </div>
+              
+              <div className="p-4 rounded-lg bg-white border border-blue-100">
+                <div className="flex items-center text-blue-600 mb-2">
+                  <TrendingUp className="h-4 w-4 mr-1" />
+                  <h4 className="font-medium">순위 변동 추적</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">상품의 순위 변화를 시각적으로 추적하고 보고서를 확인하세요</p>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="w-16 h-16 mx-auto mb-5 flex items-center justify-center rounded-full bg-gradient-to-br from-blue-100 to-indigo-100">
+              <Search className="h-8 w-8 text-blue-600" />
+            </div>
+            
+            <h3 className="text-xl font-semibold mb-2">스마트스토어 SEO 대시보드</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              로그인하여 상품의 검색 순위 및 노출 현황을 분석하세요.
+              쉽고 빠르게 상품의 SEO 성과를 확인할 수 있습니다.
+            </p>
+            
+            <Button 
+              onClick={onAddQuery}
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+            >
+              로그인하고 시작하기
+            </Button>
+            
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+              <div className="p-4 rounded-lg bg-white/80 border border-blue-100">
+                <div className="flex items-center text-blue-600 mb-2">
+                  <Search className="h-4 w-4 mr-1" />
+                  <h4 className="font-medium">상품 검색 분석</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">상품의 키워드 순위와 검색 결과 추이를 확인하세요</p>
+              </div>
+              
+              <div className="p-4 rounded-lg bg-white/80 border border-blue-100">
+                <div className="flex items-center text-blue-600 mb-2">
+                  <ShoppingBag className="h-4 w-4 mr-1" />
+                  <h4 className="font-medium">상위 노출 상품</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">어떤 상품이 검색 결과 상위에 노출되고 있는지 분석합니다</p>
+              </div>
+              
+              <div className="p-4 rounded-lg bg-white/80 border border-blue-100">
+                <div className="flex items-center text-blue-600 mb-2">
+                  <TrendingUp className="h-4 w-4 mr-1" />
+                  <h4 className="font-medium">순위 변동 추적</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">상품의 순위 변화를 시각적으로 추적하고 보고서를 확인하세요</p>
+              </div>
+            </div>
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 }

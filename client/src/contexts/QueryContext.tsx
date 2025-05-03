@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import { collection, doc, setDoc, deleteDoc, getDocs, query, where, serverTimestamp } from "firebase/firestore";
+import { collection, doc, setDoc, deleteDoc, getDocs, query as firestoreQuery, where, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Query, KeywordItem } from "@/types";
 import { useAuth } from "./AuthContext";
@@ -34,16 +34,15 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
   const { currentUser } = useAuth();
   const { toast } = useToast();
 
-  // Mock function to simulate Chrome extension analysis
+  // Function to simulate Chrome extension analysis
   async function analyzeQuery(queryText: string) {
     setIsLoading(true);
     try {
       // In a real app, this would call the Chrome extension API
-      // For now, we'll simulate a delay and return mock data
+      // For now, we'll simulate a delay and return data
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Return sample structure (in real app, this would come from Chrome extension)
-      // Generate more keywords with varying values to show ranking behavior
+      // Generate keywords with varying values to show ranking behavior
       const keywords = Array.from({ length: 6 }, (_, i) => {
         const value = Math.floor(Math.random() * 30) + 5;
         return { key: `키워드${i+1}`, value };
@@ -90,8 +89,11 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 
     setIsLoading(true);
     try {
+      // Ensure the user's collection exists
+      const userEmail = currentUser.email || '';
+      const userQueriesRef = collection(db, "analysisLogs", userEmail, "queries");
+      
       // Check if user already has 3 queries
-      const userQueriesRef = collection(db, "analysisLogs", currentUser.email!, "queries");
       const userQueriesSnapshot = await getDocs(userQueriesRef);
       
       if (userQueriesSnapshot.size >= 3) {
@@ -104,7 +106,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       }
 
       // Check if query already exists
-      const existingQueryQuery = query(userQueriesRef, where("text", "==", queryText));
+      const existingQueryQuery = firestoreQuery(userQueriesRef, where("text", "==", queryText));
       const existingQuerySnapshot = await getDocs(existingQueryQuery);
       
       if (!existingQuerySnapshot.empty) {
@@ -124,21 +126,21 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       }
 
       // Create new query document
-      const newQueryId = doc(collection(db, "analysisLogs")).id;
+      const newQueryRef = doc(userQueriesRef);
       const today = new Date().toISOString().split('T')[0];
       
-      const newQuery: Omit<Query, 'id'> = {
+      const newQueryData = {
         text: queryText,
         lastUpdated: today,
         keywords: analysisData.keywords,
         keywordCounts: analysisData.keywordCounts,
         tags: analysisData.tags,
-        email: currentUser.email!,
+        email: userEmail,
         savedAt: new Date().toISOString()
       };
 
       // Save to Firestore
-      await setDoc(doc(db, "analysisLogs", currentUser.email!, "queries", newQueryId), newQuery);
+      await setDoc(newQueryRef, newQueryData);
       
       toast({
         title: "상품 추가 성공",
@@ -160,7 +162,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function deleteQuery(queryId: string): Promise<void> {
-    if (!currentUser) {
+    if (!currentUser || !currentUser.email) {
       toast({
         title: "인증 오류",
         description: "로그인이 필요합니다.",
@@ -172,7 +174,8 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     try {
       // Delete from Firestore
-      await deleteDoc(doc(db, "analysisLogs", currentUser.email!, "queries", queryId));
+      const queryRef = doc(db, "analysisLogs", currentUser.email, "queries", queryId);
+      await deleteDoc(queryRef);
       
       toast({
         title: "상품 삭제 성공",
@@ -191,7 +194,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function refreshQuery(queryId: string): Promise<void> {
-    if (!currentUser) {
+    if (!currentUser || !currentUser.email) {
       toast({
         title: "인증 오류",
         description: "로그인이 필요합니다.",
@@ -203,17 +206,10 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     try {
       // Get existing query
-      const queryDocRef = doc(db, "analysisLogs", currentUser.email!, "queries", queryId);
-      const querySnapshot = await getDocs(collection(db, "analysisLogs", currentUser.email!, "queries"));
-      let existingQuery: Query | null = null;
+      const queryRef = doc(db, "analysisLogs", currentUser.email, "queries", queryId);
+      const queryDoc = await getDoc(queryRef);
       
-      querySnapshot.forEach(doc => {
-        if (doc.id === queryId) {
-          existingQuery = { id: doc.id, ...doc.data() } as Query;
-        }
-      });
-      
-      if (!existingQuery) {
+      if (!queryDoc.exists()) {
         toast({
           title: "상품 조회 오류",
           description: "상품을 찾을 수 없습니다.",
@@ -221,7 +217,9 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
         });
         return;
       }
-
+      
+      const existingQuery = queryDoc.data() as Omit<Query, 'id'> & { text: string };
+      
       // Re-analyze query
       const newAnalysisData = await analyzeQuery(existingQuery.text);
       
@@ -232,13 +230,12 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       const today = new Date().toISOString().split('T')[0];
       
       // Compare and mark changes
-      const updatedKeywords = compareAndMarkChanges(existingQuery.keywords, newAnalysisData.keywords);
-      const updatedKeywordCounts = compareAndMarkChanges(existingQuery.keywordCounts, newAnalysisData.keywordCounts);
-      const updatedTags = compareAndMarkChanges(existingQuery.tags, newAnalysisData.tags);
+      const updatedKeywords = compareAndMarkChanges(existingQuery.keywords || [], newAnalysisData.keywords);
+      const updatedKeywordCounts = compareAndMarkChanges(existingQuery.keywordCounts || [], newAnalysisData.keywordCounts);
+      const updatedTags = compareAndMarkChanges(existingQuery.tags || [], newAnalysisData.tags);
 
       // Update query
-      await setDoc(queryDocRef, {
-        ...existingQuery,
+      await setDoc(queryRef, {
         lastUpdated: today,
         keywords: updatedKeywords,
         keywordCounts: updatedKeywordCounts,
@@ -263,14 +260,18 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 
   // Helper function to compare and mark changes in keyword items
   function compareAndMarkChanges(oldItems: KeywordItem[], newItems: KeywordItem[]): KeywordItem[] {
-    const oldItemMap = new Map(oldItems.map(item => [item.key, item.value]));
-    const newItemMap = new Map(newItems.map(item => [item.key, item.value]));
+    // Create maps for efficient lookup
+    const oldItemMap = new Map<string, number>();
+    oldItems.forEach(item => oldItemMap.set(item.key, item.value));
+    
+    const newItemMap = new Map<string, number>();
+    newItems.forEach(item => newItemMap.set(item.key, item.value));
     
     // Mark added, removed, or changed items
     const result: KeywordItem[] = [];
     
     // Check for new or changed items
-    for (const [key, value] of newItemMap.entries()) {
+    newItemMap.forEach((value, key) => {
       if (!oldItemMap.has(key)) {
         // New item
         result.push({ key, value, status: 'added' });
@@ -287,18 +288,17 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
           result.push({ key, value, status: 'unchanged' });
         }
       }
-    }
+    });
     
     // Check for removed items
-    for (const [key, value] of oldItemMap.entries()) {
+    oldItemMap.forEach((value, key) => {
       if (!newItemMap.has(key)) {
         // Removed item
         result.push({ key, value, status: 'removed' });
       }
-    }
+    });
     
     // Sort by value (higher first) then by status (added first, removed last)
-    const statusOrder = { 'added': 0, 'increased': 1, 'unchanged': 2, 'decreased': 3, 'removed': 4 };
     result.sort((a, b) => {
       if (a.status === 'removed' && b.status !== 'removed') return 1;
       if (a.status !== 'removed' && b.status === 'removed') return -1;
