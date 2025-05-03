@@ -12,7 +12,7 @@ import {
   QueryDocumentSnapshot 
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { Query, DashboardStats, KeywordItem, DateAnalysis } from "@/types";
+import { Query, DashboardStats, KeywordItem } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
@@ -75,69 +75,16 @@ export function useQueries() {
               docData.lastUpdated = new Date().toISOString().split('T')[0];
             }
             
-            // 새 데이터 구조 처리
-            // 날짜별 분석 결과 확인
-            const dateAnalyses: Record<string, DateAnalysis> = {};
-            const today = new Date().toISOString().split('T')[0];
-            let latestDateKey = '';
-            
-            // 과거 데이터 형식 처리 (하위 호환성)
-            if (docData.keywords && docData.keywordCounts && docData.tags) {
-              if (!docData.dates) {
-                // 기존 데이터를 dates 형식으로 변환
-                const dateKey = docData.lastUpdated || today;
-                dateAnalyses[dateKey] = {
-                  keywords: processKeywordItems(docData.keywords || []),
-                  keywordCounts: processKeywordItems(docData.keywordCounts || []),
-                  tags: processKeywordItems(docData.tags || []),
-                  lastUpdated: docData.lastUpdated || today,
-                  savedAt: docData.savedAt || new Date().toISOString()
-                };
-                latestDateKey = dateKey;
-              }
-            }
-            
-            // 신규 데이터 구조 처리 (dates 객체)
-            if (docData.dates && typeof docData.dates === 'object') {
-              // dates 객체의 각 날짜 처리
-              Object.entries(docData.dates).forEach(([dateKey, dateData]) => {
-                if (typeof dateData === 'object' && dateData !== null) {
-                  const data = dateData as any;
-                  dateAnalyses[dateKey] = {
-                    keywords: processKeywordItems(data.keywords || []),
-                    keywordCounts: processKeywordItems(data.keywordCounts || []),
-                    tags: processKeywordItems(data.tags || []),
-                    lastUpdated: data.lastUpdated || dateKey,
-                    savedAt: data.savedAt || new Date().toISOString()
-                  };
-                  
-                  // 가장 최근 날짜 추적
-                  if (!latestDateKey || dateKey > latestDateKey) {
-                    latestDateKey = dateKey;
-                  }
-                }
-              });
-            }
-            
-            // 표시할 최신 데이터 가져오기
-            const latestData = latestDateKey ? dateAnalyses[latestDateKey] : {
-              keywords: [],
-              keywordCounts: [],
-              tags: [],
-              lastUpdated: today,
-              savedAt: new Date().toISOString()
-            };
-            
-            // 최종 Query 객체 생성
+            // Create a properly typed Query object
             const query: Query = {
               id: docSnapshot.id,
               text: docData.text || "",
+              lastUpdated: docData.lastUpdated || "-",
+              keywords: processKeywordItems(docData.keywords || []),
+              keywordCounts: processKeywordItems(docData.keywordCounts || []),
+              tags: processKeywordItems(docData.tags || []),
               email: docData.email || userEmail,
-              lastUpdated: latestData.lastUpdated,
-              keywords: latestData.keywords,
-              keywordCounts: latestData.keywordCounts,
-              tags: latestData.tags,
-              dates: dateAnalyses
+              savedAt: docData.savedAt || new Date().toISOString()
             };
             
             // Count changes in this query

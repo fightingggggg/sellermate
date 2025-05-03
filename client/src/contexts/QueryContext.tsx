@@ -16,7 +16,6 @@ interface QueryContextProps {
     keywordCounts: KeywordItem[];
     tags: KeywordItem[];
   } | null>;
-  compareAndMarkChanges: (oldItems: KeywordItem[], newItems: KeywordItem[]) => KeywordItem[];
 }
 
 const QueryContext = createContext<QueryContextProps>({
@@ -25,8 +24,7 @@ const QueryContext = createContext<QueryContextProps>({
   addQuery: async () => false,
   deleteQuery: async () => {},
   refreshQuery: async () => {},
-  analyzeQuery: async () => null,
-  compareAndMarkChanges: () => []
+  analyzeQuery: async () => null
 });
 
 export function useQueryContext() {
@@ -326,8 +324,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
     addQuery,
     deleteQuery,
     refreshQuery,
-    analyzeQuery,
-    compareAndMarkChanges
+    analyzeQuery
   };
 
   return (
