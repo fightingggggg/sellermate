@@ -60,15 +60,8 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
     return null;
   };
   
-  // 표시할 데이터 결정
-  const displayData = compareMode ? comparedData : {
-    keywords: query.keywords,
-    keywordCounts: query.keywordCounts,
-    tags: query.tags
-  };
-  
   // Calculate frequency-based rank for each keyword
-  const sortedByFrequency = [...displayData.keywordCounts]
+  const sortedByFrequency = [...query.keywordCounts]
     .sort((a, b) => b.value - a.value)
     .slice(0, 12); // Get top 12 items
   
@@ -116,6 +109,13 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
       tags: compareAndMarkChanges(selectedDateData.tags, query.tags)
     });
   }, [compareMode, selectedDate, query.dates, compareAndMarkChanges]);
+
+  // 표시할 데이터 결정
+  const displayData = compareMode ? comparedData : {
+    keywords: query.keywords,
+    keywordCounts: query.keywordCounts,
+    tags: query.tags
+  };
   
   return (
     <Card className="mb-6">
@@ -297,7 +297,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
             <div className="mb-4">
               <h4 className="text-sm font-medium text-gray-500 mb-2">태그</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                {[...displayData.tags].sort((a, b) => b.value - a.value).map((tag, index) => (
+                {[...query.tags].sort((a, b) => b.value - a.value).map((tag, index) => (
                   <div 
                     key={index} 
                     className={`flex items-center p-3 bg-gray-50 rounded-lg ${
@@ -332,7 +332,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
             
             <h4 className="text-sm font-medium text-gray-500 mb-2">태그 구름</h4>
             <div className="flex flex-wrap gap-2">
-              {[...displayData.tags].sort((a, b) => b.value - a.value).map((tag, index) => (
+              {[...query.tags].sort((a, b) => b.value - a.value).map((tag, index) => (
                 <div 
                   key={index} 
                   className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
