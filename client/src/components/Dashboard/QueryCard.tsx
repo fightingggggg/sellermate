@@ -725,10 +725,23 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                   >
                     <div className="flex items-center">
                       <div className="w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs mr-2">
-                        {index + 1}
+                        {tag.currentRank || index + 1}
                       </div>
                       {renderChangeIndicator(tag)}
                       <span className="text-sm font-medium">{tag.key}</span>
+                      {tag.rankChange !== undefined && tag.rankChange !== 0 && (
+                        <Badge className={`ml-2 ${
+                          tag.rankChange > 0 
+                          ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
+                          : 'bg-amber-100 text-amber-800 border-amber-300'
+                        } hover:bg-blue-200 border`}>
+                          {tag.rankChange > 0 
+                            ? <ChevronUp className="w-3 h-3 mr-1" /> 
+                            : <ChevronDown className="w-3 h-3 mr-1" />
+                          }
+                          {Math.abs(tag.rankChange)}
+                        </Badge>
+                      )}
                     </div>
                     <div className="ml-auto flex items-center">
                       <div className="w-20 bg-gray-200 rounded-full h-2.5">
