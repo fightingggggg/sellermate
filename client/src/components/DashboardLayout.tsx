@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
-import { LogOut, Menu, PlusCircle, ShoppingBag, Home } from "lucide-react";
+import { LogOut, Menu, PlusCircle, ShoppingBag, Home, User, UserPlus } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -58,8 +58,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="flex items-center">
               {currentUser ? (
                 <>
-
-                  
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild className="cursor-pointer">
                       <div className="flex items-center">
@@ -80,6 +78,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         <ShoppingBag className="mr-2 h-4 w-4" />
                         <span>대시보드</span>
                       </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate("/profile")} className="cursor-pointer">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>내 프로필</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600 focus:text-red-600">
                         <LogOut className="mr-2 h-4 w-4" />
                         <span>로그아웃</span>
@@ -88,12 +91,22 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   </DropdownMenu>
                 </>
               ) : (
-                <Button 
-                  onClick={() => navigate("/login")}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                >
-                  로그인
-                </Button>
+                <div className="flex items-center space-x-3">
+                  <Button 
+                    onClick={() => navigate("/signup")}
+                    variant="outline"
+                    className="border-blue-500 text-blue-600 hover:bg-blue-50"
+                  >
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    회원가입
+                  </Button>
+                  <Button 
+                    onClick={() => navigate("/login")}
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                  >
+                    로그인
+                  </Button>
+                </div>
               )}
               
               <div className="flex items-center sm:hidden ml-4">
@@ -116,7 +129,29 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <Link href="/dashboard" className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-700">
                 대시보드
               </Link>
-
+              {!currentUser && (
+                <>
+                  <Link href="/login" className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-700">
+                    로그인
+                  </Link>
+                  <Link href="/signup" className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-700">
+                    회원가입
+                  </Link>
+                </>
+              )}
+              {currentUser && (
+                <>
+                  <Link href="/profile" className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-700">
+                    내 프로필
+                  </Link>
+                  <button 
+                    onClick={handleLogout}
+                    className="block w-full text-left px-3 py-2 text-base font-medium text-red-600 hover:bg-gray-50 hover:text-red-700"
+                  >
+                    로그아웃
+                  </button>
+                </>
+              )}
             </div>
           )}
         </div>
