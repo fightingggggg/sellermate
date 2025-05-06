@@ -15,8 +15,8 @@ export default function Dashboard() {
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedQuery, setSelectedQuery] = useState<{ id: string; text: string } | null>(null);
-  const [selectedCurrentDate, setSelectedCurrentDate] = useState(null); // Added state for current date
-  const [selectedCompareDate, setSelectedCompareDate] = useState(null); // Added state for compare date
+  const [selectedCurrentDate, setSelectedCurrentDate] = useState<string | undefined>(undefined);
+  const [selectedCompareDate, setSelectedCompareDate] = useState<string | undefined>(undefined);
 
   const handleOpenDeleteModal = (queryId: string, queryText: string) => {
     setSelectedQuery({ id: queryId, text: queryText });
