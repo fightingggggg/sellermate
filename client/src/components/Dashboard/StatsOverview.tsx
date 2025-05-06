@@ -24,21 +24,40 @@ export default function StatsOverview({ stats, queries, currentDate, compareDate
       const currentData = query.dates[currentDate];
       const compareData = query.dates[compareDate];
 
-      // Count changes in keywords
+      // 키워드 변화 카운트 - 비교 날짜 기준
       if (currentData.keywords && compareData.keywords) {
+        // 비교 날짜에서의 순위와 현재 순위를 비교
+        const compareRanks = new Map(compareData.keywords.map((k, i) => [k.key, i + 1]));
+        
+        totalChanges += compareData.keywords.filter(k => {
+          const currentKeyword = currentData.keywords.find(ck => ck.key === k.key);
+          if (!currentKeyword) return true; // 제거된 경우
+          const prevRank = compareRanks.get(k.key) || 0;
+          const currentRank = currentData.keywords.findIndex(ck => ck.key === k.key) + 1;
+          return prevRank !== currentRank; // 순위 변화가 있는 경우
+        }).length;
+
+        // 새로 추가된 키워드도 카운트
         totalChanges += currentData.keywords.filter(k => 
-          k.status === 'added' || k.status === 'removed' || 
-          k.status === 'increased' || k.status === 'decreased' ||
-          (k.rankChange !== undefined && k.rankChange !== 0)
+          !compareData.keywords.some(ck => ck.key === k.key)
         ).length;
       }
 
-      // Count changes in keywordCounts
+      // 키워드 개수 변화 카운트 - 비교 날짜 기준
       if (currentData.keywordCounts && compareData.keywordCounts) {
-        totalChanges += currentData.keywordCounts.filter(k => 
-          k.status === 'added' || k.status === 'removed' || 
-          k.status === 'increased' || k.status === 'decreased' ||
-          (k.rankChange !== undefined && k.rankChange !== 0)
+        const compareRanks = new Map(compareData.keywordCounts.map((k, i) => [k.key, i + 1]));
+        
+        totalChanges += compareData.keywordCounts.filter(k => {
+          const currentKeyword = currentData.keywordCounts.find(ck => ck.key === k.key);
+          if (!currentKeyword) return true; // 제거된 경우
+          const prevRank = compareRanks.get(k.key) || 0;
+          const currentRank = currentData.keywordCounts.findIndex(ck => ck.key === k.key) + 1;
+          return prevRank !== currentRank; // 순위 변화가 있는 경우
+        }).length;
+
+        // 새로 추가된 키워드도 카운트 
+        totalChanges += currentData.keywordCounts.filter(k =>
+          !compareData.keywordCounts.some(ck => ck.key === k.key)
         ).length;
       }
 
