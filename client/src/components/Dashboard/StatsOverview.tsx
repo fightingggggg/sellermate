@@ -29,7 +29,7 @@ export default function StatsOverview({ stats, queries, currentDate, compareDate
         // 비교 날짜에서의 순위와 현재 순위를 비교
         const compareRanks = new Map(compareData.keywords.map((k, i) => [k.key, i + 1]));
         
-        totalChanges += compareData.keywords.filter(k => {
+        totalChanges += compareData.keywords.filter((k: { key: string }) => {
           const currentKeyword = currentData.keywords.find(ck => ck.key === k.key);
           if (!currentKeyword) return true; // 제거된 경우
           const prevRank = compareRanks.get(k.key) || 0;
