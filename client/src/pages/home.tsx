@@ -36,11 +36,11 @@ export default function Home() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Button 
-                  onClick={() => navigate(currentUser ? "/dashboard" : "/login")}
+                  onClick={() => navigate("/dashboard")}
                   className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-lg py-6"
                   size="lg"
                 >
-                  {currentUser ? "대시보드로 이동" : "시작하기"}
+                  시작하기
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
                 <Button 
@@ -171,11 +171,11 @@ export default function Home() {
             크롬 확장프로그램과 연동하여 스마트스토어 상품의 검색 성과를 분석하고 개선하세요.
           </p>
           <Button 
-            onClick={() => navigate(currentUser ? "/dashboard" : "/login")}
+            onClick={() => navigate("/dashboard")}
             className="bg-white text-blue-600 hover:bg-blue-50 text-lg"
             size="lg"
           >
-            {currentUser ? "대시보드로 이동" : "무료로 시작하기"}
+            시작하기
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
