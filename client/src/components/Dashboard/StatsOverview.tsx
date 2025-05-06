@@ -1,6 +1,6 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { DashboardStats } from "@/types";
+import { DashboardStats, Query, KeywordItem } from "@/types";
 import { BarChart2, Calendar, ShoppingBag } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -31,17 +31,17 @@ export default function StatsOverview({ stats, queries, currentDate, compareDate
                        (currentData?.tags?.length || 0);
       } else {
         // 변화가 있는 항목 카운트
-        const keywordChanges = compareData?.keywords?.filter(k => 
+        const keywordChanges = compareData?.keywords?.filter((k: KeywordItem) => 
           k.status === 'added' || k.status === 'removed' || 
           (k.rankChange !== undefined && k.rankChange !== 0)
         ).length || 0;
 
-        const keywordCountChanges = compareData?.keywordCounts?.filter(k => 
+        const keywordCountChanges = compareData?.keywordCounts?.filter((k: KeywordItem) => 
           k.status === 'added' || k.status === 'removed' || 
           (k.rankChange !== undefined && k.rankChange !== 0)
         ).length || 0;
 
-        const tagChanges = compareData?.tags?.filter(k => 
+        const tagChanges = compareData?.tags?.filter((k: KeywordItem) => 
           k.status === 'added' || k.status === 'removed' || 
           (k.rankChange !== undefined && k.rankChange !== 0)
         ).length || 0;
