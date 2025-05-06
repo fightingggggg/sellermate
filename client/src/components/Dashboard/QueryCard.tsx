@@ -38,15 +38,9 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
     new Date(b).getTime() - new Date(a).getTime()
   );
 
-  // 디버깅 출력
-  console.log("쿼리 데이터:", query);
-  console.log("날짜 정보:", query.dates);
-  console.log("사용 가능한 날짜:", availableDates);
-
   // Helper function to compare data between two dates
   const compareAnalysisData = (currentDate: string, compareDate: string | null) => {
     if (!query.dates || !currentDate || !query.dates[currentDate]) {
-      console.log("현재 날짜의 데이터가 없습니다:", currentDate);
       setComparedData(null);
       return;
     }
@@ -55,7 +49,6 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
 
     // 만약 비교 날짜가 "none"이거나 null이면 비교 안함, 현재 데이터만 표시
     if (!compareDate || compareDate === "none" || !query.dates[compareDate]) {
-      console.log("비교 날짜가 없거나 none입니다. 현재 데이터만 사용합니다.");
       setComparedData({
         keywords: currentData?.keywords || [],
         keywordCounts: currentData?.keywordCounts || [],
@@ -66,7 +59,6 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
 
     const compareData = query.dates[compareDate];
     if (!compareData) {
-      console.log("비교 날짜의 데이터가 없습니다:", compareDate);
       setComparedData({
         keywords: currentData.keywords || [],
         keywordCounts: currentData.keywordCounts || [],
@@ -237,29 +229,9 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
       );
     }
 
-    return null; // 그 외 상태의 경우 아이콘 표시 안함
+    return null; 
   };
 
-  // Helper function to render change amount
-  const renderChangeAmount = (item: KeywordItem) => {
-    if (item.status === 'increased' && item.change) {
-      return <span className="ml-1 text-xs text-emerald-500">+{item.change}</span>;
-    } else if (item.status === 'decreased' && item.change) {
-      return <span className="ml-1 text-xs text-red-500">-{item.change}</span>;
-    }
-    return null;
-  };
-
-  // Calculate frequency-based rank for each keyword
-  const getKeywordData = () => {
-    return comparedData ? comparedData.keywordCounts : query.keywordCounts;
-  };
-
-  // Check if a keyword is newly ranked in top 12
-  const isNewlyRanked = (item: KeywordItem, index: number) => {
-    return item.status === 'added' || 
-           (item.status === 'increased' && item.change && item.change > 5);
-  };
 
   // 변화가 있는지 확인하는 함수
   const hasChanges = () => {
@@ -283,11 +255,6 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
     );
 
     return hasKeywordChanges || hasKeywordCountChanges || hasTagChanges;
-  };
-
-  // 상태별 변화 개수 계산
-  const countChangesByStatus = (items: KeywordItem[], status: KeywordItem['status']) => {
-    return items.filter(item => item.status === status).length;
   };
 
   return (
@@ -389,20 +356,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                           .slice(0, 5)
                           .map((k, idx) => (
                             <li key={idx} className="flex items-start py-1 px-2 rounded-md hover:bg-blue-50">
-                              {k.status === 'added' ? (
-                                <Badge className="mr-2 px-1.5 bg-blue-100 text-blue-800 border border-blue-200">NEW</Badge>
-                              ) : k.status === 'removed' ? (
-                                <Badge className="mr-2 px-1.5 bg-red-100 text-red-800 border border-red-200">OUT</Badge>
-                              ) : k.rankChange !== undefined && k.rankChange !== 0 ? (
-                                <Badge className={`mr-2 px-1.5 ${
-                                  k.rankChange > 0 
-                                  ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
-                                  : 'bg-amber-100 text-amber-800 border-amber-300'
-                                } border`}>
-                                  {Math.abs(k.rankChange)}위 {k.rankChange > 0 ? `상승(${k.previousRank}위→${k.currentRank}위)` : `하락(${k.previousRank}위→${k.currentRank}위)`}
-                                </Badge>
-                              ) : null}
-
+                              {renderChangeIndicator(k)}
                               <div>
                                 <span className="font-medium text-gray-800">"{k.key}"</span>{' '}
                                 {k.status === 'added' ? (
@@ -414,11 +368,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                                     <span className="text-emerald-600">상승</span> : 
                                     <span className="text-amber-600">하락</span>}
                                   </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
-                                ) : (
-                                  <span>값이 {k.status === 'increased' ? 
-                                    <>{k.value - (k.change || 0)} → <span className="font-semibold text-blue-600">{k.value}</span></> : 
-                                    <>{k.value + (k.change || 0)} → <span className="font-semibold text-amber-600">{k.value}</span></>} 변경되었습니다.</span>
-                                )}
+                                ) : null}
                               </div>
                             </li>
                           ))}
@@ -438,20 +388,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                           .slice(0, 3)
                           .map((k, idx) => (
                             <li key={idx} className="flex items-start py-1 px-2 rounded-md hover:bg-indigo-50">
-                              {k.status === 'added' ? (
-                                <Badge className="mr-2 px-1.5 bg-blue-100 text-blue-800 border border-blue-200">NEW</Badge>
-                              ) : k.status === 'removed' ? (
-                                <Badge className="mr-2 px-1.5 bg-red-100 text-red-800 border border-red-200">OUT</Badge>
-                              ) : k.rankChange !== undefined && k.rankChange !== 0 ? (
-                                <Badge className={`mr-2 px-1.5 ${
-                                  k.rankChange > 0 
-                                  ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
-                                  : 'bg-amber-100 text-amber-800 border-amber-300'
-                                } border`}>
-                                  {Math.abs(k.rankChange)}위 {k.rankChange > 0 ? `상승(${k.previousRank}위→${k.currentRank}위)` : `하락(${k.previousRank}위→${k.currentRank}위)`}
-                                </Badge>
-                              ) : null}
-
+                              {renderChangeIndicator(k)}
                               <div>
                                 <span className="font-medium text-gray-800">"{k.key}"</span>{' '}
                                 {k.status === 'added' ? (
@@ -463,11 +400,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                                     <span className="text-emerald-600">상승</span> : 
                                     <span className="text-amber-600">하락</span>}
                                   </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
-                                ) : (
-                                  <span>값이 {k.status === 'increased' ? 
-                                    <>{k.value - (k.change || 0)} → <span className="font-semibold text-blue-600">{k.value}</span></> : 
-                                    <>{k.value + (k.change || 0)} → <span className="font-semibold text-amber-600">{k.value}</span></>} 변경되었습니다.</span>
-                                )}
+                                ) : null}
                               </div>
                             </li>
                           ))}
@@ -487,20 +420,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                           .slice(0, 3)
                           .map((k, idx) => (
                             <li key={idx} className="flex items-start py-1 px-2 rounded-md hover:bg-purple-50">
-                              {k.status === 'added' ? (
-                                <Badge className="mr-2 px-1.5 bg-blue-100 text-blue-800 border border-blue-200">NEW</Badge>
-                              ) : k.status === 'removed' ? (
-                                <Badge className="mr-2 px-1.5 bg-red-100 text-red-800 border border-red-200">OUT</Badge>
-                              ) : k.rankChange !== undefined && k.rankChange !== 0 ? (
-                                <Badge className={`mr-2 px-1.5 ${
-                                  k.rankChange > 0 
-                                  ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
-                                  : 'bg-amber-100 text-amber-800 border-amber-300'
-                                } border`}>
-                                  {Math.abs(k.rankChange)}위 {k.rankChange > 0 ? `상승(${k.previousRank}위→${k.currentRank}위)` : `하락(${k.previousRank}위→${k.currentRank}위)`}
-                                </Badge>
-                              ) : null}
-
+                              {renderChangeIndicator(k)}
                               <div>
                                 <span className="font-medium text-gray-800">"{k.key}"</span>{' '}
                                 {k.status === 'added' ? (
@@ -512,11 +432,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                                     <span className="text-emerald-600">상승</span> : 
                                     <span className="text-amber-600">하락</span>}
                                   </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
-                                ) : (
-                                  <span>값이 {k.status === 'increased' ? 
-                                    <>{k.value - (k.change || 0)} → <span className="font-semibold text-blue-600">{k.value}</span></> : 
-                                    <>{k.value + (k.change || 0)} → <span className="font-semibold text-amber-600">{k.value}</span></>} 변경되었습니다.</span>
-                                )}
+                                ) : null}
                               </div>
                             </li>
                           ))}
@@ -754,7 +670,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                       </Badge>
                     ) : null}
                   </div>
-                  <div className="ml-auto flex items-center">
+                  <div className="mlauto flex items-center">
                     <div className="w-24 bg-gray-200 rounded-full h-2.5">
                       <div 
                         className={`${count.status === 'removed' ? 'bg-gray-400' : 'bg-primary'} h-2.5 rounded-full`} 
