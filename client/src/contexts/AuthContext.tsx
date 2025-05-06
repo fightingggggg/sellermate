@@ -74,7 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // 컬렉션 이름 정정: userInfo -> usersInfo
       const userDocRef = doc(db, "usersInfo", uid);
       const userDoc = await getDoc(userDocRef);
-      
+
       if (userDoc.exists()) {
         const userData = userDoc.data();
         setUserProfile({
@@ -102,7 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           createdAt: new Date().toISOString()
         };
         setUserProfile(basicProfile);
-        
+
         // 기본 프로필 문서 생성
         await setDoc(userDocRef, {
           uid: auth.currentUser.uid,
@@ -148,10 +148,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const credential = await createUserWithEmailAndPassword(auth, email, password);
       const user = credential.user;
-      
+
       // 이메일 인증 메일 발송
       await sendEmailVerification(user);
-      
+
       // 사용자 추가 정보 저장
       if (user) {
         const userProfile = {
@@ -163,7 +163,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           createdAt: new Date().toISOString(),
           emailVerified: false
         };
-        
+
         // usersInfo 컬렉션에 사용자 정보 저장
         await setDoc(doc(db, "usersInfo", user.uid), userProfile);
       }
@@ -210,10 +210,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       // usersInfo 컬렉션 사용
       const userDocRef = doc(db, "usersInfo", currentUser.uid);
-      
+
       // 해당 문서가 존재하는지 확인
       const docSnap = await getDoc(userDocRef);
-      
+
       if (docSnap.exists()) {
         // 문서가 있으면 업데이트
         await updateDoc(userDocRef, profileData);
@@ -227,7 +227,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           emailVerified: auth.currentUser?.emailVerified || false
         });
       }
-      
+
       // 상태 업데이트
       setUserProfile(prev => prev ? { ...prev, ...profileData } : null);
       return true;
@@ -253,17 +253,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password
       );
       await reauthenticateWithCredential(auth.currentUser, credential);
-      
+
       // 이메일 업데이트
       await updateEmail(auth.currentUser, newEmail);
-      
+
       // 이메일 인증 재발송
       await sendEmailVerification(auth.currentUser);
-      
+
       // 프로필 업데이트
       setCurrentUser(prev => prev ? { ...prev, email: newEmail } : null);
       setUserProfile(prev => prev ? { ...prev, email: newEmail } : null);
-      
+
       return true;
     } catch (error: any) {
       console.error("Error updating email", error);
@@ -287,7 +287,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         currentPassword
       );
       await reauthenticateWithCredential(auth.currentUser, credential);
-      
+
       // 비밀번호 업데이트
       await updatePassword(auth.currentUser, newPassword);
       return true;
@@ -313,13 +313,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password
       );
       await reauthenticateWithCredential(auth.currentUser, credential);
-      
+
       // Firestore에서 사용자 정보 삭제 (usersInfo 컬렉션 사용)
       await deleteDoc(doc(db, "usersInfo", currentUser.uid));
-      
+
       // Firebase Auth에서 사용자 삭제
       await deleteUser(auth.currentUser);
-      
+
       setCurrentUser(null);
       setUserProfile(null);
       return true;
@@ -352,7 +352,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      await sendEmailVerification(auth.currentUser);
+      await sendEmailVerification(auth.currentUser, {
+        url: 'your-verification-url' // Add your verification URL here.  This is crucial.
+      });
       return true;
     } catch (error: any) {
       console.error("Error sending verification email", error);
