@@ -19,37 +19,34 @@ export default function StatsOverview({ stats, queries, currentDate, compareDate
     let totalChanges = 0;
     
     queries.forEach(query => {
-      if (!query.dates?.[currentDate || ''] || !query.dates?.[compareDate || '']) return;
+      const dates = Object.keys(query.dates || {}).sort((a, b) => 
+        new Date(b).getTime() - new Date(a).getTime()
+      );
       
-      const currentData = query.dates[currentDate || ''];
-      const compareData = query.dates[compareDate || ''];
-
-      if (!compareDate || compareDate === "none") {
-        // 비교 날짜가 없으면 현재 데이터의 모든 항목을 카운트
-        totalChanges += (currentData?.keywords?.length || 0) +
-                       (currentData?.keywordCounts?.length || 0) +
-                       (currentData?.tags?.length || 0);
-      } else {
-        // 변화가 있는 항목 카운트
-        const keywordChanges = compareData?.keywords?.filter((k: KeywordItem) => 
-          k.status === 'added' || k.status === 'removed' || 
+      if (dates.length < 2) return; // 비교할 데이터가 없으면 건너뛰기
+      
+      const latestDate = dates[0];
+      const previousDate = dates[1];
+      const currentData = query.dates[latestDate];
+      const compareData = query.dates[previousDate];
+      
+      if (!currentData || !compareData) return;
+      
+      // 변화가 있는 항목 카운트
+      const countChangesInCategory = (items: KeywordItem[] = []) => 
+        items.filter(k => 
+          k.status === 'added' || 
+          k.status === 'removed' || 
+          k.status === 'increased' || 
+          k.status === 'decreased' ||
           (k.rankChange !== undefined && k.rankChange !== 0)
-        ).length || 0;
-
-        const keywordCountChanges = compareData?.keywordCounts?.filter((k: KeywordItem) => 
-          k.status === 'added' || k.status === 'removed' || 
-          (k.rankChange !== undefined && k.rankChange !== 0)
-        ).length || 0;
-
-        const tagChanges = compareData?.tags?.filter((k: KeywordItem) => 
-          k.status === 'added' || k.status === 'removed' || 
-          (k.rankChange !== undefined && k.rankChange !== 0)
-        ).length || 0;
-
-        totalChanges += keywordChanges + keywordCountChanges + tagChanges;
-      }
+        ).length;
+      
+      totalChanges += countChangesInCategory(compareData.keywords);
+      totalChanges += countChangesInCategory(compareData.keywordCounts);
+      totalChanges += countChangesInCategory(compareData.tags);
     });
-
+    
     return totalChanges;
   };
 
