@@ -662,7 +662,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                     {count.status === 'added' ? (
                       <Badge className="ml-2 bg-blue-500 text-white">NEW</Badge>
                     ) : count.status === 'removed' ? (
-                      <Badge className="ml-2 bg-red-500 text-white">OUT</Badge>
+                      <Badge className="ml-2 bg-red-500 textwhite">OUT</Badge>
                     ) : count.rankChange !== undefined && count.rankChange !== 0 ? (
                       <Badge className={`ml-2 ${
                         count.rankChange > 0 
@@ -683,7 +683,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                     <span className={`ml-2 font-semibold ${
                       count.status === 'removed' ? 'text-gray-400' : 'text-primary'
                     }`}>
-                      {count.value} 
+                      {count.key} {count.value}
                       {count.status === 'increased' && count.change ? (
                         <span className="ml-1 text-sm font-bold text-emerald-500">+{count.change}</span>
                       ) : count.status === 'decreased' && count.change ? (
