@@ -6,24 +6,22 @@ import { useAuth } from "@/contexts/AuthContext";
 interface StatsOverviewProps {
   stats: DashboardStats;
   queries: Query[];
+  currentDate?: string;
+  compareDate?: string;
 }
 
-export default function StatsOverview({ stats, queries }: StatsOverviewProps) {
+export default function StatsOverview({ stats, queries, currentDate, compareDate }: StatsOverviewProps) {
   const { currentUser } = useAuth();
 
   // Calculate changes between comparison dates
   const countChangesBetweenDates = () => {
     let totalChanges = 0;
 
+    if (!currentDate || !compareDate) return 0;
+
     queries.forEach(query => {
-      const dates = Object.keys(query.dates || {}).sort((a, b) => 
-        new Date(b).getTime() - new Date(a).getTime()
-      );
+      if (!query.dates || !query.dates[currentDate] || !query.dates[compareDate]) return;
 
-      if (dates.length < 2) return;
-
-      const currentDate = dates[0];
-      const compareDate = dates[1];
       const currentData = query.dates[currentDate];
       const compareData = query.dates[compareDate];
 
