@@ -242,20 +242,22 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
       return false;
     }
 
-    const hasKeywordChanges = comparedData.keywords.some(k => k.status !== 'unchanged');
-    const hasKeywordCountChanges = comparedData.keywordCounts.some(k => k.status !== 'unchanged');
-    const hasTagChanges = comparedData.tags.some(k => k.status !== 'unchanged');
+    const hasKeywordChanges = comparedData.keywords.some(k => 
+      k.status === 'added' || k.status === 'removed' || 
+      k.status === 'increased' || k.status === 'decreased'
+    );
+
+    const hasKeywordCountChanges = comparedData.keywordCounts.some(k => 
+      k.status === 'added' || k.status === 'removed' || 
+      k.status === 'increased' || k.status === 'decreased'
+    );
+
+    const hasTagChanges = comparedData.tags.some(k => 
+      k.status === 'added' || k.status === 'removed' || 
+      k.status === 'increased' || k.status === 'decreased'
+    );
 
     return hasKeywordChanges || hasKeywordCountChanges || hasTagChanges;
-  };
-
-  // Helper function to count changes between dates
-  const countChangesBetweenDates = (data: {keywords: KeywordItem[], keywordCounts: KeywordItem[], tags: KeywordItem[]}): number => {
-    let count = 0;
-    count += data.keywords.filter(k => k.status !== 'unchanged').length;
-    count += data.keywordCounts.filter(k => k.status !== 'unchanged').length;
-    count += data.tags.filter(k => k.status !== 'unchanged').length;
-    return count;
   };
 
   return (
@@ -267,7 +269,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
               <h3 className="text-lg font-medium text-text-primary">{query.text}</h3>
               {hasChanges() && (
                 <Badge className="ml-2 bg-blue-100 text-blue-800 hover:bg-blue-200 border border-blue-300">
-                  <AlertCircle className="w-3 h-3 mr-1" /> 변화 있음 ({countChangesBetweenDates(comparedData || {keywords: [], keywordCounts: [], tags: []})}건)
+                  <AlertCircle className="w-3 h-3 mr-1" /> 변화 있음
                 </Badge>
               )}
             </div>
@@ -339,7 +341,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
             {hasChanges() && selectedCompareDate && selectedCompareDate !== "none" && (
               <div className="mt-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
                 <h4 className="text-sm font-medium text-blue-800 mb-2 flex items-center">
-                  <BarChart className="h-4 w-4 mr-1" /> 변화 요약 ({countChangesBetweenDates(comparedData || {keywords: [], keywordCounts: [], tags: []})}건)
+                  <BarChart className="h-4 w-4 mr-1" /> 변화 요약
                 </h4>
 
 

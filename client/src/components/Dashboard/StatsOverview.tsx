@@ -1,50 +1,15 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { DashboardStats, Query, KeywordItem } from "@/types";
+import { DashboardStats } from "@/types";
 import { BarChart2, Calendar, ShoppingBag } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface StatsOverviewProps {
   stats: DashboardStats;
-  queries: Query[];
-  currentDate?: string;
-  compareDate?: string;
 }
 
-export default function StatsOverview({ stats, queries, currentDate, compareDate }: StatsOverviewProps) {
+export default function StatsOverview({ stats }: StatsOverviewProps) {
   const { currentUser } = useAuth();
-
-  // Calculate changes between comparison dates
-  const countChangesBetweenDates = () => {
-    let totalChanges = 0;
-
-    if (!currentDate || !compareDate) return 0;
-
-    queries.forEach(query => {
-      if (!query.dates || !query.dates[currentDate] || !query.dates[compareDate]) return;
-
-      const currentData = query.dates[currentDate];
-      const compareData = query.dates[compareDate];
-
-      if (!currentData || !compareData) return;
-
-      const countChangesInData = (currentItems: KeywordItem[] = [], compareItems: KeywordItem[] = []) => {
-        if (!Array.isArray(currentItems) || !Array.isArray(compareItems)) return 0;
-        return currentItems.filter(item => {
-          const compareItem = compareItems.find(ci => ci.key === item.key);
-          return !compareItem || item.value !== compareItem.value;
-        }).length;
-      };
-
-      totalChanges += countChangesInData(currentData.keywords, compareData.keywords);
-      totalChanges += countChangesInData(currentData.keywordCounts, compareData.keywordCounts);
-      totalChanges += countChangesInData(currentData.tags, compareData.tags);
-    });
-
-    return totalChanges;
-  };
-
-  const changesCount = countChangesBetweenDates();
-
+  
   return (
     <div className="mb-8">
       <h2 className="text-xl font-semibold mb-4">분석 개요</h2>
@@ -57,7 +22,7 @@ export default function StatsOverview({ stats, queries, currentDate, compareDate
           color="blue"
           isActive={!!currentUser}
         />
-
+        
         <StatCard 
           title="마지막 업데이트" 
           value={stats.lastUpdated} 
@@ -66,11 +31,11 @@ export default function StatsOverview({ stats, queries, currentDate, compareDate
           color="green"
           isActive={!!currentUser}
         />
-
+        
         <StatCard 
           title="변경된 데이터" 
-          value={changesCount.toString()} 
-          description="비교 날짜 기준 변경 항목" 
+          value={stats.changesCount.toString()} 
+          description="전체 변경 항목 개수" 
           icon={<BarChart2 />}
           color="indigo"
           isActive={!!currentUser}
@@ -110,9 +75,9 @@ function StatCard({ title, value, description, icon, color, isActive }: StatCard
       valueText: isActive ? 'text-indigo-700' : 'text-gray-500'
     }
   };
-
+  
   const colors = colorMap[color];
-
+  
   return (
     <Card className={`border ${colors.border} ${colors.bg} shadow-sm overflow-hidden`}>
       <CardContent className="p-6">
