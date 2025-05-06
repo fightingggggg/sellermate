@@ -569,7 +569,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
               );
 
               // 변화가 있으면 Dialog로 감싸서 반환, 없으면 카드만 반환
-              return hasChanges && (keyword.status !== 'unchanged' || (keyword.rankChange !== undefined && keyword.rankChange !== 0)) && selectedCompareDate && selectedCompareDate !== "none" ? (
+              return selectedCompareDate && selectedCompareDate !== "none" ? (
                 <Dialog key={index}>
                   <DialogTrigger asChild>
                     {KeywordCard}
@@ -815,6 +815,52 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                     <Badge className="ml-1 px-1 py-0 text-xs bg-red-100 text-red-800 border border-red-200">OUT</Badge>
                   ) : tag.rankChange !== undefined && tag.rankChange !== 0 ? (
                     <Badge className={`ml-1 px-1 py-0 text-xs ${
+                    tag.rankChange > 0 ? 'bg-green-100 text-green-800 border border-green-200' : 
+                    'bg-amber-100 text-amber-800 border border-amber-200'
+                  }`}>
+                    {tag.rankChange > 0 ? `+${tag.rankChange}` : tag.rankChange}
+                  </Badge>
+                  ) : null}
+                </div>
+              );
+
+              return selectedCompareDate && selectedCompareDate !== "none" ? (
+                <Dialog key={index}>
+                  <DialogTrigger asChild>
+                    {TagCard}
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="text-center">
+                        {tag.key} <span className="text-sm text-gray-500">태그 변화</span>
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h5 className="text-sm font-medium text-gray-600 mb-1">이전 값</h5>
+                          <span className="text-2xl font-bold">{tag.previousValue || '-'}</span>
+                        </div>
+                        <div className="text-right">
+                          <h5 className="text-sm font-medium text-gray-600 mb-1">현재 값</h5>
+                          <span className="text-2xl font-bold">{tag.value}</span>
+                        </div>
+                      </div>
+                      <div className="text-center my-4">
+                        {tag.status === 'added' ? (
+                          `"${tag.key}"이(가) 새로 추가되었습니다.`
+                        ) : tag.status === 'removed' ? (
+                          `"${tag.key}"이(가) 제외되었습니다.`
+                        ) : tag.rankChange !== undefined && tag.rankChange !== 0 ? (
+                          `"${tag.key}"의 순위가 ${Math.abs(tag.rankChange)}단계 ${tag.rankChange > 0 ? '상승' : '하락'}했습니다.`
+                        ) : (
+                          `"${tag.key}"의 순위가 변경되지 않았습니다.`
+                        )}
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              ) : TagCard;
                       tag.rankChange > 0 
                       ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
                       : 'bg-amber-100 text-amber-800 border-amber-300'
