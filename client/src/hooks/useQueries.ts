@@ -24,6 +24,8 @@ export function useQueries() {
     changesCount: 0
   });
   const [loading, setLoading] = useState(true);
+  const [currentDate, setCurrentDate] = useState<string>("");
+  const [compareDate, setCompareDate] = useState<string>("");
   const { currentUser } = useAuth();
   const { toast } = useToast();
 
@@ -408,5 +410,11 @@ export function useQueries() {
     return count;
   }
 
-  return { queries, stats, loading };
+  return { 
+    queries, 
+    stats, 
+    loading,
+    setCurrentDate,
+    setCompareDate
+  };
 }
