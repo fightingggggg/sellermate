@@ -24,6 +24,7 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
   const [number, setPhoneNumber] = useState("");
   const [tab, setTab] = useState("login");
   const [, navigate] = useLocation();
+  const [signupStatus, setSignupStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null); // 회원가입 상태 추가
 
   useEffect(() => {
     if (currentUser && !isModal) {
@@ -44,8 +45,13 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
 
   const handleSignUp = async () => {
     if (!email || !password || password !== passwordConfirm || !businessName || !businessLink || !number) return;
-    await signUp(email, password, businessName, businessLink, number);
-    setTab("login");
+    try {
+      await signUp(email, password, businessName, businessLink, number);
+      setSignupStatus({ type: 'success', message: '회원가입이 완료되었습니다. 인증 메일을 확인해주세요.' });
+      setTab("login");
+    } catch (err: any) {
+      setSignupStatus({ type: 'error', message: err.message });
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -79,11 +85,18 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
               <p className="text-sm text-center text-gray-600 mb-4">
                 로그인하여 스마트스토어 상품 분석 결과를 확인하고 관리하세요.
               </p>
-              
+
               {error && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
+                  <AlertDescription>
+                    {error.includes('auth/invalid-email') && '올바른 이메일 형식을 입력해주세요.'}
+                    {error.includes('auth/invalid-login-credentials') && '이메일 또는 비밀번호가 올바르지 않습니다.'}
+                    {error.includes('auth/user-not-found') && '등록되지 않은 이메일입니다.'}
+                    {error.includes('auth/wrong-password') && '비밀번호가 올바르지 않습니다.'}
+                    {error.includes('auth/too-many-requests') && '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.'}
+                    {!error.includes('auth/') && error}
+                  </AlertDescription>
                 </Alert>
               )}
 
@@ -134,11 +147,14 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
               <p className="text-sm text-center text-gray-600 mb-4">
                 회원가입 후 스마트스토어 상품 분석 기능을 이용하세요.
               </p>
-              
-              {error && (
-                <Alert variant="destructive">
+
+              {(error || signupStatus) && (
+                <Alert 
+                  variant={signupStatus?.type === "success" ? "default" : "destructive"}
+                  className={signupStatus?.type === "success" ? "bg-green-50 text-green-800 border-green-200" : ""}
+                >
                   <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
+                  <AlertDescription>{signupStatus?.message || error}</AlertDescription>
                 </Alert>
               )}
 
