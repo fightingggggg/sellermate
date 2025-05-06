@@ -497,7 +497,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                   key={index} 
                   className={`flex items-center p-3 rounded-lg cursor-pointer transition-all duration-200 ${
                     keyword.status === 'removed' ? 'text-gray-400 bg-gray-100' :
-                    keyword.status === 'added' ? 'bg-emerald-50 border border-emerald-200 hover:bg-emerald-100' :
+                    keyword.status === 'added' ? 'bg-blue-50 border border-blue-200 hover:bg-blue-100' :
                     keyword.rankChange !== undefined && keyword.rankChange !== 0 ? 
                       (keyword.rankChange > 0 ? 'bg-green-50 border border-green-200 hover:bg-green-100' : 
                       'bg-amber-50 border border-amber-200 hover:bg-amber-100') :
@@ -643,7 +643,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                   key={index} 
                   className={`flex items-center p-3 rounded-lg ${
                     count.status === 'removed' ? 'text-gray-400 bg-gray-100' :
-                    count.status === 'added' ? 'bg-emerald-50 border border-emerald-200' :
+                    count.status === 'added' ? 'bg-blue-50 border border-blue-200' :
                     count.rankChange !== undefined && count.rankChange !== 0 ? 
                       (count.rankChange > 0 ? 'bg-green-50 border border-green-200' : 'bg-amber-50 border border-amber-200') :
                     'bg-gray-50 hover:bg-gray-100'
@@ -669,7 +669,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                         {Math.abs(count.rankChange)}위 {count.rankChange > 0 ? `상승(${count.previousRank}위→${count.currentRank}위)` : `하락(${count.previousRank}위→${count.currentRank}위)`}
                       </Badge>
                     ) : null}
-                  </</div>
+                  </div>
                   <div className="mlauto flex items-center">
                     <div className="w-24 bg-gray-200 rounded-full h-2.5">
                       <div 
@@ -708,7 +708,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                     key={index} 
                     className={`flex items-center p-3 rounded-lg ${
                       tag.status === 'removed' ? 'text-gray-400 bg-gray-100' :
-                      tag.status === 'added' ? 'bg-emerald-50 border border-emerald-200' :
+                      tag.status === 'added' ? 'bg-blue-50 border border-blue-200' :
                       tag.rankChange !== undefined && tag.rankChange !== 0 ? 
                         (tag.rankChange > 0 ? 'bg-green-50 border border-green-200' : 'bg-amber-50 border border-amber-200') :
                       'bg-gray-50 hover:bg-gray-100'
@@ -768,7 +768,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                   key={index} 
                   className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                     tag.status === 'removed' ? 'bg-gray-100 text-gray-600' :
-                    tag.status === 'added' ? 'bg-emerald-100 text-emerald-800' :
+                    tag.status === 'added' ? 'bg-blue-100 text-blue-800' :
                     tag.rankChange !== undefined && tag.rankChange !== 0 ? 
                       (tag.rankChange > 0 ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800') :
                     'bg-blue-100 text-blue-800'
