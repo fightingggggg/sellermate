@@ -23,6 +23,7 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
   const [businessLink, setStoreUrl] = useState("");
   const [number, setPhoneNumber] = useState("");
   const [tab, setTab] = useState("login");
+  const [alertMessage, setAlertMessage] = useState({ message: '', type: '' }); // Alert message state
   const [, navigate] = useLocation();
 
   useEffect(() => {
@@ -44,8 +45,49 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
 
   const handleSignUp = async () => {
     if (!email || !password || password !== passwordConfirm || !businessName || !businessLink || !number) return;
-    await signUp(email, password, businessName, businessLink, number);
-    setTab("login");
+    try {
+      await signUp(email, password, businessName, businessLink, number);
+      setAlertMessage({
+        message: "회원가입이 완료되었습니다! 이메일로 발송된 인증 링크를 확인해주세요.",
+        type: "success"
+      });
+      setTimeout(() => {
+        setTab("login");
+      }, 3000);
+    } catch (error: any) {
+      console.error("Signup error:", error);
+      if (error.code === "auth/email-already-in-use") {
+        setAlertMessage({
+          message: "이미 가입한 회원입니다. 로그인을 진행해주세요.",
+          type: "error"
+        });
+      } else if (error.code === "auth/invalid-email") {
+        setAlertMessage({
+          message: "올바른 이메일 주소를 입력해주세요. (예: example@domain.com)",
+          type: "error"
+        });
+      } else if (error.code === "auth/weak-password") {
+        setAlertMessage({
+          message: "안전한 비밀번호를 위해 영문, 숫자, 특수문자를 포함한 6자 이상으로 설정해주세요.",
+          type: "error"
+        });
+      } else if (error.code === "auth/network-request-failed") {
+        setAlertMessage({
+          message: "네트워크 연결을 확인해주세요.",
+          type: "error"
+        });
+      } else if (error.code === "auth/too-many-requests") {
+        setAlertMessage({
+          message: "너무 많은 시도가 있었습니다. 잠시 후 다시 시도해주세요.",
+          type: "error"
+        });
+      } else {
+        setAlertMessage({
+          message: "회원가입 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.",
+          type: "error"
+        });
+      }
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -79,7 +121,7 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
               <p className="text-sm text-center text-gray-600 mb-4">
                 로그인하여 스마트스토어 상품 분석 결과를 확인하고 관리하세요.
               </p>
-              
+
               {error && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
@@ -134,11 +176,11 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
               <p className="text-sm text-center text-gray-600 mb-4">
                 회원가입 후 스마트스토어 상품 분석 기능을 이용하세요.
               </p>
-              
-              {error && (
-                <Alert variant="destructive">
+
+              {alertMessage.message && (
+                <Alert variant={alertMessage.type === 'success' ? 'success' : 'destructive'}>
                   <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
+                  <AlertDescription>{alertMessage.message}</AlertDescription>
                 </Alert>
               )}
 
