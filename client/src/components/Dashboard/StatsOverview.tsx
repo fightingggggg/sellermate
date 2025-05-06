@@ -26,20 +26,29 @@ export default function StatsOverview({ stats, queries, currentDate, compareDate
       const currentData = query.dates[currentDate];
       const compareData = query.dates[compareDate];
 
-      // 키워드의 변화 수 계산
-      if (compareData.keywords?.some(k => k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)) {
-        totalChanges += compareData.keywords.filter(k => k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0).length;
-      }
+      // 변화된 키워드 수
+      const keywordChanges = compareData.keywords?.filter(k => 
+        k.status === 'added' || k.status === 'removed' || 
+        k.status === 'increased' || k.status === 'decreased' ||
+        (k.rankChange !== undefined && k.rankChange !== 0)
+      ).length || 0;
 
-      // 키워드 카운트의 변화 수 계산
-      if (compareData.keywordCounts?.some(k => k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)) {
-        totalChanges += compareData.keywordCounts.filter(k => k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0).length;
-      }
+      // 변화된 키워드 카운트 수
+      const keywordCountChanges = compareData.keywordCounts?.filter(k => 
+        k.status === 'added' || k.status === 'removed' || 
+        k.status === 'increased' || k.status === 'decreased' ||
+        (k.rankChange !== undefined && k.rankChange !== 0)
+      ).length || 0;
 
-      // 태그의 변화 수 계산
-      if (compareData.tags?.some(k => k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)) {
-        totalChanges += compareData.tags.filter(k => k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0).length;
-      }
+      // 변화된 태그 수
+      const tagChanges = compareData.tags?.filter(k => 
+        k.status === 'added' || k.status === 'removed' || 
+        k.status === 'increased' || k.status === 'decreased' ||
+        (k.rankChange !== undefined && k.rankChange !== 0)
+      ).length || 0;
+
+      // 모든 변화 수를 합산
+      totalChanges += keywordChanges + keywordCountChanges + tagChanges;
     });
 
     return totalChanges;
