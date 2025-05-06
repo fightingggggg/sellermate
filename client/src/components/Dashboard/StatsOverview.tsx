@@ -27,27 +27,18 @@ export default function StatsOverview({ stats, queries, currentDate, compareDate
       const compareData = query.dates[compareDate];
 
       // 키워드의 변화 수 계산
-      if (compareData.keywords) {
-        totalChanges += compareData.keywords.filter(k => 
-          k.status === 'added' || k.status === 'removed' || 
-          (k.rankChange !== undefined && k.rankChange !== 0)
-        ).length;
+      if (compareData.keywords?.some(k => k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)) {
+        totalChanges += compareData.keywords.filter(k => k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0).length;
       }
 
-      // 키워드 카운트의 변화 수 계산 
-      if (compareData.keywordCounts) {
-        totalChanges += compareData.keywordCounts.filter(k =>
-          k.status === 'added' || k.status === 'removed' || 
-          (k.rankChange !== undefined && k.rankChange !== 0)
-        ).length;
+      // 키워드 카운트의 변화 수 계산
+      if (compareData.keywordCounts?.some(k => k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)) {
+        totalChanges += compareData.keywordCounts.filter(k => k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0).length;
       }
 
       // 태그의 변화 수 계산
-      if (compareData.tags) {
-        totalChanges += compareData.tags.filter(k =>
-          k.status === 'added' || k.status === 'removed' || 
-          (k.rankChange !== undefined && k.rankChange !== 0)
-        ).length;
+      if (compareData.tags?.some(k => k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)) {
+        totalChanges += compareData.tags.filter(k => k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0).length;
       }
     });
 
