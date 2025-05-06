@@ -46,7 +46,7 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
   const isValidURL = (url: string) => {
     try {
       new URL(url);
-      return url.startsWith('https://smartstore.naver.com/');
+      return true;
     } catch {
       return false;
     }
@@ -74,9 +74,10 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
     try {
       await signUp(email, password, businessName, businessLink, number);
       setAlertMessage({
-        message: "회원가입이 완료되었습니다! 이메일로 발송된 인증 링크를 확인해주세요. 인증 완료 후 로그인이 가능합니다.",
+        message: "회원가입이 완료되었습니다! 이메일로 발송된 인증 메일을 확인하시고, 이메일 인증을 완료해주세요. 인증이 완료되어야 로그인이 가능합니다.",
         type: "success"
       });
+      setTab("login");
       setTimeout(() => {
         setTab("login");
       }, 3000);

@@ -181,7 +181,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       
       if (!userCredential.user.emailVerified) {
-        setError("이메일 인증이 필요합니다. 인증 메일을 확인하시고 인증을 완료해주세요. 인증 메일을 받지 못하셨다면 재발송해드리겠습니다.");
+        setError("이메일 인증이 완료되지 않았습니다. 이메일함을 확인하여 인증을 완료해주세요. 인증 메일을 받지 못하셨다면 아래 버튼을 클릭하여 재발송 받으실 수 있습니다.");
         await sendEmailVerification(userCredential.user);
         await signOut(auth);
         return false;
