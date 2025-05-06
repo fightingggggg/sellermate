@@ -569,7 +569,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
               );
 
               // 변화가 있으면 Dialog로 감싸서 반환, 없으면 카드만 반환
-              return hasChanges && keyword.status !== 'unchanged' && selectedCompareDate && selectedCompareDate !== "none" ? (
+              return hasChanges && (keyword.status !== 'unchanged' || (keyword.rankChange !== undefined && keyword.rankChange !== 0)) && selectedCompareDate && selectedCompareDate !== "none" ? (
                 <Dialog key={index}>
                   <DialogTrigger asChild>
                     {KeywordCard}
