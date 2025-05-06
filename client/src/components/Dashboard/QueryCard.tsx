@@ -607,16 +607,17 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
 
               // 키워드 카드 컴포넌트
               const KeywordCard = (
-                <div 
-                  key={index} 
-                  className={`flex items-center p-3 rounded-lg cursor-pointer transition-all duration-200 ${
-                    keyword.status === 'removed' ? 'text-gray-400 bg-gray-100' :
-                    keyword.status === 'added' ? 'bg-blue-50 border border-blue-200 hover:bg-blue-100' :
-                    keyword.rankChange !== undefined && keyword.rankChange !== 0 ? 
-                      (keyword.rankChange > 0 ? 'bg-green-50 border border-green-200 hover:bg-green-100' : 
-                      'bg-amber-50 border border-amber-200 hover:bg-amber-100') :
-                    'bg-gray-50 hover:bg-gray-100'
-                  }`}
+                <Dialog key={index}>
+                  <DialogTrigger asChild>
+                    <div 
+                      className={`flex items-center p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                        keyword.status === 'removed' ? 'text-gray-400 bg-gray-100' :
+                        keyword.status === 'added' ? 'bg-blue-50 border border-blue-200 hover:bg-blue-100' :
+                        keyword.rankChange !== undefined && keyword.rankChange !== 0 ? 
+                          (keyword.rankChange > 0 ? 'bg-green-50 border border-green-200 hover:bg-green-100' : 
+                          'bg-amber-50 border border-amber-200 hover:bg-amber-100') :
+                        'bg-gray-50 hover:bg-gray-100'
+                      }`}
                 >
                   <div className="flex items-center">
                     <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs mr-2">
@@ -662,8 +663,82 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                 </div>
               );
 
-              // 모든 카드에 대해 Dialog로 감싸서 반환
-              return wrapInDialog(KeywordCard, keyword);
+              </div>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="text-center">
+                        {keyword.key} <span className="text-sm text-gray-500">변화</span>
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4">
+                      <div className="p-4 bg-gray-50 rounded-lg">
+                        <div className="flex justify-between mb-4">
+                          <div>
+                            <h5 className="text-sm font-medium text-gray-600 mb-1">이전 값</h5>
+                            {keyword.status === 'added' ? (
+                              <span className="text-2xl font-bold text-gray-400">-</span>
+                            ) : (
+                              <div className="flex items-center">
+                                <span className="text-2xl font-bold">
+                                  {keyword.status === 'increased' && keyword.change ? keyword.value - keyword.change : 
+                                   keyword.status === 'decreased' && keyword.change ? keyword.value + keyword.change : 
+                                   keyword.value}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="text-center mt-2">
+                            <span className="text-4xl">
+                              {keyword.status === 'added' ? (
+                                <span className="text-emerald-500">→</span>
+                              ) : keyword.status === 'removed' ? (
+                                <span className="text-red-500">→</span>
+                              ) : keyword.status === 'increased' ? (
+                                <span className="text-blue-500">↑</span>
+                              ) : (
+                                <span className="text-amber-500">↓</span>
+                              )}
+                            </span>
+                          </div>
+                          <div className="text-right">
+                            <h5 className="text-sm font-medium text-gray-600 mb-1">현재 값</h5>
+                            {keyword.status === 'removed' ? (
+                              <span className="text-2xl font-bold text-gray-400">-</span>
+                            ) : (
+                              <div className="flex items-center justify-end">
+                                <span className="text-2xl font-bold">{keyword.value}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="text-center my-4">
+                          <span className="text-sm font-medium">
+                            {keyword.status === 'added' ? (
+                              `"${keyword.key}"이(가) 새로 추가되어 ${keyword.currentRank}위에 올랐습니다.`
+                            ) : keyword.status === 'removed' ? (
+                              `"${keyword.key}"이(가) 순위에서 제외되었습니다.`
+                            ) : keyword.rankChange !== undefined && keyword.rankChange !== 0 ? (
+                              `"${keyword.key}"의 순위가 ${Math.abs(keyword.rankChange)}단계 ${keyword.rankChange > 0 ? '상승' : '하락'}했습니다. (${keyword.previousRank}위 → ${keyword.currentRank}위)`
+                            ) : (
+                              `"${keyword.key}"의 순위가 변경되지 않았습니다.`
+                            )}
+                          </span>
+                        </div>
+
+                        <div className="mt-4 text-sm text-gray-500">
+                          <p>
+                            {selectedCurrentDate && format(new Date(selectedCurrentDate), 'yyyy년 MM월 dd일')}과(와) 
+                            {selectedCompareDate && selectedCompareDate !== "none" && format(new Date(selectedCompareDate), 'yyyy년 MM월 dd일')} 사이의 
+                            변화입니다.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              );
              })}
           </div>
         )}
