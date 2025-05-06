@@ -5,11 +5,9 @@ import { useAuth } from "@/contexts/AuthContext";
 
 interface StatsOverviewProps {
   stats: DashboardStats;
-  currentDate?: string;
-  compareDate?: string;
 }
 
-export default function StatsOverview({ stats, currentDate, compareDate }: StatsOverviewProps) {
+export default function StatsOverview({ stats }: StatsOverviewProps) {
   const { currentUser } = useAuth();
   
   return (

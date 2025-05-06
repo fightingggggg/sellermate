@@ -24,8 +24,6 @@ export function useQueries() {
     changesCount: 0
   });
   const [loading, setLoading] = useState(true);
-  const [currentDate, setCurrentDate] = useState<string>("");
-  const [compareDate, setCompareDate] = useState<string>("");
   const { currentUser } = useAuth();
   const { toast } = useToast();
 
@@ -377,9 +375,17 @@ export function useQueries() {
     return result;
   }
 
-  // Count changes between specific dates in a query
-  function countChanges(query: Query, currentDate?: string, compareDate?: string): number {
-    if (!query.dates || !currentDate || !compareDate) return 0;
+  // Count changes between dates in a query
+  function countChanges(query: Query): number {
+    // If there are not at least 2 dates, there are no changes to count
+    const dates = Object.keys(query.dates || {}).sort((a, b) => 
+      new Date(b).getTime() - new Date(a).getTime()
+    );
+
+    if (dates.length < 2) return 0;
+
+    const currentDate = dates[0];
+    const compareDate = dates[1];
 
     const currentData = query.dates[currentDate];
     const compareData = query.dates[compareDate];
@@ -410,11 +416,5 @@ export function useQueries() {
     return count;
   }
 
-  return { 
-    queries, 
-    stats, 
-    loading,
-    setCurrentDate,
-    setCompareDate
-  };
+  return { queries, stats, loading };
 }
