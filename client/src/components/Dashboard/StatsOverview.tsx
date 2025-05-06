@@ -15,7 +15,7 @@ export default function StatsOverview({ stats, queries, currentDate, compareDate
 
   // Calculate changes between comparison dates
   const countChangesBetweenDates = () => {
-    if (!currentDate || !compareDate) return 0;
+    if (!currentDate || !compareDate || compareDate === "none") return 0;
     let totalChanges = 0;
 
     queries.forEach(query => {
@@ -28,7 +28,6 @@ export default function StatsOverview({ stats, queries, currentDate, compareDate
       if (currentData.keywords && compareData.keywords) {
         totalChanges += currentData.keywords.filter(k => 
           k.status === 'added' || k.status === 'removed' || 
-          k.status === 'increased' || k.status === 'decreased' ||
           (k.rankChange !== undefined && k.rankChange !== 0)
         ).length;
       }
@@ -37,7 +36,6 @@ export default function StatsOverview({ stats, queries, currentDate, compareDate
       if (currentData.keywordCounts && compareData.keywordCounts) {
         totalChanges += currentData.keywordCounts.filter(k => 
           k.status === 'added' || k.status === 'removed' || 
-          k.status === 'increased' || k.status === 'decreased' ||
           (k.rankChange !== undefined && k.rankChange !== 0)
         ).length;
       }
@@ -46,7 +44,6 @@ export default function StatsOverview({ stats, queries, currentDate, compareDate
       if (currentData.tags && compareData.tags) {
         totalChanges += currentData.tags.filter(k => 
           k.status === 'added' || k.status === 'removed' || 
-          k.status === 'increased' || k.status === 'decreased' ||
           (k.rankChange !== undefined && k.rankChange !== 0)
         ).length;
       }
