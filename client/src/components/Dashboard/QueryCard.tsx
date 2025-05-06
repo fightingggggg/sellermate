@@ -659,12 +659,12 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                         count.rankChange > 0 
                         ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
                         : 'bg-amber-100 text-amber-800 border-amber-300'
-                      } hoverbg-blue-200 border`}>
+                      } hover:bg-blue-200 border`}>
                         {Math.abs(count.rankChange)}위 {count.rankChange > 0 ? `상승(${count.previousRank}위→${count.currentRank}위)` : `하락(${count.previousRank}위→${count.currentRank}위)`}
                       </Badge>
                     ) : null}
                   </div>
-                  <div className="mlauto flex items-center">
+                  <div className="ml-auto flex items-center">
                     <div className="w-24 bg-gray-200 rounded-full h-2.5">
                       <div 
                         className={`${count.status === 'removed' ? 'bg-gray-400' : 'bg-primary'} h-2.5 rounded-full`} 
@@ -674,7 +674,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                     <span className={`ml-2 font-semibold ${
                       count.status === 'removed' ? 'text-gray-400' : 'text-primary'
                     }`}>
-                      {count.value}
+                      {count.key} {count.value}
                       {count.status === 'increased' && count.change ? (
                         <span className="ml-1 text-sm font-bold text-emerald-500">+{count.change}</span>
                       ) : count.status === 'decreased' && count.change ? (
