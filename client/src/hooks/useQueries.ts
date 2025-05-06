@@ -385,9 +385,7 @@ export function useQueries() {
       
       return items.filter(k => 
         k?.status === 'added' || 
-        k?.status === 'removed' || 
-        k?.status === 'increased' || 
-        k?.status === 'decreased' ||
+        k?.status === 'removed' ||
         (k?.rankChange !== undefined && k?.rankChange !== 0)
       ).length;
     };
