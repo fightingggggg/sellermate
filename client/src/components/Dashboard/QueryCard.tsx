@@ -543,7 +543,9 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                         <span className="ml-1 text-sm font-bold text-emerald-500">+{keyword.change}</span>
                       ) : keyword.status === 'decreased' && keyword.change ? (
                         <span className="ml-1 text-sm font-bold text-red-500">-{keyword.change}</span>
-                      ) : null}
+                      ) : (
+                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                      )}
                     </span>
                   </div>
                 </div>
@@ -755,7 +757,9 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                           <span className="ml-1 text-sm font-bold text-emerald-500">+{tag.change}</span>
                         ) : tag.status === 'decreased' && tag.change ? (
                           <span className="ml-1 text-sm font-bold text-red-500">-{tag.change}</span>
-                        ) : null}
+                        ) : (
+                          <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        )}
                       </span>
                     </div>
                   </div>
