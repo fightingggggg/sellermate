@@ -24,8 +24,32 @@ export default function StatsOverview({ stats, queries, currentDate, compareDate
       const currentData = query.dates[currentDate];
       const compareData = query.dates[compareDate];
 
-      // Assuming changes are simply the difference in the number of entries
-      totalChanges += Math.abs(Object.keys(currentData).length - Object.keys(compareData).length);
+      // Count changes in keywords
+      if (currentData.keywords && compareData.keywords) {
+        totalChanges += currentData.keywords.filter(k => 
+          k.status === 'added' || k.status === 'removed' || 
+          k.status === 'increased' || k.status === 'decreased' ||
+          (k.rankChange !== undefined && k.rankChange !== 0)
+        ).length;
+      }
+
+      // Count changes in keywordCounts
+      if (currentData.keywordCounts && compareData.keywordCounts) {
+        totalChanges += currentData.keywordCounts.filter(k => 
+          k.status === 'added' || k.status === 'removed' || 
+          k.status === 'increased' || k.status === 'decreased' ||
+          (k.rankChange !== undefined && k.rankChange !== 0)
+        ).length;
+      }
+
+      // Count changes in tags
+      if (currentData.tags && compareData.tags) {
+        totalChanges += currentData.tags.filter(k => 
+          k.status === 'added' || k.status === 'removed' || 
+          k.status === 'increased' || k.status === 'decreased' ||
+          (k.rankChange !== undefined && k.rankChange !== 0)
+        ).length;
+      }
     });
     return totalChanges;
   };
