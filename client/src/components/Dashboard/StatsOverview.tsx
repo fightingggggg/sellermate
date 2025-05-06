@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 import { DashboardStats } from "@/types";
 import { BarChart2, Calendar, ShoppingBag } from "lucide-react";
@@ -13,45 +14,45 @@ interface StatsOverviewProps {
 export default function StatsOverview({ stats, queries, currentDate, compareDate }: StatsOverviewProps) {
   const { currentUser } = useAuth();
 
-  // Calculate changes between comparison dates
-  const countChangesBetweenDates = () => {
+  // 변경된 데이터 카운트 함수
+  const countChanges = () => {
     if (!currentDate || !compareDate || compareDate === "none") return 0;
+    
     let totalChanges = 0;
-
+    
     queries.forEach(query => {
-      if (!query.dates || !query.dates[currentDate] || !query.dates[compareDate]) return;
+      if (!query.dates?.[currentDate] || !query.dates?.[compareDate]) return;
 
       const currentData = query.dates[currentDate];
       const compareData = query.dates[compareDate];
 
-      // Count changes in keywords
+      // 키워드의 변화 수 계산
       if (currentData.keywords && compareData.keywords) {
-        totalChanges += currentData.keywords.filter((k: KeywordItem) => 
-          (k.status === 'added' || k.status === 'removed') && k.date === compareDate || 
+        totalChanges += currentData.keywords.filter(k => 
+          ((k.status === 'added' || k.status === 'removed') && k.date === compareDate) || 
           (k.rankChange !== undefined && k.rankChange !== 0 && k.date === compareDate)
         ).length;
       }
 
-      // Count changes in keywordCounts
+      // 키워드 카운트의 변화 수 계산 
       if (currentData.keywordCounts && compareData.keywordCounts) {
-        totalChanges += currentData.keywordCounts.filter((k: KeywordItem) => 
-          (k.status === 'added' || k.status === 'removed') && k.date === compareDate || 
+        totalChanges += currentData.keywordCounts.filter(k =>
+          ((k.status === 'added' || k.status === 'removed') && k.date === compareDate) || 
           (k.rankChange !== undefined && k.rankChange !== 0 && k.date === compareDate)
         ).length;
       }
 
-      // Count changes in tags
+      // 태그의 변화 수 계산
       if (currentData.tags && compareData.tags) {
-        totalChanges += currentData.tags.filter((k: KeywordItem) => 
-          (k.status === 'added' || k.status === 'removed') && k.date === compareDate || 
+        totalChanges += currentData.tags.filter(k =>
+          ((k.status === 'added' || k.status === 'removed') && k.date === compareDate) || 
           (k.rankChange !== undefined && k.rankChange !== 0 && k.date === compareDate)
         ).length;
       }
     });
+
     return totalChanges;
   };
-
-  const changesCount = countChangesBetweenDates();
 
   return (
     <div className="mb-8">
@@ -65,7 +66,7 @@ export default function StatsOverview({ stats, queries, currentDate, compareDate
           color="blue"
           isActive={!!currentUser}
         />
-
+        
         <StatCard 
           title="마지막 업데이트" 
           value={stats.lastUpdated} 
@@ -74,11 +75,11 @@ export default function StatsOverview({ stats, queries, currentDate, compareDate
           color="green"
           isActive={!!currentUser}
         />
-
+        
         <StatCard 
           title="변경된 데이터" 
-          value={changesCount.toString()} 
-          description="비교 날짜 기준 변경 항목 개수" 
+          value={countChanges().toString()} 
+          description="비교 날짜 기준 변경 항목 수" 
           icon={<BarChart2 />}
           color="indigo"
           isActive={!!currentUser}
@@ -101,7 +102,7 @@ function StatCard({ title, value, description, icon, color, isActive }: StatCard
   const colorMap = {
     blue: {
       bg: isActive ? 'bg-blue-50' : 'bg-gray-50/80',
-      border: isActive ? 'border-blue-100' : 'border-gray-200',
+      border: isActive ? 'border-blue-100' : 'border-gray-200', 
       text: isActive ? 'text-blue-600' : 'text-gray-400',
       valueText: isActive ? 'text-blue-700' : 'text-gray-500'
     },
@@ -114,7 +115,7 @@ function StatCard({ title, value, description, icon, color, isActive }: StatCard
     indigo: {
       bg: isActive ? 'bg-indigo-50' : 'bg-gray-50/80',
       border: isActive ? 'border-indigo-100' : 'border-gray-200',
-      text: isActive ? 'text-indigo-600' : 'text-gray-400',
+      text: isActive ? 'text-indigo-600' : 'text-gray-400',  
       valueText: isActive ? 'text-indigo-700' : 'text-gray-500'
     }
   };
@@ -139,8 +140,4 @@ function StatCard({ title, value, description, icon, color, isActive }: StatCard
       </CardContent>
     </Card>
   );
-}
-
-interface Query {
-  dates: { [date: string]: { [key: string]: any } };
 }
