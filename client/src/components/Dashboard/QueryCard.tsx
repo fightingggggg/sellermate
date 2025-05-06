@@ -227,7 +227,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
             : 'bg-amber-100 text-amber-800 border-amber-300'
           } border`}
         >
-          {item.key} {item.rankChange > 0 ? '+' : '-'}{Math.abs(item.rankChange)} => {item.currentRank}위 {item.rankChange > 0 ? '상승' : '하락'}
+          {Math.abs(item.rankChange)}위 {item.rankChange > 0 ? '상승' : '하락'}
         </Badge>
       );
     }
@@ -356,16 +356,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                       <ul className="text-sm space-y-2.5">
                         {comparedData?.keywords
                           .filter(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0))
-                          .sort((a, b) => {
-                            // NEW와 OUT을 우선 정렬
-                            if (a.status === 'added' && b.status !== 'added') return -1;
-                            if (b.status === 'added' && a.status !== 'added') return 1;
-                            if (a.status === 'removed' && b.status !== 'removed') return -1;
-                            if (b.status === 'removed' && a.status !== 'removed') return 1;
-                            // 그 다음 순위 변화가 큰 순서대로
-                            return Math.abs((b.rankChange || 0)) - Math.abs((a.rankChange || 0));
-                          })
-                          .slice(0, 3)
+                          .slice(0, 5)
                           .map((k, idx) => (
                             <li key={idx} className="flex items-start py-1 px-2 rounded-md hover:bg-blue-50">
                               {renderChangeIndicator(k)}
@@ -376,7 +367,10 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                                 ) : k.status === 'removed' ? (
                                   <span>순위에서 제외되었습니다. (이전 <span className="font-semibold text-red-600">{k.previousRank}위</span>)</span>
                                 ) : k.rankChange !== undefined && k.rankChange !== 0 ? (
-                                  <span>{k.key} {k.rankChange > 0 ? '+' : '-'}{Math.abs(k.rankChange)} => {k.currentRank}위 {k.rankChange > 0 ? '상승' : '하락'}</span>
+                                  <span>순위가 <span className="font-semibold">{Math.abs(k.rankChange)}위 {k.rankChange > 0 ? 
+                                    <span className="text-emerald-600">상승</span> : 
+                                    <span className="text-amber-600">하락</span>}
+                                  </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
                                 ) : null}
                               </div>
                             </li>
@@ -405,7 +399,10 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                                 ) : k.status === 'removed' ? (
                                   <span>순위에서 제외되었습니다. (이전 <span className="font-semibold text-red-600">{k.previousRank}위</span>)</span>
                                 ) : k.rankChange !== undefined && k.rankChange !== 0 ? (
-                                  <span>{k.key} {k.rankChange > 0 ? '+' : '-'}{Math.abs(k.rankChange)} => {k.currentRank}위 {k.rankChange > 0 ? '상승' : '하락'}</span>
+                                  <span>순위가 <span className="font-semibold">{Math.abs(k.rankChange)}위 {k.rankChange > 0 ? 
+                                    <span className="text-emerald-600">상승</span> : 
+                                    <span className="text-amber-600">하락</span>}
+                                  </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
                                 ) : null}
                               </div>
                             </li>
@@ -434,7 +431,10 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                                 ) : k.status === 'removed' ? (
                                   <span>순위에서 제외되었습니다. (이전 <span className="font-semibold text-red-600">{k.previousRank}위</span>)</span>
                                 ) : k.rankChange !== undefined && k.rankChange !== 0 ? (
-                                  <span>{k.key} {k.rankChange > 0 ? '+' : '-'}{Math.abs(k.rankChange)} => {k.currentRank}위 {k.rankChange > 0 ? '상승' : '하락'}</span>
+                                  <span>순위가 <span className="font-semibold">{Math.abs(k.rankChange)}위 {k.rankChange > 0 ? 
+                                    <span className="text-emerald-600">상승</span> : 
+                                    <span className="text-amber-600">하락</span>}
+                                  </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
                                 ) : null}
                               </div>
                             </li>
@@ -543,9 +543,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                         <span className="ml-1 text-sm font-bold text-emerald-500">+{keyword.change}</span>
                       ) : keyword.status === 'decreased' && keyword.change ? (
                         <span className="ml-1 text-sm font-bold text-red-500">-{keyword.change}</span>
-                      ) : (
-                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                      )}
+                      ) : null}
                     </span>
                   </div>
                 </div>
@@ -675,7 +673,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                       </Badge>
                     ) : null}
                   </div>
-                  <div className="ml-auto flex items-center">
+                  <div className="mlauto flex items-center">
                     <div className="w-24 bg-gray-200 rounded-full h-2.5">
                       <div 
                         className={`${count.status === 'removed' ? 'bg-gray-400' : 'bg-primary'} h-2.5 rounded-full`} 
@@ -685,14 +683,12 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                     <span className={`ml-2 font-semibold ${
                       count.status === 'removed' ? 'text-gray-400' : 'text-primary'
                     }`}>
-                      {count.value} 
+                      {count.value}
                       {count.status === 'increased' && count.change ? (
                         <span className="ml-1 text-sm font-bold text-emerald-500">+{count.change}</span>
                       ) : count.status === 'decreased' && count.change ? (
                         <span className="ml-1 text-sm font-bold text-red-500">-{count.change}</span>
-                      ) : (
-                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                      )}
+                      ) : null}
                     </span>
                   </div>
                 </div>
@@ -757,9 +753,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                           <span className="ml-1 text-sm font-bold text-emerald-500">+{tag.change}</span>
                         ) : tag.status === 'decreased' && tag.change ? (
                           <span className="ml-1 text-sm font-bold text-red-500">-{tag.change}</span>
-                        ) : (
-                          <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                        )}
+                        ) : null}
                       </span>
                     </div>
                   </div>
