@@ -16,32 +16,38 @@ export default function StatsOverview({ stats, queries, currentDate, compareDate
 
   // 변경된 데이터 카운트 함수
   const countChanges = () => {
-    if (!currentDate || !compareDate || compareDate === "none") return 0;
-    
     let totalChanges = 0;
     
     queries.forEach(query => {
-      if (!query.dates?.[currentDate] || !query.dates?.[compareDate]) return;
+      if (!query.dates?.[currentDate || ''] || !query.dates?.[compareDate || '']) return;
+      
+      const currentData = query.dates[currentDate || ''];
+      const compareData = query.dates[compareDate || ''];
 
-      const compareData = query.dates[compareDate];
+      if (!compareDate || compareDate === "none") {
+        // 비교 날짜가 없으면 현재 데이터의 모든 항목을 카운트
+        totalChanges += (currentData?.keywords?.length || 0) +
+                       (currentData?.keywordCounts?.length || 0) +
+                       (currentData?.tags?.length || 0);
+      } else {
+        // 변화가 있는 항목 카운트
+        const keywordChanges = compareData?.keywords?.filter(k => 
+          k.status === 'added' || k.status === 'removed' || 
+          (k.rankChange !== undefined && k.rankChange !== 0)
+        ).length || 0;
 
-      // 변화가 있는 항목 카운트
-      const keywordChanges = compareData?.keywords?.filter(k => 
-        k.status === 'added' || k.status === 'removed' || 
-        (k.rankChange !== undefined && k.rankChange !== 0)
-      ).length || 0;
+        const keywordCountChanges = compareData?.keywordCounts?.filter(k => 
+          k.status === 'added' || k.status === 'removed' || 
+          (k.rankChange !== undefined && k.rankChange !== 0)
+        ).length || 0;
 
-      const keywordCountChanges = compareData?.keywordCounts?.filter(k => 
-        k.status === 'added' || k.status === 'removed' || 
-        (k.rankChange !== undefined && k.rankChange !== 0)
-      ).length || 0;
+        const tagChanges = compareData?.tags?.filter(k => 
+          k.status === 'added' || k.status === 'removed' || 
+          (k.rankChange !== undefined && k.rankChange !== 0)
+        ).length || 0;
 
-      const tagChanges = compareData?.tags?.filter(k => 
-        k.status === 'added' || k.status === 'removed' || 
-        (k.rankChange !== undefined && k.rankChange !== 0)
-      ).length || 0;
-
-      totalChanges += keywordChanges + keywordCountChanges + tagChanges;
+        totalChanges += keywordChanges + keywordCountChanges + tagChanges;
+      }
     });
 
     return totalChanges;
