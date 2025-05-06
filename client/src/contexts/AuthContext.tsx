@@ -178,7 +178,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function signIn(email: string, password: string): Promise<boolean> {
     setError(null);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      if (!userCredential.user.emailVerified) {
+        setError("이메일 인증이 완료되지 않았습니다. 인증 메일을 확인해주세요.");
+        await signOut(auth);
+        return false;
+      }
       return true;
     } catch (error: any) {
       console.error("Error signing in", error);

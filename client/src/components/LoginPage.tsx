@@ -44,11 +44,20 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
   };
 
   const handleSignUp = async () => {
-    if (!email || !password || password !== passwordConfirm || !businessName || !businessLink || !number) return;
+    if (!email || !password || !businessName || !businessLink || !number) return;
+    
+    if (password !== passwordConfirm) {
+      setAlertMessage({
+        message: "비밀번호가 일치하지 않습니다. 다시 확인해주세요.",
+        type: "error"
+      });
+      return;
+    }
+    
     try {
       await signUp(email, password, businessName, businessLink, number);
       setAlertMessage({
-        message: "회원가입이 완료되었습니다! 이메일로 발송된 인증 링크를 확인해주세요.",
+        message: "회원가입이 완료되었습니다! 이메일로 발송된 인증 링크를 확인해주세요. 인증 완료 후 로그인이 가능합니다.",
         type: "success"
       });
       setTimeout(() => {
@@ -256,7 +265,7 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
               <Button 
                 onClick={handleSignUp} 
                 className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                disabled={loading || !email || !password || password !== passwordConfirm || !businessName || !businessLink || !number}
+                disabled={loading || !email || !password || !businessName || !businessLink || !number}
               >
                 {loading ? (
                   <>
