@@ -227,7 +227,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
             : 'bg-amber-100 text-amber-800 border-amber-300'
           } border`}
         >
-          {Math.abs(item.rankChange)}위 {item.rankChange > 0 ? '상승' : '하락'}
+          {item.key} {item.rankChange > 0 ? '+' : '-'}{Math.abs(item.rankChange)} => {item.currentRank}위 {item.rankChange > 0 ? '상승' : '하락'}
         </Badge>
       );
     }
@@ -367,10 +367,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                                 ) : k.status === 'removed' ? (
                                   <span>순위에서 제외되었습니다. (이전 <span className="font-semibold text-red-600">{k.previousRank}위</span>)</span>
                                 ) : k.rankChange !== undefined && k.rankChange !== 0 ? (
-                                  <span>순위가 <span className="font-semibold">{Math.abs(k.rankChange)}위 {k.rankChange > 0 ? 
-                                    <span className="text-emerald-600">상승</span> : 
-                                    <span className="text-amber-600">하락</span>}
-                                  </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
+                                  <span>{k.key} {k.rankChange > 0 ? '+' : '-'}{Math.abs(k.rankChange)} => {k.currentRank}위 {k.rankChange > 0 ? '상승' : '하락'}</span>
                                 ) : null}
                               </div>
                             </li>
@@ -399,10 +396,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                                 ) : k.status === 'removed' ? (
                                   <span>순위에서 제외되었습니다. (이전 <span className="font-semibold text-red-600">{k.previousRank}위</span>)</span>
                                 ) : k.rankChange !== undefined && k.rankChange !== 0 ? (
-                                  <span>순위가 <span className="font-semibold">{Math.abs(k.rankChange)}위 {k.rankChange > 0 ? 
-                                    <span className="text-emerald-600">상승</span> : 
-                                    <span className="text-amber-600">하락</span>}
-                                  </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
+                                  <span>{k.key} {k.rankChange > 0 ? '+' : '-'}{Math.abs(k.rankChange)} => {k.currentRank}위 {k.rankChange > 0 ? '상승' : '하락'}</span>
                                 ) : null}
                               </div>
                             </li>
@@ -431,10 +425,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                                 ) : k.status === 'removed' ? (
                                   <span>순위에서 제외되었습니다. (이전 <span className="font-semibold text-red-600">{k.previousRank}위</span>)</span>
                                 ) : k.rankChange !== undefined && k.rankChange !== 0 ? (
-                                  <span>순위가 <span className="font-semibold">{Math.abs(k.rankChange)}위 {k.rankChange > 0 ? 
-                                    <span className="text-emerald-600">상승</span> : 
-                                    <span className="text-amber-600">하락</span>}
-                                  </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
+                                  <span>{k.key} {k.rankChange > 0 ? '+' : '-'}{Math.abs(k.rankChange)} => {k.currentRank}위 {k.rankChange > 0 ? '상승' : '하락'}</span>
                                 ) : null}
                               </div>
                             </li>
@@ -668,7 +659,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                         count.rankChange > 0 
                         ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
                         : 'bg-amber-100 text-amber-800 border-amber-300'
-                      } hover:bg-blue-200 border`}>
+                      } hoverbg-blue-200 border`}>
                         {Math.abs(count.rankChange)}위 {count.rankChange > 0 ? `상승(${count.previousRank}위→${count.currentRank}위)` : `하락(${count.previousRank}위→${count.currentRank}위)`}
                       </Badge>
                     ) : null}
