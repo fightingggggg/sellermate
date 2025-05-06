@@ -46,7 +46,7 @@ export default function StatsOverview({ stats, queries }: StatsOverviewProps) {
   };
 
   const changesCount = countChangesBetweenDates();
-  
+
   return (
     <div className="mb-8">
       <h2 className="text-xl font-semibold mb-4">분석 개요</h2>
@@ -59,7 +59,7 @@ export default function StatsOverview({ stats, queries }: StatsOverviewProps) {
           color="blue"
           isActive={!!currentUser}
         />
-        
+
         <StatCard 
           title="마지막 업데이트" 
           value={stats.lastUpdated} 
@@ -68,7 +68,7 @@ export default function StatsOverview({ stats, queries }: StatsOverviewProps) {
           color="green"
           isActive={!!currentUser}
         />
-        
+
         <StatCard 
           title="변경된 데이터" 
           value={changesCount.toString()} 
@@ -112,9 +112,9 @@ function StatCard({ title, value, description, icon, color, isActive }: StatCard
       valueText: isActive ? 'text-indigo-700' : 'text-gray-500'
     }
   };
-  
+
   const colors = colorMap[color];
-  
+
   return (
     <Card className={`border ${colors.border} ${colors.bg} shadow-sm overflow-hidden`}>
       <CardContent className="p-6">
