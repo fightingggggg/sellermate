@@ -41,9 +41,7 @@ const profileSchema = z.object({
 // 회원탈퇴 스키마
 const deleteAccountSchema = z.object({
   password: z.string().min(1, "비밀번호를 입력해주세요"),
-  confirmation: z.string().min(1, "확인 문구를 입력해주세요").refine(val => val === "탈퇴합니다", {
-    message: "확인 문구를 정확히 입력해주세요",
-  }),
+  reason: z.string().min(10, "탈퇴 사유를 10자 이상 입력해주세요"),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -81,7 +79,7 @@ export default function ProfilePage() {
     resolver: zodResolver(deleteAccountSchema),
     defaultValues: {
       password: "",
-      confirmation: "" as any, // 타입 에러 해결을 위한 임시 처리
+      reason: "",
     },
   });
 
@@ -366,26 +364,24 @@ export default function ProfilePage() {
                               )}
                             />
 
-                            <FormField
-                              control={deleteAccountForm.control}
-                              name="confirmation"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel className="text-[#555] font-bold text-sm">확인</FormLabel>
-                                  <p className="text-sm text-gray-500 mb-2">
-                                    계정 삭제를 확인하려면 아래에 "탈퇴합니다"라고 입력하세요.
-                                  </p>
-                                  <FormControl>
-                                    <Input 
-                                      placeholder="이 곳에 입력하세요" 
-                                      className="border border-[#ccc] rounded-md p-3 font-normal focus:border-[#007BFF]"
-                                      {...field} 
-                                    />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
+<FormField
+  control={deleteAccountForm.control}
+  name="reason"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel className="text-[#555] font-bold text-sm">탈퇴 사유</FormLabel>
+      <FormControl>
+        <Input
+          placeholder="탈퇴 사유를 입력해주세요 (10자 이상)"
+          className="border border-[#ccc] rounded-md p-3 font-normal focus:border-[#007BFF]"
+          {...field}
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+
 
                             <DialogFooter className="gap-2 sm:gap-0">
                               <Button 
