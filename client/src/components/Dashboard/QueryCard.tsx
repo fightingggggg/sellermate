@@ -207,29 +207,32 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
 
   // Helper function to render change indicator
   const renderChangeIndicator = (item: KeywordItem) => {
-    if (!item.status || item.status === 'unchanged') return null;
+    const badges = [];
 
     if (item.status === 'added') {
-      return <Badge className="mr-2 px-1.5 py-0 text-xs bg-blue-100 text-blue-800 border border-blue-200">NEW</Badge>;
+      badges.push(<Badge key="new" className="mr-2 px-1.5 py-0 text-xs bg-blue-100 text-blue-800 border border-blue-200">NEW</Badge>);
     } 
 
     if (item.status === 'removed') {
-      return <Badge className="mr-2 px-1.5 py-0 text-xs bg-red-100 text-red-800 border border-red-200">OUT</Badge>;
+      badges.push(<Badge key="out" className="mr-2 px-1.5 py-0 text-xs bg-red-100 text-red-800 border border-red-200">OUT</Badge>);
     }
 
     if (item.rankChange !== undefined && item.rankChange !== 0) {
-      return (
-        <Badge className={`mr-2 px-1.5 py-0 text-xs ${
-          item.rankChange > 0 
-          ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
-          : 'bg-amber-100 text-amber-800 border-amber-300'
-        } border`}>
+      badges.push(
+        <Badge 
+          key="rank" 
+          className={`mr-2 px-1.5 py-0 text-xs ${
+            item.rankChange > 0 
+            ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
+            : 'bg-amber-100 text-amber-800 border-amber-300'
+          } border`}
+        >
           {Math.abs(item.rankChange)}위 {item.rankChange > 0 ? '상승' : '하락'}
         </Badge>
       );
     }
 
-    return null; 
+    return badges.length > 0 ? badges : null;
   };
 
 
