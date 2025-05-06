@@ -9,12 +9,15 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AlertTriangle, Loader2 } from "lucide-react";
 
 export default function Dashboard() {
-  const { queries, stats, loading } = useQueries();
+  const { queries, stats, loading, setCompareDate, setCurrentDate } = useQueries(); // Assuming useQueries now accepts functions to set dates
   const { refreshQuery, error } = useQueryContext();
   const { currentUser } = useAuth();
-  
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedQuery, setSelectedQuery] = useState<{ id: string; text: string } | null>(null);
+  const [selectedCurrentDate, setSelectedCurrentDate] = useState<string>("");
+  const [selectedCompareDate, setSelectedCompareDate] = useState<string>("");
+
 
   const handleOpenDeleteModal = (queryId: string, queryText: string) => {
     setSelectedQuery({ id: queryId, text: queryText });
@@ -30,6 +33,17 @@ export default function Dashboard() {
     await refreshQuery(queryId);
   };
 
+  const handleDateChange = (type: 'current' | 'compare', date: string) => {
+    if (type === 'current') {
+      setCurrentDate(date);
+      setSelectedCurrentDate(date);
+    } else {
+      setCompareDate(date);
+      setSelectedCompareDate(date);
+    }
+  };
+
+
   if (loading) {
     return (
       <div className="text-center py-12">
@@ -38,7 +52,7 @@ export default function Dashboard() {
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className="text-center py-12">
@@ -63,11 +77,20 @@ export default function Dashboard() {
             <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">스마트스토어 SEO 분석 대시보드</h2>
             <p className="text-muted-foreground mt-1">상품 순위 변화와 검색 트렌드를 확인하세요</p>
           </div>
+          {/* Add date pickers here to select current and compare dates */}
+          <div>
+            {/* Date pickers for current and compare dates */}
+            {/* Example using input fields (replace with actual date picker component) */}
+            <label>Current Date:</label>
+            <input type="date" value={selectedCurrentDate} onChange={e => handleDateChange('current', e.target.value)} />
+            <label>Compare Date:</label>
+            <input type="date" value={selectedCompareDate} onChange={e => handleDateChange('compare', e.target.value)}/>
+          </div>
 
         </div>
-        
-        <StatsOverview stats={stats} />
-        
+
+        <StatsOverview stats={stats} currentDate={selectedCurrentDate} compareDate={selectedCompareDate} />
+
         <div className="mt-10 mb-8">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">저장된 상품 분석</h2>
@@ -75,7 +98,7 @@ export default function Dashboard() {
               <p className="text-sm text-muted-foreground">최대 3개의 상품을 분석할 수 있습니다</p>
             )}
           </div>
-          
+
           {queries.length === 0 ? (
             <EmptyState />
           ) : (
@@ -92,7 +115,7 @@ export default function Dashboard() {
           )}
         </div>
       </div>
-      
+
       {selectedQuery && (
         <DeleteQueryModal
           isOpen={isDeleteModalOpen}
