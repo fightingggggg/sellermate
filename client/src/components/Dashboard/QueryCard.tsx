@@ -606,10 +606,10 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                               `"${keyword.key}, ${keyword.value}"이(가) 새로 추가되어 ${index + 1}위에 올랐습니다.`
                             ) : keyword.status === 'removed' ? (
                               `"${keyword.key}, ${keyword.value}"이(가) 순위에서 제외되었습니다.`
-                            ) : keyword.status === 'increased' ? (
-                              `"${keyword.key}"의 값이 ${keyword.value - (keyword.change || 0)}에서 ${keyword.value}(으)로 변경되었습니다.`
+                            ) : keyword.status === 'increased' || keyword.status === 'decreased' ? (
+                              `"${keyword.key}"의 순위가 변경되었습니다.`
                             ) : (
-                              `"${keyword.key}"의 값이 ${keyword.value + (keyword.change || 0)}에서 ${keyword.value}(으)로 변경되었습니다.`
+                              `"${keyword.key}"의 순위가 변경되었습니다.`
                             )}
                           </span>
                         </div>
@@ -669,7 +669,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                         {Math.abs(count.rankChange)}위 {count.rankChange > 0 ? `상승(${count.previousRank}위→${count.currentRank}위)` : `하락(${count.previousRank}위→${count.currentRank}위)`}
                       </Badge>
                     ) : null}
-                  </div>
+                  </</div>
                   <div className="mlauto flex items-center">
                     <div className="w-24 bg-gray-200 rounded-full h-2.5">
                       <div 
