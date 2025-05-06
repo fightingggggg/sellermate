@@ -356,7 +356,14 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                       <ul className="text-sm space-y-2.5">
                         {comparedData?.keywords
                           .filter(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0))
-                          .slice(0, 5)
+                          .sort((a, b) => {
+                            // NEW/OUT 우선
+                            if ((a.status === 'added' || a.status === 'removed') && !(b.status === 'added' || b.status === 'removed')) return -1;
+                            if (!(a.status === 'added' || a.status === 'removed') && (b.status === 'added' || b.status === 'removed')) return 1;
+                            // 순위 변화 크기로 정렬
+                            return Math.abs((b.rankChange || 0)) - Math.abs((a.rankChange || 0));
+                          })
+                          .slice(0, 3)
                           .map((k, idx) => (
                             <li key={idx} className="flex items-start py-1 px-2 rounded-md hover:bg-blue-50">
                               {renderChangeIndicator(k)}
@@ -388,6 +395,11 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                       <ul className="text-sm space-y-2.5">
                         {comparedData?.keywordCounts
                           .filter(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0))
+                          .sort((a, b) => {
+                            if ((a.status === 'added' || a.status === 'removed') && !(b.status === 'added' || b.status === 'removed')) return -1;
+                            if (!(a.status === 'added' || a.status === 'removed') && (b.status === 'added' || b.status === 'removed')) return 1;
+                            return Math.abs((b.rankChange || 0)) - Math.abs((a.rankChange || 0));
+                          })
                           .slice(0, 3)
                           .map((k, idx) => (
                             <li key={idx} className="flex items-start py-1 px-2 rounded-md hover:bg-indigo-50">
@@ -420,6 +432,11 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                       <ul className="text-sm space-y-2.5">
                         {comparedData?.tags
                           .filter(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0))
+                          .sort((a, b) => {
+                            if ((a.status === 'added' || a.status === 'removed') && !(b.status === 'added' || b.status === 'removed')) return -1;
+                            if (!(a.status === 'added' || a.status === 'removed') && (b.status === 'added' || b.status === 'removed')) return 1;
+                            return Math.abs((b.rankChange || 0)) - Math.abs((a.rankChange || 0));
+                          })
                           .slice(0, 3)
                           .map((k, idx) => (
                             <li key={idx} className="flex items-start py-1 px-2 rounded-md hover:bg-purple-50">
