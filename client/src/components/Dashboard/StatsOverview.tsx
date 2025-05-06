@@ -23,23 +23,23 @@ export default function StatsOverview({ stats, queries, currentDate, compareDate
     queries.forEach(query => {
       if (!query.dates?.[currentDate] || !query.dates?.[compareDate]) return;
 
-      const currentData = query.dates[currentDate];
       const compareData = query.dates[compareDate];
 
-      // 각 섹션의 변화 수 계산
-      const calculateChanges = (items: KeywordItem[] = []) => {
-        return items.filter(item => 
-          item.status === 'added' || 
-          item.status === 'removed' || 
-          item.status === 'increased' || 
-          item.status === 'decreased'
-        ).length;
-      };
+      // 변화가 있는 항목 카운트
+      const keywordChanges = compareData?.keywords?.filter(k => 
+        k.status === 'added' || k.status === 'removed' || 
+        (k.rankChange !== undefined && k.rankChange !== 0)
+      ).length || 0;
 
-      // 키워드, 키워드 카운트, 태그의 변화 수 합산
-      const keywordChanges = calculateChanges(compareData?.keywords);
-      const keywordCountChanges = calculateChanges(compareData?.keywordCounts);
-      const tagChanges = calculateChanges(compareData?.tags);
+      const keywordCountChanges = compareData?.keywordCounts?.filter(k => 
+        k.status === 'added' || k.status === 'removed' || 
+        (k.rankChange !== undefined && k.rankChange !== 0)
+      ).length || 0;
+
+      const tagChanges = compareData?.tags?.filter(k => 
+        k.status === 'added' || k.status === 'removed' || 
+        (k.rankChange !== undefined && k.rankChange !== 0)
+      ).length || 0;
 
       totalChanges += keywordChanges + keywordCountChanges + tagChanges;
     });
