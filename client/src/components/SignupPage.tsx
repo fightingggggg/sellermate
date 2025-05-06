@@ -30,9 +30,7 @@ const signupSchema = z.object({
   terms: z.literal(true, {
     errorMap: () => ({ message: "이용약관과 개인정보처리방침에 동의해야 합니다" }),
   }),
-  terms: z.literal(true, {
-    errorMap: () => ({ message: "이용약관과 개인정보처리방침에 동의해야 합니다" }),
-  }),
+ 
 }).refine((data) => data.password === data.confirmPassword, {
   message: "비밀번호가 일치하지 않습니다",
   path: ["confirmPassword"],
@@ -55,7 +53,7 @@ export default function SignupPage() {
       email: "",
       password: "",
       confirmPassword: "",
-      terms: false,
+
       terms: false as any, // 타입 에러 해결을 위한 임시 처리
     },
   });
@@ -71,7 +69,7 @@ export default function SignupPage() {
         data.number
       );
       setAlertMessage({
-        message: "회원가입 성공! 이메일 인증을 완료해주세요.",
+        message: "회원가입이 완료되었습니다! 이메일로 발송된 인증 메일을 확인하시고, 이메일 인증을 완료해주세요. 인증이 완료되어야 로그인이 가능합니다.",
         type: "success"
       });
       setTimeout(() => {

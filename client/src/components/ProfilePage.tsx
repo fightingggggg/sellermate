@@ -57,9 +57,10 @@ export default function ProfilePage() {
     updateUserProfile, 
     deleteUserAccount, 
     logout,
-    error: authError 
+    error: authError,
+    sendPasswordReset // Added sendPasswordReset function
   } = useAuth();
-  
+
   const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -162,13 +163,13 @@ export default function ProfilePage() {
           <h1 className="text-2xl font-bold">내 계정</h1>
           <Button variant="outline" onClick={handleLogout}>로그아웃</Button>
         </div>
-        
+
         {authError && (
           <Alert variant="destructive" className="mb-6">
             <AlertDescription>{authError}</AlertDescription>
           </Alert>
         )}
-        
+
         {profileLoading ? (
           <div className="flex justify-center items-center h-32">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -183,7 +184,7 @@ export default function ProfilePage() {
                 계정 관리
               </TabsTrigger>
             </TabsList>
-            
+
             {/* 기본 정보 탭 */}
             <TabsContent value="profile">
               <Card className="border-none shadow-sm">
@@ -193,14 +194,14 @@ export default function ProfilePage() {
                     스마트스토어 관련 정보와 연락처를 관리합니다.
                   </CardDescription>
                 </CardHeader>
-                
+
                 <CardContent>
                   <div className="mb-6 p-4 bg-blue-50 rounded-md text-blue-800">
-              
+
                     <p className="text-sm">이메일: {userProfile?.email}</p>
-               
+
                   </div>
-                
+
                   <Form {...profileForm}>
                     <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
                       <FormField
@@ -220,7 +221,7 @@ export default function ProfilePage() {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={profileForm.control}
                         name="businessLink"
@@ -238,7 +239,7 @@ export default function ProfilePage() {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={profileForm.control}
                         name="number"
@@ -256,7 +257,7 @@ export default function ProfilePage() {
                           </FormItem>
                         )}
                       />
-                      
+
                       <div className="pt-4">
                         <Button 
                           type="submit" 
@@ -277,23 +278,54 @@ export default function ProfilePage() {
                 </CardContent>
               </Card>
             </TabsContent>
-            
+
             {/* 계정 관리 탭 */}
             <TabsContent value="danger">
               <Card className="border-none shadow-sm">
                 <CardHeader>
-                  <CardTitle className="text-red-600">계정 삭제</CardTitle>
+                  <CardTitle>계정 관리</CardTitle>
                   <CardDescription>
-                    계정을 삭제하면 모든 정보가 영구적으로 제거됩니다. 이 작업은 되돌릴 수 없습니다.
+                    비밀번호 재설정 및 계정 삭제와 같은 계정 관련 작업을 수행할 수 있습니다.
                   </CardDescription>
                 </CardHeader>
-                
-                <CardContent>
-                  <div className="flex flex-col space-y-4">
-                    <p className="text-sm text-muted-foreground">
-                      계정을 삭제하기 전에 다른 방법을 고려해보세요. 계정 삭제 시 모든 데이터가 영구적으로 제거됩니다.
+
+                <CardContent className="space-y-6">
+                  <div className="border-b pb-6">
+                    <h3 className="text-lg font-medium mb-2">비밀번호 재설정</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      현재 이메일 주소로 비밀번호 재설정 링크를 발송합니다.
                     </p>
-                    
+                    <Button 
+                      variant="outline"
+                      onClick={async () => {
+                        try {
+                          if (userProfile?.email) {
+                            const success = await sendPasswordReset(userProfile.email);
+                            if (success) {
+                              toast({
+                                title: "비밀번호 재설정 이메일 발송",
+                                description: "이메일함을 확인하여 비밀번호를 재설정해주세요.",
+                              });
+                            }
+                          }
+                        } catch (error) {
+                          toast({
+                            title: "오류 발생",
+                            description: "비밀번호 재설정 이메일 발송 중 문제가 발생했습니다.",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
+                    >
+                      비밀번호 재설정 이메일 받기
+                    </Button>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-medium text-red-600 mb-2">계정 삭제</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      계정을 삭제하면 모든 정보가 영구적으로 제거됩니다. 이 작업은 되돌릴 수 없습니다.
+                    </p>
                     <div className="pt-4">
                       <Button 
                         variant="destructive" 
@@ -303,7 +335,7 @@ export default function ProfilePage() {
                         계정 삭제
                       </Button>
                     </div>
-                    
+
                     <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                       <DialogContent className="border-none shadow-md">
                         <DialogHeader>
@@ -312,7 +344,7 @@ export default function ProfilePage() {
                             계정을 삭제하시면 모든 데이터가 영구적으로 삭제되며, 이 작업은 되돌릴 수 없습니다.
                           </DialogDescription>
                         </DialogHeader>
-                        
+
                         <Form {...deleteAccountForm}>
                           <form onSubmit={deleteAccountForm.handleSubmit(onDeleteSubmit)} className="space-y-4">
                             <FormField
@@ -333,7 +365,7 @@ export default function ProfilePage() {
                                 </FormItem>
                               )}
                             />
-                            
+
                             <FormField
                               control={deleteAccountForm.control}
                               name="confirmation"
@@ -354,7 +386,7 @@ export default function ProfilePage() {
                                 </FormItem>
                               )}
                             />
-                            
+
                             <DialogFooter className="gap-2 sm:gap-0">
                               <Button 
                                 type="button" 

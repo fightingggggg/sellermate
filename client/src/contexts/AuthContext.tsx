@@ -67,8 +67,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setProfileLoading(true);
     try {
       // 현재 인증된 사용자만 프로필에 접근할 수 있도록 함
-      if (!auth.currentUser) {
-        throw new Error("인증된 사용자만 프로필에 접근할 수 있습니다.");
+      if (!auth.currentUser || !auth.currentUser.emailVerified) {
+        await signOut(auth);
+        throw new Error("이메일 인증이 필요합니다.");
       }
 
       // 컬렉션 이름 정정: userInfo -> usersInfo
@@ -154,18 +155,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // 사용자 추가 정보 저장
       if (user) {
-        const userProfile = {
-          uid: user.uid,
-          email: user.email,
-          businessName: businessName || "",
-          businessLink: businessLink || "",
-          number: number || "",
-          createdAt: new Date().toISOString(),
-          emailVerified: false
-        };
+        try {
+          const userProfile = {
+            uid: user.uid,
+            email: user.email,
+            businessName: businessName || "",
+            businessLink: businessLink || "",
+            number: number || "",
+            createdAt: new Date().toISOString(),
+            emailVerified: false
+          };
 
-        // usersInfo 컬렉션에 사용자 정보 저장
-        await setDoc(doc(db, "usersInfo", user.uid), userProfile);
+          // usersInfo 컬렉션에 사용자 정보 저장
+          await setDoc(doc(db, "usersInfo", user.uid), userProfile);
+          
+          // 회원가입 후 바로 로그아웃
+          await signOut(auth);
+          setCurrentUser(null);
+          setUserProfile(null);
+        } catch (error) {
+          console.error("Error creating user profile:", error);
+          // 프로필 생성 실패시에도 회원가입은 완료되도록 함
+          await signOut(auth);
+          setCurrentUser(null);
+          setUserProfile(null);
+        }
       }
     } catch (error: any) {
       console.error("Error signing up", error);
@@ -178,19 +192,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function signIn(email: string, password: string): Promise<boolean> {
     setError(null);
     try {
+      // First check if the user exists and is verified
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       
       if (!userCredential.user.emailVerified) {
-        setError("이메일 인증이 완료되지 않았습니다. 이메일함을 확인하여 인증을 완료해주세요. 인증 메일을 받지 못하셨다면 아래 버튼을 클릭하여 재발송 받으실 수 있습니다.");
-        await sendEmailVerification(userCredential.user);
         await signOut(auth);
+        setError("이메일 인증이 필요합니다. 이메일함을 확인하여 인증을 완료해주세요.");
         return false;
       }
+
+      // Update Firestore emailVerified status
+      const userDocRef = doc(db, "usersInfo", userCredential.user.uid);
+      const userDoc = await getDoc(userDocRef);
       
+      if (!userDoc.exists()) {
+        await signOut(auth);
+        setError("사용자 정보를 찾을 수 없습니다.");
+        return false;
+      }
+
+      // Update Firestore verification status if needed
+      if (userDoc.exists() && !userDoc.data().emailVerified && userCredential.user.emailVerified) {
+        await updateDoc(userDocRef, {
+          emailVerified: true
+        });
+      }
+
+      // Fetch fresh user data to ensure email verification status
+      const freshUserData = await auth.currentUser?.reload();
+      if (!auth.currentUser?.emailVerified) {
+        await signOut(auth);
+        setError("이메일 인증이 필요합니다. 이메일함을 확인하여 인증을 완료해주세요.");
+        return false;
+      }
+
       return true;
     } catch (error: any) {
       console.error("Error signing in", error);
-      setError(error.message || "로그인 중 오류가 발생했습니다.");
+      if (error.code === "auth/user-not-found") {
+        setError("등록되지 않은 이메일입니다.");
+      } else if (error.code === "auth/wrong-password") {
+        setError("잘못된 비밀번호입니다.");
+      } else {
+        setError("로그인 중 오류가 발생했습니다.");
+      }
       return false;
     }
   }
@@ -361,7 +406,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     try {
       await sendEmailVerification(auth.currentUser, {
-        url: 'your-verification-url' // Add your verification URL here.  This is crucial.
+        url: window.location.origin + '/login',
+        handleCodeInApp: true
       });
       return true;
     } catch (error: any) {

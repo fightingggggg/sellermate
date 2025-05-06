@@ -42,7 +42,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   </h1>
                 </Link>
               </div>
-              
+
               <div className="hidden sm:ml-6 sm:flex sm:items-center">
                 <Link href="/" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-700 flex items-center">
                   <Home className="h-4 w-4 mr-1" />
@@ -54,7 +54,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </Link>
               </div>
             </div>
-            
+
             <div className="flex items-center">
               {currentUser ? (
                 <>
@@ -92,14 +92,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </>
               ) : (
                 <div className="flex items-center space-x-3">
-                  <Button 
-                    onClick={() => navigate("/signup")}
-                    variant="outline"
-                    className="border-blue-500 text-blue-600 hover:bg-blue-50"
-                  >
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    회원가입
-                  </Button>
+                  <Link href="/login?tab=register">
+                    <Button 
+                      variant="outline"
+                      className="border-blue-500 text-blue-600 hover:bg-blue-50"
+                    >
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      회원가입
+                    </Button>
+                  </Link>
                   <Button 
                     onClick={() => navigate("/login")}
                     className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
@@ -108,7 +109,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   </Button>
                 </div>
               )}
-              
+
               <div className="flex items-center sm:hidden ml-4">
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -119,7 +120,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               </div>
             </div>
           </div>
-          
+
           {/* Mobile menu */}
           {isMobileMenuOpen && (
             <div className="sm:hidden py-2 space-y-1 border-t border-gray-200">
@@ -160,7 +161,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children}
       </main>
-      
+
       <footer className="bg-white border-t border-gray-200 py-8 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center text-sm text-gray-500">

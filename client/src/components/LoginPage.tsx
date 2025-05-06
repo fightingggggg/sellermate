@@ -8,6 +8,7 @@ import { AlertCircle, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLocation } from "wouter";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface LoginPageProps {
   isModal?: boolean;
@@ -22,7 +23,11 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
   const [businessName, setStoreName] = useState("");
   const [businessLink, setStoreUrl] = useState("");
   const [number, setPhoneNumber] = useState("");
-  const [tab, setTab] = useState("login");
+  const [tab, setTab] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('tab') || "login";
+  });
+  const [terms, setTerms] = useState(false);
   const [alertMessage, setAlertMessage] = useState({ message: '', type: '' }); // Alert message state
   const [, navigate] = useLocation();
 
@@ -54,7 +59,7 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
 
   const handleSignUp = async () => {
     if (!email || !password || !businessName || !businessLink || !number) return;
-    
+
     if (!isValidURL(businessLink)) {
       setAlertMessage({
         message: "올바른 스마트스토어 URL을 입력해주세요. (예: https://smartstore.naver.com/yourstore)",
@@ -70,17 +75,21 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
       });
       return;
     }
-    
+
     try {
       await signUp(email, password, businessName, businessLink, number);
       setAlertMessage({
-        message: "회원가입이 완료되었습니다! 이메일로 발송된 인증 메일을 확인하시고, 이메일 인증을 완료해주세요. 인증이 완료되어야 로그인이 가능합니다.",
+        message: "회원가입 성공! 이메일함을 확인하여 이메일 인증을 완료해주세요.",
         type: "success"
       });
-      setTab("login");
-      setTimeout(() => {
-        setTab("login");
-      }, 3000);
+      setEmail("");
+      setPassword("");
+      setStoreName("");
+      setStoreUrl("");
+      setPhoneNumber("");
+      setPasswordConfirm(""); //비밀번호 확인 초기화
+      setTerms(false); //동의 초기화
+
     } catch (error: any) {
       console.error("Signup error:", error);
       if (error.code === "auth/email-already-in-use") {
@@ -93,9 +102,9 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
           message: "올바른 이메일 형식이 아닙니다. 예시: your.name@example.com",
           type: "error"
         });
-      } else if (error.code === "auth/weak-password") {
+      } else if (error.code === "auth/weak-password" || error.code === "auth/password-does-not-meet-requirements") {
         setAlertMessage({
-          message: "보안을 위해 다음 조건을 만족하는 비밀번호를 설정해주세요:\n- 최소 6자 이상\n- 영문 대/소문자\n- 숫자\n- 특수문자(!@#$%^&* 등)",
+          message: "비밀번호는 소문자, 특수문자, 숫자 포함 6자 이상이여야 합니다",
           type: "error"
         });
       } else if (error.code === "auth/network-request-failed") {
@@ -199,7 +208,7 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
 
           {/* 회원가입 탭 */}
           <TabsContent value="register">
-            <div className="space-y-4">
+            <div className="space-y-2">
               <p className="text-sm text-center text-gray-600 mb-4">
                 회원가입 후 스마트스토어 상품 분석 기능을 이용하세요.
               </p>
@@ -280,10 +289,33 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
                 />
               </div>
 
+              <div className="flex items-center space-x-2 mt-4">
+  <Checkbox 
+    id="terms" 
+    checked={terms}
+    onCheckedChange={(checked) => setTerms(checked as boolean)}
+  />
+  <label
+    htmlFor="terms"
+    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+  >
+    <a
+      href="https://chambray-midnight-e7f.notion.site/SEO-18678708053f806a9955f0f5375cdbdd"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="underline text-blue-600 hover:text-blue-800"
+    >
+      이용약관 및 개인정보처리방침
+    </a>
+    에 동의합니다
+  </label>
+</div>
+
+
               <Button 
-                onClick={handleSignUp} 
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                disabled={loading || !email || !password || !businessName || !businessLink || !number}
+                onClick={handleSignUp}
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 mt-4"
+                disabled={loading || !email || !password || !businessName || !businessLink || !number || !terms}
               >
                 {loading ? (
                   <>

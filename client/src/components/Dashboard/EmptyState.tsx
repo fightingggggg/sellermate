@@ -64,7 +64,7 @@ export default function EmptyState() {
               쉽고 빠르게 상품의 SEO 성과를 확인할 수 있습니다.
             </p>
             
-            <a href="/login">
+            <a href="/login?tab=register">
               <Button 
                 className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
               >
