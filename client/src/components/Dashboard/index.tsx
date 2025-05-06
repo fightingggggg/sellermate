@@ -12,9 +12,11 @@ export default function Dashboard() {
   const { queries, stats, loading } = useQueries();
   const { refreshQuery, error } = useQueryContext();
   const { currentUser } = useAuth();
-  
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedQuery, setSelectedQuery] = useState<{ id: string; text: string } | null>(null);
+  const [selectedCurrentDate, setSelectedCurrentDate] = useState(null); // Added state for current date
+  const [selectedCompareDate, setSelectedCompareDate] = useState(null); // Added state for compare date
 
   const handleOpenDeleteModal = (queryId: string, queryText: string) => {
     setSelectedQuery({ id: queryId, text: queryText });
@@ -38,7 +40,7 @@ export default function Dashboard() {
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className="text-center py-12">
@@ -65,9 +67,14 @@ export default function Dashboard() {
           </div>
 
         </div>
-        
-        <StatsOverview stats={stats} />
-        
+
+        <StatsOverview 
+          stats={stats} 
+          queries={queries}
+          currentDate={selectedCurrentDate} 
+          compareDate={selectedCompareDate}
+        />
+
         <div className="mt-10 mb-8">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">저장된 상품 분석</h2>
@@ -75,7 +82,7 @@ export default function Dashboard() {
               <p className="text-sm text-muted-foreground">최대 3개의 상품을 분석할 수 있습니다</p>
             )}
           </div>
-          
+
           {queries.length === 0 ? (
             <EmptyState />
           ) : (
@@ -92,7 +99,7 @@ export default function Dashboard() {
           )}
         </div>
       </div>
-      
+
       {selectedQuery && (
         <DeleteQueryModal
           isOpen={isDeleteModalOpen}

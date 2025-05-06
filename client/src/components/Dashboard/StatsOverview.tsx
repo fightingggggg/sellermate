@@ -5,11 +5,33 @@ import { useAuth } from "@/contexts/AuthContext";
 
 interface StatsOverviewProps {
   stats: DashboardStats;
+  queries: Query[];
+  currentDate?: string;
+  compareDate?: string;
 }
 
-export default function StatsOverview({ stats }: StatsOverviewProps) {
+export default function StatsOverview({ stats, queries, currentDate, compareDate }: StatsOverviewProps) {
   const { currentUser } = useAuth();
-  
+
+  // Calculate changes between comparison dates
+  const countChangesBetweenDates = () => {
+    if (!currentDate || !compareDate) return 0;
+    let totalChanges = 0;
+
+    queries.forEach(query => {
+      if (!query.dates || !query.dates[currentDate] || !query.dates[compareDate]) return;
+
+      const currentData = query.dates[currentDate];
+      const compareData = query.dates[compareDate];
+
+      // Assuming changes are simply the difference in the number of entries
+      totalChanges += Math.abs(Object.keys(currentData).length - Object.keys(compareData).length);
+    });
+    return totalChanges;
+  };
+
+  const changesCount = countChangesBetweenDates();
+
   return (
     <div className="mb-8">
       <h2 className="text-xl font-semibold mb-4">분석 개요</h2>
@@ -22,7 +44,7 @@ export default function StatsOverview({ stats }: StatsOverviewProps) {
           color="blue"
           isActive={!!currentUser}
         />
-        
+
         <StatCard 
           title="마지막 업데이트" 
           value={stats.lastUpdated} 
@@ -31,11 +53,11 @@ export default function StatsOverview({ stats }: StatsOverviewProps) {
           color="green"
           isActive={!!currentUser}
         />
-        
+
         <StatCard 
           title="변경된 데이터" 
-          value={stats.changesCount.toString()} 
-          description="전체 변경 항목 개수" 
+          value={changesCount.toString()} 
+          description="비교 날짜 기준 변경 항목 개수" 
           icon={<BarChart2 />}
           color="indigo"
           isActive={!!currentUser}
@@ -75,9 +97,9 @@ function StatCard({ title, value, description, icon, color, isActive }: StatCard
       valueText: isActive ? 'text-indigo-700' : 'text-gray-500'
     }
   };
-  
+
   const colors = colorMap[color];
-  
+
   return (
     <Card className={`border ${colors.border} ${colors.bg} shadow-sm overflow-hidden`}>
       <CardContent className="p-6">
@@ -96,4 +118,8 @@ function StatCard({ title, value, description, icon, color, isActive }: StatCard
       </CardContent>
     </Card>
   );
+}
+
+interface Query {
+  dates: { [date: string]: { [key: string]: any } };
 }
