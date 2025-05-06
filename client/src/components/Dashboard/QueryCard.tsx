@@ -262,9 +262,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
 
   // Helper function to determine if an item should show dialog
   const shouldShowDialog = (item: KeywordItem) => {
-    return selectedCompareDate && selectedCompareDate !== "none" && 
-           (item.status === 'added' || item.status === 'removed' || 
-            (item.rankChange !== undefined && item.rankChange !== 0));
+    return selectedCompareDate && selectedCompareDate !== "none";
   };
 
   // Helper function to wrap content in Dialog if needed
