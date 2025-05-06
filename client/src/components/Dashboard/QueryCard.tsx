@@ -673,8 +673,8 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                       </Badge>
                     ) : null}
                   </div>
-                  <div className="mlauto flex items-center">
-                    <div className="w-24 bg-gray-200 rounded-full h-2.5">
+                  <div className="ml-auto flex items-center">
+                    <div className="w-20 bg-gray-200 rounded-full h-2.5">
                       <div 
                         className={`${count.status === 'removed' ? 'bg-gray-400' : 'bg-primary'} h-2.5 rounded-full`} 
                         style={{ width: `${Math.min(100, count.value * 2)}%` }}
@@ -683,12 +683,14 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                     <span className={`ml-2 font-semibold ${
                       count.status === 'removed' ? 'text-gray-400' : 'text-primary'
                     }`}>
-                      {count.value}
+                      {count.value} 
                       {count.status === 'increased' && count.change ? (
                         <span className="ml-1 text-sm font-bold text-emerald-500">+{count.change}</span>
                       ) : count.status === 'decreased' && count.change ? (
                         <span className="ml-1 text-sm font-bold text-red-500">-{count.change}</span>
-                      ) : null}
+                      ) : (
+                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                      )}
                     </span>
                   </div>
                 </div>
