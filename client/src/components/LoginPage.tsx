@@ -43,9 +43,26 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
     }
   };
 
+  const isValidURL = (url: string) => {
+    try {
+      new URL(url);
+      return url.startsWith('https://smartstore.naver.com/');
+    } catch {
+      return false;
+    }
+  };
+
   const handleSignUp = async () => {
     if (!email || !password || !businessName || !businessLink || !number) return;
     
+    if (!isValidURL(businessLink)) {
+      setAlertMessage({
+        message: "올바른 스마트스토어 URL을 입력해주세요. (예: https://smartstore.naver.com/yourstore)",
+        type: "error"
+      });
+      return;
+    }
+
     if (password !== passwordConfirm) {
       setAlertMessage({
         message: "비밀번호가 일치하지 않습니다. 다시 확인해주세요.",

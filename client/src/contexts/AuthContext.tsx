@@ -179,11 +179,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setError(null);
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
       if (!userCredential.user.emailVerified) {
-        setError("이메일 인증이 완료되지 않았습니다. 인증 메일을 확인해주세요.");
+        setError("이메일 인증이 필요합니다. 인증 메일을 확인하시고 인증을 완료해주세요. 인증 메일을 받지 못하셨다면 재발송해드리겠습니다.");
+        await sendEmailVerification(userCredential.user);
         await signOut(auth);
         return false;
       }
+      
       return true;
     } catch (error: any) {
       console.error("Error signing in", error);
