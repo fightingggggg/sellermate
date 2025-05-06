@@ -26,7 +26,7 @@ export default function StatsOverview({ stats, queries, currentDate, compareDate
 
       // Count changes in keywords
       if (currentData.keywords && compareData.keywords) {
-        totalChanges += currentData.keywords.filter(k => 
+        totalChanges += currentData.keywords.filter((k: KeywordItem) => 
           (k.status === 'added' || k.status === 'removed') && k.date === compareDate || 
           (k.rankChange !== undefined && k.rankChange !== 0 && k.date === compareDate)
         ).length;
@@ -34,7 +34,7 @@ export default function StatsOverview({ stats, queries, currentDate, compareDate
 
       // Count changes in keywordCounts
       if (currentData.keywordCounts && compareData.keywordCounts) {
-        totalChanges += currentData.keywordCounts.filter(k => 
+        totalChanges += currentData.keywordCounts.filter((k: KeywordItem) => 
           (k.status === 'added' || k.status === 'removed') && k.date === compareDate || 
           (k.rankChange !== undefined && k.rankChange !== 0 && k.date === compareDate)
         ).length;
@@ -42,7 +42,7 @@ export default function StatsOverview({ stats, queries, currentDate, compareDate
 
       // Count changes in tags
       if (currentData.tags && compareData.tags) {
-        totalChanges += currentData.tags.filter(k => 
+        totalChanges += currentData.tags.filter((k: KeywordItem) => 
           (k.status === 'added' || k.status === 'removed') && k.date === compareDate || 
           (k.rankChange !== undefined && k.rankChange !== 0 && k.date === compareDate)
         ).length;
