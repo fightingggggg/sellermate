@@ -728,58 +728,132 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                     (Array.isArray(comparedData.tags) ? [...comparedData.tags] : []) : 
                     (Array.isArray(query.tags) ? [...query.tags] : [])
                 ).sort((a, b) => b.value - a.value).map((tag, index) => (
-                  <div 
-                    key={index} 
-                    className={`flex items-center p-3 rounded-lg ${
-                      tag.status === 'removed' ? 'text-gray-400 bg-gray-100' :
-                      tag.status === 'added' ? 'bg-blue-50 border border-blue-200' :
-                      tag.rankChange !== undefined && tag.rankChange !== 0 ? 
-                        (tag.rankChange > 0 ? 'bg-green-50 border border-green-200' : 'bg-amber-50 border border-amber-200') :
-                      'bg-gray-50 hover:bg-gray-100'
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <div className="w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs mr-2">
-                        {tag.status === 'removed' ? 
-                          (tag.previousRank || index + 1) : 
-                          (tag.currentRank || index + 1)}
+                  <Dialog key={index}>
+                    <DialogTrigger asChild>
+                      <div 
+                        key={index} 
+                        className={`flex items-center p-3 rounded-lg ${
+                          tag.status === 'removed' ? 'text-gray-400 bg-gray-100' :
+                          tag.status === 'added' ? 'bg-blue-50 border border-blue-200' :
+                          tag.rankChange !== undefined && tag.rankChange !== 0 ? 
+                            (tag.rankChange > 0 ? 'bg-green-50 border border-green-200' : 'bg-amber-50 border border-amber-200') :
+                          'bg-gray-50 hover:bg-gray-100'
+                        }`}
+                      >
+                        <div className="flex items-center">
+                          <div className="w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs mr-2">
+                            {tag.status === 'removed' ? 
+                              (tag.previousRank || index + 1) : 
+                              (tag.currentRank || index + 1)}
+                          </div>
+                          <span className="text-sm font-medium">{tag.key}</span>
+                          {tag.status === 'added' ? (
+                            <Badge className="ml-2 bg-blue-500 text-white">NEW</Badge>
+                          ) : tag.status === 'removed' ? (
+                            <Badge className="ml-2 bg-red-500 text-white">OUT</Badge>
+                          ) : tag.rankChange !== undefined && tag.rankChange !== 0 ? (
+                            <Badge className={`ml-2 ${
+                              tag.rankChange > 0 
+                              ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
+                              : 'bg-amber-100 text-amber-800 border-amber-300'
+                            } hover:bg-blue-200 border`}>
+                              {Math.abs(tag.rankChange)}위 {tag.rankChange > 0 ? `상승(${tag.previousRank}위→${tag.currentRank}위)` : `하락(${tag.previousRank}위→${tag.currentRank}위)`}
+                            </Badge>
+                          ) : null}
+                        </div>
+                        <div className="ml-auto flex items-center">
+                          <div className="w-20 bg-gray-200 rounded-full h-2.5">
+                            <div 
+                              className={`${tag.status === 'removed' ? 'bg-gray-400' : 'bg-purple-600'} h-2.5 rounded-full`} 
+                              style={{ width: `${Math.min(100, tag.value * 2)}%` }}
+                            ></div>
+                          </div>
+                          <span className={`ml-2 font-semibold ${
+                            tag.status === 'removed' ? 'text-gray-400' : 'text-purple-600'
+                          }`}>
+                            {tag.value}
+                            {tag.status === 'increased' && tag.change ? (
+                              <span className="ml-1 text-sm font-bold text-emerald-500">+{tag.change}</span>
+                            ) : tag.status === 'decreased' && tag.change ? (
+                              <span className="ml-1 text-sm font-bold text-red-500">-{tag.change}</span>
+                            ) : null}
+                          </span>
+                        </div>
                       </div>
-                      <span className="text-sm font-medium">{tag.key}</span>
-                      {tag.status === 'added' ? (
-                        <Badge className="ml-2 bg-blue-500 text-white">NEW</Badge>
-                      ) : tag.status === 'removed' ? (
-                        <Badge className="ml-2 bg-red-500 text-white">OUT</Badge>
-                      ) : tag.rankChange !== undefined && tag.rankChange !== 0 ? (
-                        <Badge className={`ml-2 ${
-                          tag.rankChange > 0 
-                          ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
-                          : 'bg-amber-100 text-amber-800 border-amber-300'
-                        } hover:bg-blue-200 border`}>
-                          {Math.abs(tag.rankChange)}위 {tag.rankChange > 0 ? `상승(${tag.previousRank}위→${tag.currentRank}위)` : `하락(${tag.previousRank}위→${tag.currentRank}위)`}
-                        </Badge>
-                      ) : null}
-                    </div>
-                    <div className="ml-auto flex items-center">
-                      <div className="w-20 bg-gray-200 rounded-full h-2.5">
-                        <div 
-                          className={`${tag.status === 'removed' ? 'bg-gray-400' : 'bg-purple-600'} h-2.5 rounded-full`} 
-                          style={{ width: `${Math.min(100, tag.value * 2)}%` }}
-                        ></div>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                      <DialogHeader>
+                        <DialogTitle className="text-center">
+                          {tag.key} <span className="text-sm text-gray-500">태그 변화</span>
+                        </DialogTitle>
+                      </DialogHeader>
+                      <div className="py-4">
+                        <div className="p-4 bg-gray-50 rounded-lg">
+                          <div className="flex justify-between mb-4">
+                            <div>
+                              <h5 className="text-sm font-medium text-gray-600 mb-1">이전 값</h5>
+                              {tag.status === 'added' ? (
+                                <span className="text-2xl font-bold text-gray-400">-</span>
+                              ) : (
+                                <div className="flex items-center">
+                                  <span className="text-2xl font-bold">
+                                    {tag.status === 'increased' && tag.change ? tag.value - tag.change : 
+                                     tag.status === 'decreased' && tag.change ? tag.value + tag.change : 
+                                     tag.value}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="text-center mt-2">
+                              <span className="text-4xl">
+                                {tag.status === 'added' ? (
+                                  <span className="text-emerald-500">→</span>
+                                ) : tag.status === 'removed' ? (
+                                  <span className="text-red-500">→</span>
+                                ) : tag.status === 'increased' ? (
+                                  <span className="text-blue-500">↑</span>
+                                ) : (
+                                  <span className="text-amber-500">↓</span>
+                                )}
+                              </span>
+                            </div>
+                            <div className="text-right">
+                              <h5 className="text-sm font-medium text-gray-600 mb-1">현재 값</h5>
+                              {tag.status === 'removed' ? (
+                                <span className="text-2xl font-bold text-gray-400">-</span>
+                              ) : (
+                                <div className="flex items-center justify-end">
+                                  <span className="text-2xl font-bold">{tag.value}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="text-center my-4">
+                            <span className="text-sm font-medium">
+                              {tag.status === 'added' ? (
+                                `"${tag.key}"이(가) 새로 추가되어 ${tag.currentRank}위에 올랐습니다.`
+                              ) : tag.status === 'removed' ? (
+                                `"${tag.key}"이(가) 순위에서 제외되었습니다.`
+                              ) : tag.rankChange !== undefined && tag.rankChange !== 0 ? (
+                                `"${tag.key}"의 순위가 ${Math.abs(tag.rankChange)}단계 ${tag.rankChange > 0 ? '상승' : '하락'}했습니다. (${tag.previousRank}위 → ${tag.currentRank}위)`
+                              ) : (
+                                `"${tag.key}"의 순위가 변경되지 않았습니다.`
+                              )}
+                            </span>
+                          </div>
+
+                          <div className="mt-4 text-sm text-gray-500">
+                            <p>
+                              {selectedCurrentDate && format(new Date(selectedCurrentDate), 'yyyy년 MM월 dd일')}과(와) 
+                              {selectedCompareDate && selectedCompareDate !== "none" && format(new Date(selectedCompareDate), 'yyyy년 MM월 dd일')} 사이의 
+                              변화입니다.
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      <span className={`ml-2 font-semibold ${
-                        tag.status === 'removed' ? 'text-gray-400' : 'text-purple-600'
-                      }`}>
-                        {tag.value}
-                        {tag.status === 'increased' && tag.change ? (
-                          <span className="ml-1 text-sm font-bold text-emerald-500">+{tag.change}</span>
-                        ) : tag.status === 'decreased' && tag.change ? (
-                          <span className="ml-1 text-sm font-bold text-red-500">-{tag.change}</span>
-                        ) : (
-                          <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                        )}
-                      </span>
-                    </div>
-                  </div>
+                    </DialogContent>
+                  </Dialog>
                 ))}
               </div>
             </div>
@@ -815,63 +889,12 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                     <Badge className="ml-1 px-1 py-0 text-xs bg-red-100 text-red-800 border border-red-200">OUT</Badge>
                   ) : tag.rankChange !== undefined && tag.rankChange !== 0 ? (
                     <Badge className={`ml-1 px-1 py-0 text-xs ${
-                    tag.rankChange > 0 ? 'bg-green-100 text-green-800 border border-green-200' : 
-                    'bg-amber-100 text-amber-800 border border-amber-200'
-                  }`}>
-                    {tag.rankChange > 0 ? `+${tag.rankChange}` : tag.rankChange}
-                  </Badge>
-                  ) : null}
-                </div>
-              );
-
-              return selectedCompareDate && selectedCompareDate !== "none" ? (
-                <Dialog key={index}>
-                  <DialogTrigger asChild>
-                    {TagCard}
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle className="text-center">
-                        {tag.key} <span className="text-sm text-gray-500">태그 변화</span>
-                      </DialogTitle>
-                    </DialogHeader>
-                    <div className="py-4">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h5 className="text-sm font-medium text-gray-600 mb-1">이전 값</h5>
-                          <span className="text-2xl font-bold">{tag.previousValue || '-'}</span>
-                        </div>
-                        <div className="text-right">
-                          <h5 className="text-sm font-medium text-gray-600 mb-1">현재 값</h5>
-                          <span className="text-2xl font-bold">{tag.value}</span>
-                        </div>
-                      </div>
-                      <div className="text-center my-4">
-                        {tag.status === 'added' ? (
-                          `"${tag.key}"이(가) 새로 추가되었습니다.`
-                        ) : tag.status === 'removed' ? (
-                          `"${tag.key}"이(가) 제외되었습니다.`
-                        ) : tag.rankChange !== undefined && tag.rankChange !== 0 ? (
-                          `"${tag.key}"의 순위가 ${Math.abs(tag.rankChange)}단계 ${tag.rankChange > 0 ? '상승' : '하락'}했습니다.`
-                        ) : (
-                          `"${tag.key}"의 순위가 변경되지 않았습니다.`
-                        )}
-                      </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              ) : TagCard;
-                      tag.rankChange > 0 
-                      ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
-                      : 'bg-amber-100 text-amber-800 border-amber-300'
-                    } border`}>
+                    tag.rankChange > 0 
+                    ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
+                    : 'bg-amber-100 text-amber-800 border-amber-300'
+                  } border`}>
                       {Math.abs(tag.rankChange)}위 {tag.rankChange > 0 ? `상승(${tag.previousRank}위→${tag.currentRank}위)` : `하락(${tag.previousRank}위→${tag.currentRank}위)`}
                     </Badge>
-                  ) : null}
-                  {tag.status === 'increased' && tag.change ? (
-                    <span className="ml-1 text-sm font-bold text-emerald-500">+{tag.change}</span>
-                  ) : tag.status === 'decreased' && tag.change ? (
-                    <span className="ml-1 text-sm font-bold text-red-500">-{tag.change}</span>
                   ) : null}
                 </div>
               ))}
