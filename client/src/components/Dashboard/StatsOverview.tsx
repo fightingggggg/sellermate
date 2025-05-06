@@ -5,10 +5,47 @@ import { useAuth } from "@/contexts/AuthContext";
 
 interface StatsOverviewProps {
   stats: DashboardStats;
+  queries: Query[];
 }
 
-export default function StatsOverview({ stats }: StatsOverviewProps) {
+export default function StatsOverview({ stats, queries }: StatsOverviewProps) {
   const { currentUser } = useAuth();
+
+  // Calculate changes between comparison dates
+  const countChangesBetweenDates = () => {
+    let totalChanges = 0;
+
+    queries.forEach(query => {
+      const dates = Object.keys(query.dates || {}).sort((a, b) => 
+        new Date(b).getTime() - new Date(a).getTime()
+      );
+
+      if (dates.length < 2) return;
+
+      const currentDate = dates[0];
+      const compareDate = dates[1];
+      const currentData = query.dates[currentDate];
+      const compareData = query.dates[compareDate];
+
+      if (!currentData || !compareData) return;
+
+      const countChangesInData = (currentItems: KeywordItem[] = [], compareItems: KeywordItem[] = []) => {
+        if (!Array.isArray(currentItems) || !Array.isArray(compareItems)) return 0;
+        return currentItems.filter(item => {
+          const compareItem = compareItems.find(ci => ci.key === item.key);
+          return !compareItem || item.value !== compareItem.value;
+        }).length;
+      };
+
+      totalChanges += countChangesInData(currentData.keywords, compareData.keywords);
+      totalChanges += countChangesInData(currentData.keywordCounts, compareData.keywordCounts);
+      totalChanges += countChangesInData(currentData.tags, compareData.tags);
+    });
+
+    return totalChanges;
+  };
+
+  const changesCount = countChangesBetweenDates();
   
   return (
     <div className="mb-8">
@@ -34,8 +71,8 @@ export default function StatsOverview({ stats }: StatsOverviewProps) {
         
         <StatCard 
           title="변경된 데이터" 
-          value={stats.changesCount.toString()} 
-          description="전체 변경 항목 개수" 
+          value={changesCount.toString()} 
+          description="비교 날짜 기준 변경 항목" 
           icon={<BarChart2 />}
           color="indigo"
           isActive={!!currentUser}

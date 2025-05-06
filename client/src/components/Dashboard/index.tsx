@@ -66,7 +66,7 @@ export default function Dashboard() {
 
         </div>
         
-        <StatsOverview stats={stats} />
+        <StatsOverview stats={stats} queries={queries} />
         
         <div className="mt-10 mb-8">
           <div className="flex justify-between items-center mb-4">
