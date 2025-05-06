@@ -568,7 +568,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                 </div>
               );
 
-              // 변화가 있으면 Dialog로 감싸서 반환, 없으면 카드만 반환
+              // 모든 카드에 대해 Dialog로 감싸서 반환
               return selectedCompareDate && selectedCompareDate !== "none" ? (
                 <Dialog key={index}>
                   <DialogTrigger asChild>
