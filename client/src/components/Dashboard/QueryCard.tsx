@@ -356,7 +356,16 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                       <ul className="text-sm space-y-2.5">
                         {comparedData?.keywords
                           .filter(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0))
-                          .slice(0, 5)
+                          .sort((a, b) => {
+                            // NEW와 OUT을 우선 정렬
+                            if (a.status === 'added' && b.status !== 'added') return -1;
+                            if (b.status === 'added' && a.status !== 'added') return 1;
+                            if (a.status === 'removed' && b.status !== 'removed') return -1;
+                            if (b.status === 'removed' && a.status !== 'removed') return 1;
+                            // 그 다음 순위 변화가 큰 순서대로
+                            return Math.abs((b.rankChange || 0)) - Math.abs((a.rankChange || 0));
+                          })
+                          .slice(0, 3)
                           .map((k, idx) => (
                             <li key={idx} className="flex items-start py-1 px-2 rounded-md hover:bg-blue-50">
                               {renderChangeIndicator(k)}
@@ -534,7 +543,9 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                         <span className="ml-1 text-sm font-bold text-emerald-500">+{keyword.change}</span>
                       ) : keyword.status === 'decreased' && keyword.change ? (
                         <span className="ml-1 text-sm font-bold text-red-500">-{keyword.change}</span>
-                      ) : null}
+                      ) : (
+                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                      )}
                     </span>
                   </div>
                 </div>
@@ -674,12 +685,14 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                     <span className={`ml-2 font-semibold ${
                       count.status === 'removed' ? 'text-gray-400' : 'text-primary'
                     }`}>
-                      {count.key} {count.value}
+                      {count.value} 
                       {count.status === 'increased' && count.change ? (
                         <span className="ml-1 text-sm font-bold text-emerald-500">+{count.change}</span>
                       ) : count.status === 'decreased' && count.change ? (
                         <span className="ml-1 text-sm font-bold text-red-500">-{count.change}</span>
-                      ) : null}
+                      ) : (
+                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                      )}
                     </span>
                   </div>
                 </div>
@@ -744,7 +757,9 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                           <span className="ml-1 text-sm font-bold text-emerald-500">+{tag.change}</span>
                         ) : tag.status === 'decreased' && tag.change ? (
                           <span className="ml-1 text-sm font-bold text-red-500">-{tag.change}</span>
-                        ) : null}
+                        ) : (
+                          <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        )}
                       </span>
                     </div>
                   </div>
