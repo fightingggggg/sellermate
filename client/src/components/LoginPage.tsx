@@ -58,17 +58,17 @@ export default function LoginPage({ isModal = false, onLoginSuccess }: LoginPage
       console.error("Signup error:", error);
       if (error.code === "auth/email-already-in-use") {
         setAlertMessage({
-          message: "이미 가입한 회원입니다. 로그인을 진행해주세요.",
+          message: "이미 가입된 이메일입니다. 로그인 페이지에서 로그인을 진행하시거나 비밀번호 찾기를 이용해주세요.",
           type: "error"
         });
       } else if (error.code === "auth/invalid-email") {
         setAlertMessage({
-          message: "올바른 이메일 주소를 입력해주세요. (예: example@domain.com)",
+          message: "올바른 이메일 형식이 아닙니다. 예시: your.name@example.com",
           type: "error"
         });
       } else if (error.code === "auth/weak-password") {
         setAlertMessage({
-          message: "안전한 비밀번호를 위해 영문, 숫자, 특수문자를 포함한 6자 이상으로 설정해주세요.",
+          message: "보안을 위해 다음 조건을 만족하는 비밀번호를 설정해주세요:\n- 최소 6자 이상\n- 영문 대/소문자\n- 숫자\n- 특수문자(!@#$%^&* 등)",
           type: "error"
         });
       } else if (error.code === "auth/network-request-failed") {
