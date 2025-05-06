@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { DashboardStats } from "@/types";
+import { DashboardStats, Query, KeywordItem } from "@/types";
 import { BarChart2, Calendar, ShoppingBag } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
