@@ -229,17 +229,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return true;
     } catch (error: any) {
       console.error("Error signing in", error);
-      if (error.code === "auth/user-not-found") {
-        setError("등록되지 않은 이메일입니다.");
+      if (error.code === "auth/invalid-email") {
+        setError("유효하지 않은 이메일 형식입니다. 이메일 주소를 다시 확인해 주세요.");
       } else if (error.code === "auth/wrong-password") {
         setError("잘못된 비밀번호입니다.");
+      } else if (error.code === "auth/invalid-credential") {
+        setError("이메일 또는 비밀번호가 올바르지 않습니다.");
+      } else if (error.code === "auth/user-not-found") {
+        setError("등록되지 않은 이메일입니다. 회원가입을 먼저 진행해 주세요.");
+      } else if (error.code === "auth/too-many-requests") {
+        setError("너무 많은 로그인 시도가 감지되었습니다. 보안을 위해 잠시 후 다시 시도해 주세요.");
       } else {
         setError("로그인 중 오류가 발생했습니다.");
       }
       return false;
     }
   }
-
+  
   // 로그아웃 함수
   async function logout() {
     setError(null);
@@ -352,13 +358,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   // 회원 탈퇴
+  // async function deleteUserAccount(password: string): Promise<boolean> {
+  //   setError(null);
+  //   if (!auth.currentUser || !currentUser) {
+  //     setError("로그인이 필요합니다.");   
+  //     return false;
+  //   }
+
+  //   try {
+  //     // 사용자 재인증
+  //     const credential = EmailAuthProvider.credential(
+  //       currentUser.email || '', 
+  //       password
+  //     );
+  //     await reauthenticateWithCredential(auth.currentUser, credential);
+
+  //     // Firestore에서 사용자 정보 삭제 (usersInfo 컬렉션 사용)
+  //     await deleteDoc(doc(db, "usersInfo", currentUser.uid));
+
+  //     // Firebase Auth에서 사용자 삭제
+  //     await deleteUser(auth.currentUser);
+
+  //     setCurrentUser(null);
+  //     setUserProfile(null);
+  //     return true;
+  //   } catch (error: any) {
+  //     console.error("Error deleting account", error);
+      
+  //     setError(error.message || "회원 탈퇴 중 오류가 발생했습니다.");
+  //     return false;
+  //   }
+  // }
   async function deleteUserAccount(password: string): Promise<boolean> {
     setError(null);
     if (!auth.currentUser || !currentUser) {
-      setError("로그인이 필요합니다.");
+      setError("로그인이 필요합니다.");   
       return false;
     }
-
+  
     try {
       // 사용자 재인증
       const credential = EmailAuthProvider.credential(
@@ -366,23 +403,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password
       );
       await reauthenticateWithCredential(auth.currentUser, credential);
-
-      // Firestore에서 사용자 정보 삭제 (usersInfo 컬렉션 사용)
+  
+      // Firestore에서 사용자 정보 삭제
       await deleteDoc(doc(db, "usersInfo", currentUser.uid));
-
+  
       // Firebase Auth에서 사용자 삭제
       await deleteUser(auth.currentUser);
-
+  
       setCurrentUser(null);
       setUserProfile(null);
       return true;
     } catch (error: any) {
       console.error("Error deleting account", error);
-      setError(error.message || "회원 탈퇴 중 오류가 발생했습니다.");
+  
+      switch (error.code) {
+        case "auth/wrong-password":
+          setError("비밀번호가 올바르지 않습니다. 다시 입력해 주세요.");
+          break;
+        case "auth/too-many-requests":
+          setError("너무 많은 시도가 감지되었습니다. 보안을 위해 잠시 후 다시 시도해 주세요.");
+          break;
+        case "auth/requires-recent-login":
+          setError("보안을 위해 최근 로그인한 사용자만 탈퇴할 수 있습니다. 다시 로그인해 주세요.");
+          break;
+        case "auth/invalid-credential":
+          setError("이메일 또는 비밀번호가 올바르지 않습니다.");
+          break;
+        default:
+          setError("회원 탈퇴 중 오류가 발생했습니다.");
+          break;
+      }
+  
       return false;
     }
   }
-
+  
   // 비밀번호 재설정 이메일 발송
   async function sendPasswordReset(email: string): Promise<boolean> {
     setError(null);

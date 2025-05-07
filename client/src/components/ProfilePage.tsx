@@ -106,6 +106,30 @@ export default function ProfilePage() {
   };
 
   // 회원탈퇴 폼 제출 핸들러
+  // const onDeleteSubmit = async (data: DeleteAccountFormValues) => {
+  //   setIsDeleteLoading(true);
+  //   try {
+  //     const success = await deleteUserAccount(data.password);
+  //     if (success) {
+  //       toast({
+  //         title: "회원 탈퇴 완료",
+  //         description: "계정이 성공적으로 삭제되었습니다.",
+  //       });
+  //       setDeleteDialogOpen(false);
+  //       navigate("/");
+  //     }
+  //   } catch (error: any) {
+
+  //     toast({
+  //       title: "회원 탈퇴 실패",
+  //       description: error.message || "회원 탈퇴 중 오류가 발생했습니다.",
+  //       variant: "destructive",
+  //     });
+  //   } finally {
+  //     setIsDeleteLoading(false);
+  //   }
+  // };
+
   const onDeleteSubmit = async (data: DeleteAccountFormValues) => {
     setIsDeleteLoading(true);
     try {
@@ -117,11 +141,26 @@ export default function ProfilePage() {
         });
         setDeleteDialogOpen(false);
         navigate("/");
+      } else {
+        // success가 false인 경우도 처리
+        toast({
+          title: "회원 탈퇴 실패",
+          description: "계정 삭제에 실패했습니다. 다시 시도해주세요.",
+          variant: "destructive",
+        });
       }
     } catch (error: any) {
+      console.error("회원 탈퇴 중 오류:", error); // 디버깅용 콘솔 출력
+      
+      // 에러 메시지를 더 견고하게 처리
+      const errorMessage = 
+        error?.response?.data?.message || 
+        error?.message || 
+        "회원 탈퇴 중 오류가 발생했습니다.";
+      
       toast({
         title: "회원 탈퇴 실패",
-        description: error.message || "회원 탈퇴 중 오류가 발생했습니다.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

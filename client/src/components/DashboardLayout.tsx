@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { FeedbackDialog } from "./ui/feedback-dialog";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
-import { LogOut, Menu, PlusCircle, ShoppingBag, Home, User, UserPlus } from "lucide-react";
+import { LogOut, Menu, PlusCircle, ShoppingBag, Home, User, UserPlus, MessageSquare } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +23,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { currentUser, logout } = useAuth();
   const [, navigate] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -52,6 +54,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   <ShoppingBag className="h-4 w-4 mr-1" />
                   대시보드
                 </Link>
+                <button 
+                  onClick={() => setIsFeedbackOpen(true)} 
+                  className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-700 flex items-center"
+                >
+                  <MessageSquare className="h-4 w-4 mr-1" />
+                  문의 및 피드백
+                </button>
               </div>
             </div>
 
@@ -114,6 +123,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                   className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                  aria-label="메뉴 열기"
                 >
                   <Menu className="h-6 w-6" />
                 </button>
@@ -127,31 +137,29 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <Link href="/" className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-700">
                 홈
               </Link>
-              <Link href="/dashboard" className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-700">
-                대시보드
-              </Link>
-              {!currentUser && (
-                <>
-                  <Link href="/login" className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-700">
-                    로그인
-                  </Link>
-                  <Link href="/signup" className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-700">
-                    회원가입
-                  </Link>
-                </>
-              )}
               {currentUser && (
                 <>
+                  <Link href="/dashboard" className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-700">
+                    대시보드
+                  </Link>
                   <Link href="/profile" className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-700">
                     내 프로필
                   </Link>
-                  <button 
-                    onClick={handleLogout}
-                    className="block w-full text-left px-3 py-2 text-base font-medium text-red-600 hover:bg-gray-50 hover:text-red-700"
-                  >
-                    로그아웃
-                  </button>
                 </>
+              )}
+              <button 
+                onClick={() => setIsFeedbackOpen(true)}
+                className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-700"
+              >
+                피드백 및 문의 보내기
+              </button>
+              {currentUser && (
+                <button 
+                  onClick={handleLogout}
+                  className="block w-full text-left px-3 py-2 text-base font-medium text-red-600 hover:bg-gray-50 hover:text-red-700"
+                >
+                  로그아웃
+                </button>
               )}
             </div>
           )}
@@ -172,6 +180,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
         </div>
       </footer>
+
+      <FeedbackDialog 
+        isOpen={isFeedbackOpen} 
+        onClose={() => setIsFeedbackOpen(false)} 
+      />
     </div>
   );
 }

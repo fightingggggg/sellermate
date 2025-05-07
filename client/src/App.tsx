@@ -22,7 +22,7 @@ function Router() {
       <Route component={NotFound} />
     </Switch>
   );
-}
+}4
 
 function App() {
   return (

@@ -6,49 +6,12 @@ import { useAuth } from "@/contexts/AuthContext";
 
 interface StatsOverviewProps {
   stats: DashboardStats;
-  queries: Query[];
-  currentDate?: string;
-  compareDate?: string;
+
 }
 
-export default function StatsOverview({ stats, queries, currentDate, compareDate }: StatsOverviewProps) {
+export default function StatsOverview({ stats}: StatsOverviewProps) {
   const { currentUser } = useAuth();
 
-  // 변경된 데이터 카운트 함수
-  const countChanges = () => {
-    let totalChanges = 0;
-    
-    queries.forEach(query => {
-      const dates = Object.keys(query.dates || {}).sort((a, b) => 
-        new Date(b).getTime() - new Date(a).getTime()
-      );
-      
-      if (dates.length < 2) return; // 비교할 데이터가 없으면 건너뛰기
-      
-      const latestDate = dates[0];
-      const previousDate = dates[1];
-      const currentData = query.dates[latestDate];
-      const compareData = query.dates[previousDate];
-      
-      if (!currentData || !compareData) return;
-      
-      // 변화가 있는 항목 카운트
-      const countChangesInCategory = (items: KeywordItem[] = []) => 
-        items.filter(k => 
-          k.status === 'added' || 
-          k.status === 'removed' || 
-          k.status === 'increased' || 
-          k.status === 'decreased' ||
-          (k.rankChange !== undefined && k.rankChange !== 0)
-        ).length;
-      
-      totalChanges += countChangesInCategory(compareData.keywords);
-      totalChanges += countChangesInCategory(compareData.keywordCounts);
-      totalChanges += countChangesInCategory(compareData.tags);
-    });
-    
-    return totalChanges;
-  };
 
   return (
     <div className="mb-8">
@@ -73,8 +36,8 @@ export default function StatsOverview({ stats, queries, currentDate, compareDate
         />
         
         <StatCard 
-          title="변경된 데이터" 
-          value={countChanges().toString()} 
+          title="변경된 항목" 
+          value={stats.changesCount.toString()} 
           description="비교 날짜 기준 변경 항목 수" 
           icon={<BarChart2 />}
           color="indigo"
