@@ -92,17 +92,19 @@ export default function LoginPage({
     try {
       await signUp(email, password, businessName, businessLink, number);
       setAlertMessage({
-        message:
-          "회원가입 성공! 이메일함을 확인하여 이메일 인증을 완료해주세요.",
-        type: "success",
+        message: "회원가입 성공! 이메일 인증을 완료해주세요.",
+        type: "success"
       });
+      // 폼 초기화
       setEmail("");
       setPassword("");
       setStoreName("");
       setStoreUrl("");
       setPhoneNumber("");
-      setPasswordConfirm(""); //비밀번호 확인 초기화
-      setTerms(false); //동의 초기화
+      setPasswordConfirm("");
+      setTerms(false);
+      // 로그인 탭으로 전환
+      setTab("login");
     } catch (error: any) {
       console.error("Signup error:", error);
       if (error.code === "auth/email-already-in-use") {
@@ -159,7 +161,7 @@ export default function LoginPage({
     <Card className={`w-full max-w-md ${isModal ? "shadow-xl" : ""}`}>
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">
-          스마트스토어 SEO 대시보드
+          스마트스토어 상위노출 최적화 도구
         </CardTitle>
         <CardDescription>
           상품 데이터를 분석하고 관리하는 대시보드에 로그인하세요
@@ -173,7 +175,7 @@ export default function LoginPage({
           </TabsList>
 
           {/* 로그인 탭 */}
-          <TabsContent value="login">
+          <TabsContent value="login" role="tabpanel" aria-label="로그인">
             <div className="space-y-4">
               <p className="text-sm text-center text-gray-600 mb-4">
                 로그인하여 스마트스토어 상품 분석 결과를 확인하고 관리하세요.

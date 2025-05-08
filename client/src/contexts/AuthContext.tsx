@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { 
-  User as FirebaseUser, 
+import {
+  User as FirebaseUser,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
@@ -11,7 +11,7 @@ import {
   EmailAuthProvider,
   reauthenticateWithCredential,
   sendEmailVerification,
-  updateEmail
+  updateEmail,
 } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { User, UserProfile } from "@/types";
@@ -22,12 +22,22 @@ interface AuthContextProps {
   userProfile: UserProfile | null;
   loading: boolean;
   profileLoading: boolean;
-  signUp: (email: string, password: string, businessName?: string, businessLink?: string, number?: string) => Promise<void>;
+  signUp: (
+    email: string,
+    password: string,
+    businessName?: string,
+    businessLink?: string,
+    number?: string,
+  ) => Promise<void>;
   signIn: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   updateUserProfile: (profileData: Partial<UserProfile>) => Promise<boolean>;
+  fetchUserProfile: () => Promise<UserProfile | null>;
   updateUserEmail: (newEmail: string, password: string) => Promise<boolean>;
-  updateUserPassword: (currentPassword: string, newPassword: string) => Promise<boolean>;
+  updateUserPassword: (
+    currentPassword: string,
+    newPassword: string,
+  ) => Promise<boolean>;
   deleteUserAccount: (password: string) => Promise<boolean>;
   sendPasswordReset: (email: string) => Promise<boolean>;
   verifyEmail: () => Promise<boolean>;
@@ -43,12 +53,13 @@ const AuthContext = createContext<AuthContextProps>({
   signIn: async () => false,
   logout: async () => {},
   updateUserProfile: async () => false,
+  fetchUserProfile: async () => null, // ✅ 이 줄이 누락되었음
   updateUserEmail: async () => false,
   updateUserPassword: async () => false,
   deleteUserAccount: async () => false,
   sendPasswordReset: async () => false,
   verifyEmail: async () => false,
-  error: null
+  error: null,
 });
 
 export function useAuth() {
@@ -62,128 +73,75 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profileLoading, setProfileLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 사용자 프로필 불러오기
-  async function fetchUserProfile(uid: string) {
-    setProfileLoading(true);
-    try {
-      // 현재 인증된 사용자만 프로필에 접근할 수 있도록 함
-      if (!auth.currentUser || !auth.currentUser.emailVerified) {
-        await signOut(auth);
-        throw new Error("이메일 인증이 필요합니다.");
-      }
-
-      // 컬렉션 이름 정정: userInfo -> usersInfo
-      const userDocRef = doc(db, "usersInfo", uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        setUserProfile({
-          uid: userData.uid || auth.currentUser.uid,
-          email: userData.email || auth.currentUser.email,
-          displayName: auth.currentUser.displayName,
-          photoURL: auth.currentUser.photoURL,
-          businessName: userData.businessName || "",
-          businessLink: userData.businessLink || "",
-          number: userData.number || "",
-          emailVerified: userData.emailVerified || auth.currentUser.emailVerified || false,
-          createdAt: userData.createdAt || new Date().toISOString()
-        });
-      } else {
-        // 사용자 기본 프로필 설정 (프로필 문서가 없는 경우)
-        const basicProfile: UserProfile = {
-          uid: auth.currentUser.uid,
-          email: auth.currentUser.email,
-          displayName: auth.currentUser.displayName,
-          photoURL: auth.currentUser.photoURL,
-          businessName: "",
-          businessLink: "",
-          number: "",
-          emailVerified: auth.currentUser.emailVerified || false,
-          createdAt: new Date().toISOString()
-        };
-        setUserProfile(basicProfile);
-
-        // 기본 프로필 문서 생성
-        await setDoc(userDocRef, {
-          uid: auth.currentUser.uid,
-          email: auth.currentUser.email,
-          businessName: "",
-          businessLink: "",
-          number: "",
-          emailVerified: auth.currentUser.emailVerified || false,
-          createdAt: new Date().toISOString()
-        });
-      }
-    } catch (error: any) {
-      console.error("Error fetching user profile", error);
-      // 오류가 발생해도 최소한의 프로필 정보를 설정 (UI가 작동하도록)
-      if (auth.currentUser) {
-        setUserProfile({
-          uid: auth.currentUser.uid,
-          email: auth.currentUser.email,
-          displayName: auth.currentUser.displayName,
-          photoURL: auth.currentUser.photoURL,
-          businessName: "",
-          businessLink: "",
-          number: "",
-          emailVerified: auth.currentUser.emailVerified || false,
-          createdAt: new Date().toISOString()
-        });
-      }
-      setError("사용자 정보를 불러오는 중 오류가 발생했습니다.");
-    } finally {
-      setProfileLoading(false);
-    }
-  }
+  
 
   // 회원가입 함수
   async function signUp(
-    email: string, 
-    password: string, 
-    businessName?: string, 
-    businessLink?: string, 
-    number?: string
+    email: string,
+    password: string,
+    businessName?: string,
+    businessLink?: string,
+    number?: string,
   ) {
     setError(null);
     try {
-      const credential = await createUserWithEmailAndPassword(auth, email, password);
+      // 사용자 생성
+      const credential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
       const user = credential.user;
 
-      // 이메일 인증 메일 발송
-      await sendEmailVerification(user);
-
-      // 사용자 추가 정보 저장
       if (user) {
         try {
+          // 사용자 정보 즉시 저장
           const userProfile = {
             uid: user.uid,
             email: user.email,
             businessName: businessName || "",
             businessLink: businessLink || "",
             number: number || "",
-            createdAt: new Date().toISOString(),
-            emailVerified: false
+            createdAt: new Date(),
+            emailVerified: false,
           };
 
-          // usersInfo 컬렉션에 사용자 정보 저장
+          // 사용자 정보 저장
           await setDoc(doc(db, "usersInfo", user.uid), userProfile);
-          
-          // 회원가입 후 바로 로그아웃
+
+          // 이메일 인증 메일 발송
+          await sendEmailVerification(user);
+
+          // 로그아웃
           await signOut(auth);
           setCurrentUser(null);
           setUserProfile(null);
+          setError(
+            "회원가입이 완료되었습니다! \n 이메일을 확인하여 인증을 완료해주세요.",
+          );
         } catch (error) {
           console.error("Error creating user profile:", error);
-          // 프로필 생성 실패시에도 회원가입은 완료되도록 함
           await signOut(auth);
           setCurrentUser(null);
           setUserProfile(null);
+          setError(
+            "회원가입이 완료되었습니다! 이메일을 확인하여 인증을 완료해주세요.",
+          );
         }
       }
     } catch (error: any) {
       console.error("Error signing up", error);
-      setError(error.message || "회원가입 중 오류가 발생했습니다.");
+      if (error.code === "auth/email-already-in-use") {
+        setError(
+          "이미 가입된 이메일입니다. 로그인을 시도하거나 비밀번호 찾기를 이용해주세요.",
+        );
+      } else if (error.code === "auth/invalid-email") {
+        setError("올바른 이메일 형식이 아닙니다.");
+      } else if (error.code === "auth/weak-password") {
+        setError("비밀번호는 최소 6자 이상이어야 합니다.");
+      } else {
+        setError("회원가입 중 오류가 발생했습니다.");
+      }
       throw error;
     }
   }
@@ -192,45 +150,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function signIn(email: string, password: string): Promise<boolean> {
     setError(null);
     try {
-      // First check if the user exists and is verified
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+
       if (!userCredential.user.emailVerified) {
         await signOut(auth);
-        setError("이메일 인증이 필요합니다. 이메일함을 확인하여 인증을 완료해주세요.");
+        setError(
+          "이메일 인증이 필요합니다. 이메일함을 확인하여 인증을 완료해주세요.",
+        );
         return false;
       }
-
-      // Update Firestore emailVerified status
-      const userDocRef = doc(db, "usersInfo", userCredential.user.uid);
-      const userDoc = await getDoc(userDocRef);
-      
-      if (!userDoc.exists()) {
-        await signOut(auth);
-        setError("사용자 정보를 찾을 수 없습니다.");
-        return false;
-      }
-
-      // Update Firestore verification status if needed
-      if (userDoc.exists() && !userDoc.data().emailVerified && userCredential.user.emailVerified) {
-        await updateDoc(userDocRef, {
-          emailVerified: true
-        });
-      }
-
-      // Fetch fresh user data to ensure email verification status
-      const freshUserData = await auth.currentUser?.reload();
-      if (!auth.currentUser?.emailVerified) {
-        await signOut(auth);
-        setError("이메일 인증이 필요합니다. 이메일함을 확인하여 인증을 완료해주세요.");
-        return false;
-      }
-
+      await fetchUserProfile();
       return true;
     } catch (error: any) {
       console.error("Error signing in", error);
       if (error.code === "auth/invalid-email") {
-        setError("유효하지 않은 이메일 형식입니다. 이메일 주소를 다시 확인해 주세요.");
+        setError(
+          "유효하지 않은 이메일 형식입니다. 이메일 주소를 다시 확인해 주세요.",
+        );
       } else if (error.code === "auth/wrong-password") {
         setError("잘못된 비밀번호입니다.");
       } else if (error.code === "auth/invalid-credential") {
@@ -238,14 +178,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else if (error.code === "auth/user-not-found") {
         setError("등록되지 않은 이메일입니다. 회원가입을 먼저 진행해 주세요.");
       } else if (error.code === "auth/too-many-requests") {
-        setError("너무 많은 로그인 시도가 감지되었습니다. 보안을 위해 잠시 후 다시 시도해 주세요.");
+        setError(
+          "너무 많은 로그인 시도가 감지되었습니다. 보안을 위해 잠시 후 다시 시도해 주세요.",
+        );
       } else {
         setError("로그인 중 오류가 발생했습니다.");
       }
       return false;
     }
   }
-  
+
   // 로그아웃 함수
   async function logout() {
     setError(null);
@@ -259,7 +201,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   // 사용자 프로필 업데이트
-  async function updateUserProfile(profileData: Partial<UserProfile>): Promise<boolean> {
+  async function updateUserProfile(
+    profileData: Partial<UserProfile>,
+  ): Promise<boolean> {
     setError(null);
     if (!currentUser) {
       setError("로그인이 필요합니다.");
@@ -283,12 +227,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: currentUser.email,
           ...profileData,
           createdAt: new Date().toISOString(),
-          emailVerified: auth.currentUser?.emailVerified || false
+          emailVerified: auth.currentUser?.emailVerified || false,
         });
       }
 
       // 상태 업데이트
-      setUserProfile(prev => prev ? { ...prev, ...profileData } : null);
+      setUserProfile((prev) => (prev ? { ...prev, ...profileData } : null));
       return true;
     } catch (error: any) {
       console.error("Error updating profile", error);
@@ -297,8 +241,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+    // 사용자 프로필 가져오기
+async function fetchUserProfile(): Promise<UserProfile | null> {
+  setError(null);
+  if (!currentUser) {
+    setError("로그인이 필요합니다.");
+    return null;
+  }
+
+  try {
+    const userDocRef = doc(db, "usersInfo", currentUser.uid);
+    const docSnap = await getDoc(userDocRef);
+
+    if (docSnap.exists()) {
+      const userData = docSnap.data() as UserProfile;
+      setUserProfile(userData);
+      return userData;
+    } else {
+      setError("사용자 프로필이 존재하지 않습니다.");
+      return null;
+    }
+  } catch (error: any) {
+    console.error("Error fetching profile", error);
+    setError(error.message || "프로필 불러오기 중 오류가 발생했습니다.");
+    return null;
+  }
+}
+
   // 이메일 업데이트
-  async function updateUserEmail(newEmail: string, password: string): Promise<boolean> {
+  async function updateUserEmail(
+    newEmail: string,
+    password: string,
+  ): Promise<boolean> {
     setError(null);
     if (!auth.currentUser || !currentUser) {
       setError("로그인이 필요합니다.");
@@ -308,8 +282,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       // 사용자 재인증
       const credential = EmailAuthProvider.credential(
-        currentUser.email || '', 
-        password
+        currentUser.email || "",
+        password,
       );
       await reauthenticateWithCredential(auth.currentUser, credential);
 
@@ -320,8 +294,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await sendEmailVerification(auth.currentUser);
 
       // 프로필 업데이트
-      setCurrentUser(prev => prev ? { ...prev, email: newEmail } : null);
-      setUserProfile(prev => prev ? { ...prev, email: newEmail } : null);
+      setCurrentUser((prev) => (prev ? { ...prev, email: newEmail } : null));
+      setUserProfile((prev) => (prev ? { ...prev, email: newEmail } : null));
 
       return true;
     } catch (error: any) {
@@ -332,7 +306,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   // 비밀번호 업데이트
-  async function updateUserPassword(currentPassword: string, newPassword: string): Promise<boolean> {
+  async function updateUserPassword(
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<boolean> {
     setError(null);
     if (!auth.currentUser || !currentUser) {
       setError("로그인이 필요합니다.");
@@ -342,8 +319,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       // 사용자 재인증
       const credential = EmailAuthProvider.credential(
-        currentUser.email || '', 
-        currentPassword
+        currentUser.email || "",
+        currentPassword,
       );
       await reauthenticateWithCredential(auth.currentUser, credential);
 
@@ -357,74 +334,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  // 회원 탈퇴
-  // async function deleteUserAccount(password: string): Promise<boolean> {
-  //   setError(null);
-  //   if (!auth.currentUser || !currentUser) {
-  //     setError("로그인이 필요합니다.");   
-  //     return false;
-  //   }
-
-  //   try {
-  //     // 사용자 재인증
-  //     const credential = EmailAuthProvider.credential(
-  //       currentUser.email || '', 
-  //       password
-  //     );
-  //     await reauthenticateWithCredential(auth.currentUser, credential);
-
-  //     // Firestore에서 사용자 정보 삭제 (usersInfo 컬렉션 사용)
-  //     await deleteDoc(doc(db, "usersInfo", currentUser.uid));
-
-  //     // Firebase Auth에서 사용자 삭제
-  //     await deleteUser(auth.currentUser);
-
-  //     setCurrentUser(null);
-  //     setUserProfile(null);
-  //     return true;
-  //   } catch (error: any) {
-  //     console.error("Error deleting account", error);
-      
-  //     setError(error.message || "회원 탈퇴 중 오류가 발생했습니다.");
-  //     return false;
-  //   }
-  // }
+  //탈퇴
   async function deleteUserAccount(password: string): Promise<boolean> {
     setError(null);
     if (!auth.currentUser || !currentUser) {
-      setError("로그인이 필요합니다.");   
+      setError("로그인이 필요합니다.");
       return false;
     }
-  
+
     try {
       // 사용자 재인증
       const credential = EmailAuthProvider.credential(
-        currentUser.email || '', 
-        password
+        currentUser.email || "",
+        password,
       );
       await reauthenticateWithCredential(auth.currentUser, credential);
-  
+
       // Firestore에서 사용자 정보 삭제
       await deleteDoc(doc(db, "usersInfo", currentUser.uid));
-  
+
       // Firebase Auth에서 사용자 삭제
       await deleteUser(auth.currentUser);
-  
+
       setCurrentUser(null);
       setUserProfile(null);
       return true;
     } catch (error: any) {
       console.error("Error deleting account", error);
-  
+
       switch (error.code) {
         case "auth/wrong-password":
           setError("비밀번호가 올바르지 않습니다. 다시 입력해 주세요.");
           break;
         case "auth/too-many-requests":
-          setError("너무 많은 시도가 감지되었습니다. 보안을 위해 잠시 후 다시 시도해 주세요.");
+          setError(
+            "너무 많은 시도가 감지되었습니다. 보안을 위해 잠시 후 다시 시도해 주세요.",
+          );
           break;
         case "auth/requires-recent-login":
-          setError("보안을 위해 최근 로그인한 사용자만 탈퇴할 수 있습니다. 다시 로그인해 주세요.");
+          setError(
+            "보안을 위해 최근 로그인한 사용자만 탈퇴할 수 있습니다. 다시 로그인해 주세요.",
+          );
           break;
         case "auth/invalid-credential":
           setError("이메일 또는 비밀번호가 올바르지 않습니다.");
@@ -433,11 +383,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setError("회원 탈퇴 중 오류가 발생했습니다.");
           break;
       }
-  
+
       return false;
     }
   }
-  
+
   // 비밀번호 재설정 이메일 발송
   async function sendPasswordReset(email: string): Promise<boolean> {
     setError(null);
@@ -446,7 +396,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return true;
     } catch (error: any) {
       console.error("Error sending password reset", error);
-      setError(error.message || "비밀번호 재설정 이메일 발송 중 오류가 발생했습니다.");
+      setError(
+        error.message || "비밀번호 재설정 이메일 발송 중 오류가 발생했습니다.",
+      );
       return false;
     }
   }
@@ -461,8 +413,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     try {
       await sendEmailVerification(auth.currentUser, {
-        url: window.location.origin + '/login',
-        handleCodeInApp: true
+        url: window.location.origin + "/login",
+        handleCodeInApp: true,
       });
       return true;
     } catch (error: any) {
@@ -474,25 +426,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // 인증 상태 변경 감지
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user: FirebaseUser | null) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const userData: User = {
           uid: user.uid,
           email: user.email,
           displayName: user.displayName,
-          photoURL: user.photoURL
+          photoURL: user.photoURL,
         };
         setCurrentUser(userData);
-        fetchUserProfile(user.uid);
+  
+        try {
+          // Firestore에서 프로필 정보 불러오기
+          const userDocRef = doc(db, "usersInfo", user.uid);
+          const docSnap = await getDoc(userDocRef);
+  
+          if (docSnap.exists()) {
+            const userData = docSnap.data() as UserProfile;
+            setUserProfile(userData);
+          } else {
+            // Firestore에 프로필이 없다면 기본 정보로 설정
+            setUserProfile({
+              uid: user.uid,
+              email: user.email,
+              displayName: user.displayName,
+              photoURL: user.photoURL,
+              businessName: "",
+              businessLink: "",
+              number: "",
+              emailVerified: user.emailVerified,
+              createdAt: new Date().toISOString(),
+            });
+          }
+        } catch (error) {
+          console.error("자동 프로필 불러오기 실패:", error);
+        }
       } else {
         setCurrentUser(null);
         setUserProfile(null);
       }
       setLoading(false);
     });
-
+  
     return unsubscribe;
   }, []);
+  
 
   const value = {
     currentUser,
@@ -503,17 +481,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signIn,
     logout,
     updateUserProfile,
+    fetchUserProfile,
     updateUserEmail,
     updateUserPassword,
     deleteUserAccount,
     sendPasswordReset,
     verifyEmail,
-    error
+    error,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

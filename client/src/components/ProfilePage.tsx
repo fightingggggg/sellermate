@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { UserProfile } from "@/types";
+import { db } from "@/lib/firebase"; // db는 initializeApp 후에 만든 Firestore 인스턴스
+import { collection, addDoc, serverTimestamp, setDoc, doc } from "firebase/firestore";
 
 // UI 컴포넌트 import
 import {
@@ -105,34 +107,21 @@ export default function ProfilePage() {
     }
   };
 
-  // 회원탈퇴 폼 제출 핸들러
-  // const onDeleteSubmit = async (data: DeleteAccountFormValues) => {
-  //   setIsDeleteLoading(true);
-  //   try {
-  //     const success = await deleteUserAccount(data.password);
-  //     if (success) {
-  //       toast({
-  //         title: "회원 탈퇴 완료",
-  //         description: "계정이 성공적으로 삭제되었습니다.",
-  //       });
-  //       setDeleteDialogOpen(false);
-  //       navigate("/");
-  //     }
-  //   } catch (error: any) {
-
-  //     toast({
-  //       title: "회원 탈퇴 실패",
-  //       description: error.message || "회원 탈퇴 중 오류가 발생했습니다.",
-  //       variant: "destructive",
-  //     });
-  //   } finally {
-  //     setIsDeleteLoading(false);
-  //   }
-  // };
 
   const onDeleteSubmit = async (data: DeleteAccountFormValues) => {
     setIsDeleteLoading(true);
     try {
+
+       // 1. 탈퇴 사유 저장
+       await setDoc(doc(db, "accountDeletions", userProfile?.uid ?? Math.random().toString(36).substr(2, 9)), {
+        reason: data.reason,
+        email: userProfile?.email,
+        link: userProfile?.businessLink,
+        name: userProfile?.businessName,
+        timestamp: new Date(),
+      });
+      
+    
       const success = await deleteUserAccount(data.password);
       if (success) {
         toast({

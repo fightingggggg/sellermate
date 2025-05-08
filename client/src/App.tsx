@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Login from "@/pages/login";
-import Signup from "@/pages/signup";
+
 import Dashboard from "@/pages/dashboard";
 import Profile from "@/pages/profile";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -16,7 +16,6 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/login" component={Login} />
-      <Route path="/signup" component={Signup} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/profile" component={Profile} />
       <Route component={NotFound} />

@@ -70,7 +70,7 @@ export function FeedbackDialog({ isOpen, onClose }: FeedbackDialogProps) {
             <Input
               type="email"
               placeholder="답변 받을 이메일을 입력해주세요"
-              value={currentUser?.email || ""}
+              value={email}  // 상태로 관리되는 email 사용
               onChange={(e) => setEmail(e.target.value)}
               required
             />

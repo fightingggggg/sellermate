@@ -38,9 +38,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="flex">
               <div className="flex-shrink-0 flex items-center">
                 <Link href="/" className="flex items-center">
-                  <ShoppingBag className="h-6 w-6 text-blue-600 mr-2" />
+                <img
+    src="/icon.png" // public 디렉토리에 이미지 파일이 있어야 함
+    alt="로고"
+    className="h-6 w-6 mr-2"
+  />
                   <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent hidden md:block">
-                    스마트스토어 SEO 대시보드
+                    스마트스토어 상위노출 최적화 도구
                   </h1>
                 </Link>
               </div>
@@ -50,6 +54,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   <Home className="h-4 w-4 mr-1" />
                   홈
                 </Link>
+                <button
+                  onClick={() => window.open("https://chromewebstore.google.com/detail/%EC%8A%A4%EB%A7%88%ED%8A%B8%EC%8A%A4%ED%86%A0%EC%96%B4-%EC%83%81%EC%9C%84%EB%85%B8%EC%B6%9C-%EC%B5%9C%EC%A0%81%ED%99%94-%EB%8F%84%EA%B5%AC/plgdaggkagiakemkoclkpkbdiocllbbi?hl=ko", "_blank")}
+                  className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-700 flex items-center"
+                >
+                  <PlusCircle className="h-4 w-4 mr-1" />
+                  확장프로그램 설치
+                </button>
                 <Link href="/dashboard" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-700 flex items-center">
                   <ShoppingBag className="h-4 w-4 mr-1" />
                   대시보드
@@ -107,7 +118,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       className="border-blue-500 text-blue-600 hover:bg-blue-50"
                     >
                       <UserPlus className="mr-2 h-4 w-4" />
-                      회원가입
+                    3초! 회원가입
                     </Button>
                   </Link>
                   <Button 
@@ -137,11 +148,18 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <Link href="/" className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-700">
                 홈
               </Link>
+              <button
+                onClick={() => window.open("https://chromewebstore.google.com/detail/%EC%8A%A4%EB%A7%88%ED%8A%B8%EC%8A%A4%ED%86%A0%EC%96%B4-%EC%83%81%EC%9C%84%EB%85%B8%EC%B6%9C-%EC%B5%9C%EC%A0%81%ED%99%94-%EB%8F%84%EA%B5%AC/plgdaggkagiakemkoclkpkbdiocllbbi?hl=ko", "_blank")}
+                className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-700"
+              >
+                확장프로그램 설치
+              </button>
+              <Link href="/dashboard" className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-700">
+                대시보드
+              </Link>
               {currentUser && (
                 <>
-                  <Link href="/dashboard" className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-700">
-                    대시보드
-                  </Link>
+                
                   <Link href="/profile" className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-700">
                     내 프로필
                   </Link>
@@ -166,20 +184,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children}
       </main>
-
-      <footer className="bg-white border-t border-gray-200 py-8 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center text-sm text-gray-500">
-            <p>© 2025 스마트스토어 SEO 대시보드. 모든 권리 보유.</p>
-            <p className="mt-1">
-              크롬 확장프로그램 연동으로 스마트스토어 상품 정보를 쉽게 분석하세요.
-            </p>
-          </div>
-        </div>
-      </footer>
 
       <FeedbackDialog 
         isOpen={isFeedbackOpen} 

@@ -62,24 +62,25 @@ export default function Dashboard() {
       <div className="mb-8">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">스마트스토어 SEO 분석 대시보드</h2>
-            <p className="text-muted-foreground mt-1">상품 순위 변화와 검색 트렌드를 확인하세요</p>
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">키워드 추적</h2>
+            <p className="text-muted-foreground mt-1">크롬 확장프로그램으로 키워드를 검색하면 자동으로 추적됩니다. <br></br> 
+            추적 키워드는 최대 3개 입니다. 새로운 키워드를 추적하고 싶다면 이전 키워드를 삭제해주세요</p>
           </div>
 
         </div>
 
         <StatsOverview 
           stats={stats} 
-          queries={queries}
-          currentDate={selectedCurrentDate} 
-          compareDate={selectedCompareDate}
+          // queries={queries}
+          // currentDate={selectedCurrentDate} 
+          // compareDate={selectedCompareDate}
         />
 
         <div className="mt-10 mb-8">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">저장된 상품 분석</h2>
+            <h2 className="text-xl font-semibold">저장된 키워드 분석</h2>
             {currentUser && queries.length > 0 && (
-              <p className="text-sm text-muted-foreground">최대 3개의 상품을 분석할 수 있습니다</p>
+              <p className="text-sm text-muted-foreground">최대 3개의 키워드를 분석할 수 있습니다</p>
             )}
           </div>
 

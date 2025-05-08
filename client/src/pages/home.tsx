@@ -1,8 +1,14 @@
 import { useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Loader2, ArrowRight, BarChart, Search, ShoppingBag } from "lucide-react";
+import { Loader2, ArrowRight, BarChart, Search, ShoppingBag, Lock, Wand2, FileText, CheckSquare, LineChart, Star, Download } from "lucide-react";
 import { motion } from "framer-motion";
+import ExampleSection from "../components/ExampleSection";
+import TextFeaturesSection from "../components/TextFeaturesSection";
+import CtaSection from "../components/CtaSection";
+import FooterSection from "../components/FooterSection";
+import FaqSection from "../components/FaqSection";
+import DashboardLayout from "@/components/DashboardLayout";
 
 export default function Home() {
   const { currentUser, loading } = useAuth();
@@ -17,117 +23,102 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-b from-blue-50 to-indigo-50 pt-16 pb-24 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="text-center lg:text-left"
-            >
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-6">
-                스마트스토어 SEO<br />상품 분석 대시보드
-              </h1>
-              <p className="text-lg text-slate-700 mb-8 max-w-lg mx-auto lg:mx-0">
-                크롬 확장프로그램과 연동하여 스마트스토어 검색 결과의 상품 순위와 트렌드를 한눈에 파악하세요.
+    <DashboardLayout>
+      <div className="min-h-screen flex flex-col">
+      <section id="hero" className="pt-32 pb-20 bg-gradient-to-br from-[#F8F9FA] to-white">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col lg:flex-row items-center justify-between">
+            <div className="lg:w-1/2 mb-12 lg:mb-0">
+              <h2 className="text-4xl md:text-5xl font-bold mb-4">
+                <div className="mb-4">네이버 스마트스토어</div>
+                <div className="mb-4 text-[#1a73e8]">상위노출 최적화를 위한</div>
+                <div>완벽한 솔루션</div>
+              </h2>
+              <p className="text-xl mb-8 text-gray-600">
+                스마트스토어 상위 노출을 위한 상품명 키워드<br />
+                최적의 상품명, 카테고리, 태그 제안
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+
+              <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                 <Button 
+                  size="lg" 
+                  className="bg-[#1a73e8] hover:bg-[#1a73e8]/90 text-white font-semibold py-3 px-6 shadow-lg transition-all transform hover:scale-105 w-full sm:w-auto"
+                  onClick={() => window.open("https://chromewebstore.google.com/detail/%EC%8A%A4%EB%A7%88%ED%8A%B8%EC%8A%A4%ED%86%A0%EC%96%B4-%EC%83%81%EC%9C%84%EB%85%B8%EC%B6%9C-%EC%B5%9C%EC%A0%81%ED%99%94-%EB%8F%84%EA%B5%AC/plgdaggkagiakemkoclkpkbdiocllbbi?hl=ko")}
+                >
+                  <Download className="w-4 h-4 mr-2" />지금 바로 무료로 최적화하기
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="border-[#1A73E8] text-[#1A73E8] hover:bg-[#1A73E8] hover:text-white py-3 px-6 w-full sm:w-auto"
                   onClick={() => navigate("/dashboard")}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-lg py-6"
-                  size="lg"
                 >
-                  시작하기
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-                <Button 
-                  variant="outline"
-                  onClick={() => window.open('https://chrome.google.com/webstore', '_blank')}
-                  className="border-blue-200 text-blue-700 hover:bg-blue-50 text-lg py-6"
-                  size="lg"
-                >
-                  크롬 확장프로그램 설치
+                  대시보드 바로가기
                 </Button>
               </div>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="hidden lg:block relative"
-            >
-              <div className="relative rounded-lg overflow-hidden shadow-2xl border border-slate-200 bg-white">
-                <div className="h-8 bg-slate-100 border-b border-slate-200 flex items-center px-4">
-                  <div className="flex space-x-2">
-                    <div className="w-3 h-3 bg-red-400 rounded-full"></div>
-                    <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                    <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+              <div className="flex items-center mt-8">
+                <div className="flex -space-x-2">
+                  <div className="w-10 h-10 rounded-full border-2 border-white bg-gray-200 flex items-center justify-center">
+                    <span className="text-xs font-bold">KH</span>
+                  </div>
+                  <div className="w-10 h-10 rounded-full border-2 border-white bg-gray-300 flex items-center justify-center">
+                    <span className="text-xs font-bold">SJ</span>
+                  </div>
+                  <div className="w-10 h-10 rounded-full border-2 border-white bg-gray-400 flex items-center justify-center">
+                    <span className="text-xs font-bold">YM</span>
                   </div>
                 </div>
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <div>
-                      <h3 className="text-lg font-bold text-blue-700">상품 분석 결과</h3>
-                      <p className="text-sm text-slate-500">최근 업데이트: 2025년 5월 3일</p>
-                    </div>
-                    <Button size="sm" className="bg-blue-600">새로고침</Button>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">이미 <span className="font-bold text-[#1a73e8]">450+</span>명의 셀러가 사용 중</p>
+                </div>
+              </div>
+            </div>
+            <div className="lg:w-1/2 relative">
+              <div className="bg-white rounded-xl shadow-2xl p-4 max-w-lg mx-auto">
+                <div className="bg-[#F8F9FA] rounded-lg p-1 flex mb-4">
+                  <div className="flex space-x-1.5 items-center px-2">
+                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                   </div>
-                  
-                  <div className="space-y-4">
-                    <div className="p-4 border border-slate-200 rounded-md bg-slate-50 flex justify-between items-center">
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mr-3">
-                          <Search className="h-4 w-4" />
-                        </div>
-                        <div>
-                          <p className="font-medium">무선 이어폰</p>
-                          <p className="text-xs text-slate-500">저장된 검색어</p>
-                        </div>
-                      </div>
-                      <div className="text-green-600 text-sm font-medium flex items-center">
-                        <span className="mr-1">+3</span>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
-                        </svg>
-                      </div>
+                  <div className="bg-white rounded flex-1 flex items-center px-4 py-1">
+                    <Lock size={16} className="text-gray-400 mr-2" />
+                    <span className="text-gray-500 text-sm truncate">store.naver.com</span>
+                  </div>
+                </div>
+                <div className="rounded-lg shadow-md w-full h-[300px] overflow-hidden">
+                  <iframe
+                    className="w-full h-full"
+                    src="https://www.youtube.com/embed/QuMxvmBvQ4c?autoplay=1&mute=1&playsinline=1&controls=0&showinfo=0&modestbranding=1&rel=0&loop=1&playlist=QuMxvmBvQ4c"
+                    title="스마트스토어 SEO 최적화 소개 영상"
+                    frameBorder="0"
+                    allow="autoplay; encrypted-media"
+                    allowFullScreen
+                  />
+                </div>
+                <div className="mt-4 bg-[#F8F9FA] rounded-lg p-3">
+                  <div className="flex items-start">
+                    <div className="bg-[#1a73e8] h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0">
+                      <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="currentColor"/>
+                      </svg>
                     </div>
-                    
-                    <div className="space-y-3">
-                      <h4 className="text-sm font-medium text-slate-700">인기 상품 순위</h4>
-                      <div className="space-y-2">
-                        {[1, 2, 3, 4, 5].map(i => (
-                          <div key={i} className="flex items-center p-2 rounded-md hover:bg-slate-100">
-                            <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs mr-3">
-                              {i}
-                            </div>
-                            <div className="flex-1 text-sm">
-                              <div className="font-medium">샘플 상품 {i}</div>
-                              <div className="text-xs text-slate-500 flex items-center">
-                                <span className={i % 2 === 0 ? "text-green-600" : (i % 3 === 0 ? "text-red-600" : "text-slate-600")}>
-                                  {i % 2 === 0 ? "↑" : (i % 3 === 0 ? "↓" : "=")}
-                                </span>
-                                <span className="ml-1">변동 감지됨</span>
-                              </div>
-                            </div>
-                            <div className="text-sm font-medium">
-                              {Math.floor(100 - i * 8)}%
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                    <div className="ml-3">
+                      <p className="text-sm font-medium">상품 최적화 완료</p>
+                      <p className="text-xs text-gray-500">상위 노출 상품명 키워드, 카테고리, 태그 최적화 완료</p>
                     </div>
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
-      
+
+      <TextFeaturesSection />
+
+      <ExampleSection />
+
       {/* Features */}
       <section className="py-16 px-4">
         <div className="max-w-7xl mx-auto">
@@ -137,50 +128,54 @@ export default function Home() {
               스마트스토어 SEO 대시보드는 상품 검색 결과를 분석하여 다양한 인사이트를 제공합니다.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <FeatureCard 
               icon={<Search className="h-8 w-8" />} 
-              title="상품 검색 분석" 
-              description="스마트스토어에서 검색된 상품의 순위와 노출 빈도를 분석합니다."
+              title="상위 노출 키워드, 태그 분석" 
+              description="상품에 최적화된 키워드를 찾고 경쟁사 키워드 전략을 분석하여 검색 노출을 극대화합니다."
               color="blue"
             />
             <FeatureCard 
-              icon={<BarChart className="h-8 w-8" />} 
-              title="순위 변동 추적" 
-              description="시간에 따른 상품의 순위 변화를 추적하고 시각화합니다."
+              icon={<Wand2 className="h-8 w-8" />} 
+              title="상품명 최적화" 
+              description="네이버 검색 알고리즘에 최적화된 상품명을 AI가 자동으로 생성"
               color="green"
             />
             <FeatureCard 
-              icon={<ShoppingBag className="h-8 w-8" />} 
-              title="상품 트렌드 확인" 
-              description="실시간으로 인기 있는 상품과 키워드 트렌드를 확인할 수 있습니다."
+              icon={<FileText className="h-8 w-8" />} 
+              title="카테고리, 태그 최적화" 
+              description="상품에 가장 적합한 네이버 카테고리와 태그를 추천해 검색 노출을 극대화합니다."
+              color="indigo"
+            />
+            <FeatureCard 
+              icon={<CheckSquare className="h-8 w-8" />} 
+              title="원클릭 최적화" 
+              description="복잡한 SEO 작업을 버튼 하나로 자동 수행하여 시간을 절약하고 효율성을 높입니다."
+              color="blue"
+            />
+            <FeatureCard 
+              icon={<LineChart className="h-8 w-8" />} 
+              title="키워드 추적" 
+              description="상위노출 상품명 키워드, 키워드 개수, 태그를 추적합니다"
+              color="green"
+            />
+            <FeatureCard 
+              icon={<Star className="h-8 w-8" />} 
+              title="황금 키워드 제공" 
+              description="다음 페이지에는 없고 현재 페이지에만 있는 상위 노출 핵심 키워드를 제공합니다."
               color="indigo"
             />
           </div>
         </div>
       </section>
+
+      <FaqSection />
       
-      {/* CTA */}
-      <section className="bg-gradient-to-r from-blue-600 to-indigo-600 py-16 px-4 mt-auto">
-        <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-6">
-            지금 바로 스마트스토어 SEO 대시보드를 시작하세요
-          </h2>
-          <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
-            크롬 확장프로그램과 연동하여 스마트스토어 상품의 검색 성과를 분석하고 개선하세요.
-          </p>
-          <Button 
-            onClick={() => navigate("/dashboard")}
-            className="bg-white text-blue-600 hover:bg-blue-50 text-lg"
-            size="lg"
-          >
-            시작하기
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-        </div>
-      </section>
-    </div>
+      <CtaSection />
+      <FooterSection />
+      </div>
+    </DashboardLayout>
   );
 }
 
@@ -197,7 +192,7 @@ function FeatureCard({ icon, title, description, color }: FeatureCardProps) {
     green: 'bg-green-50 border-green-100 text-green-600',
     indigo: 'bg-indigo-50 border-indigo-100 text-indigo-600'
   };
-  
+
   return (
     <div className="border border-slate-200 rounded-lg p-6 bg-white hover:shadow-md transition-shadow">
       <div className={`w-14 h-14 rounded-lg ${colorMap[color]} flex items-center justify-center mb-4`}>
