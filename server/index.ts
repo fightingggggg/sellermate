@@ -60,8 +60,7 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const PORT = process.env.PORT || 8081;
-  app.listen(PORT, () => {
+  server.listen(PORT, () => {
     console.log(`서버가 ${PORT} 에서 실행 중입니다.`);
-
   });
 })();
