@@ -640,7 +640,13 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                         ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
                         : 'bg-amber-100 text-amber-800 border-amber-300'
                       } hover:bg-blue-200 border`}>
-                        {Math.abs(keyword.rankChange)}위 {keyword.rankChange > 0 ? `상승(${keyword.previousRank}위→${keyword.currentRank}위)` : `하락(${keyword.previousRank}위→${keyword.currentRank}위)`}
+                        <span className="block sm:inline">
+    {Math.abs(keyword.rankChange)}위 {keyword.rankChange > 0 ? '상승' : '하락'}
+  </span>
+  <span className="block sm:hidden"><br /></span>
+  <span className="block sm:inline">
+    ({keyword.previousRank}위→{keyword.currentRank}위)
+  </span>
                       </Badge>
                     ) : null}
                   </div>
