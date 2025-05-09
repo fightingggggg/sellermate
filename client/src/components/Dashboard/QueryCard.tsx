@@ -640,13 +640,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                         ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
                         : 'bg-amber-100 text-amber-800 border-amber-300'
                       } hover:bg-blue-200 border`}>
-                        <span className="block sm:inline">
-    {Math.abs(keyword.rankChange)}위 {keyword.rankChange > 0 ? '상승' : '하락'}
-  </span>
-  <span className="block sm:hidden"><br /></span>
-  <span className="block sm:inline">
-    ({keyword.previousRank}위→{keyword.currentRank}위)
-  </span>
+                        {Math.abs(keyword.rankChange)}위 {keyword.rankChange > 0 ? `상승(${keyword.previousRank}위→${keyword.currentRank}위)` : `하락(${keyword.previousRank}위→${keyword.currentRank}위)`}
                       </Badge>
                     ) : null}
                   </div>
@@ -680,7 +674,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
         )}
 
    {/* Tags Tab Panel */}
-   {activeTab === 'tags' && (
+        {activeTab === 'tags' && (
           <>
             <div className="mb-4">
               <h4 className="text-sm font-medium text-gray-500 mb-2">태그 순위</h4>
@@ -936,7 +930,6 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
             </div>
           </>
         )}
-        
         {/* Keyword Counts Tab Panel - Ranking by frequency */}
         {activeTab === 'keywordCounts' && (
           <>
