@@ -616,27 +616,36 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                     'bg-gray-50 hover:bg-gray-100'
                   }`}
                 >
-                  <div className="flex items-center">
-                    <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs mr-2">
-                      {keyword.status === 'removed' ? 
-                        (keyword.previousRank || index + 1) : 
-                        (keyword.currentRank || index + 1)}
-                    </div>
-                    <span className="text-sm font-medium">{keyword.key}</span>
-                    {keyword.status === 'added' ? (
-                      <Badge className="ml-2 bg-blue-500 text-white">NEW</Badge>
-                    ) : keyword.status === 'removed' ? (
-                      <Badge className="ml-2 bg-red-500 text-white">OUT</Badge>
-                    ) : keyword.rankChange !== undefined && keyword.rankChange !== 0 ? (
-                      <Badge className={`ml-2 ${
-                        keyword.rankChange > 0 
-                        ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
-                        : 'bg-amber-100 text-amber-800 border-amber-300'
-                      } hover:bg-blue-200 border`}>
-                        {Math.abs(keyword.rankChange)}위 {keyword.rankChange > 0 ? `상승(${keyword.previousRank}위→${keyword.currentRank}위)` : `하락(${keyword.previousRank}위→${keyword.currentRank}위)`}
-                      </Badge>
-                    ) : null}
-                  </div>
+ <div className="flex items-center">
+  <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs mr-2">
+    {keyword.status === 'removed' ? 
+      (keyword.previousRank || index + 1) : 
+      (keyword.currentRank || index + 1)}
+  </div>
+  <span className="text-sm font-medium">{keyword.key}</span>
+  {keyword.status === 'added' ? (
+    <Badge className="ml-2 bg-blue-500 text-white">NEW</Badge>
+  ) : keyword.status === 'removed' ? (
+    <Badge className="ml-2 bg-red-500 text-white">OUT</Badge>
+  ) : keyword.rankChange !== undefined && keyword.rankChange !== 0 ? (
+    <Badge className={`ml-2 ${
+      keyword.rankChange > 0 
+      ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
+      : 'bg-amber-100 text-amber-800 border-amber-300'
+    } hover:bg-blue-200 border`}>
+      {/* PC 화면용 (md 이상) */}
+      <div className="hidden md:block">
+        {Math.abs(keyword.rankChange)}위 {keyword.rankChange > 0 ? `상승(${keyword.previousRank}위→${keyword.currentRank}위)` : `하락(${keyword.previousRank}위→${keyword.currentRank}위)`}
+      </div>
+      
+      {/* 모바일 화면용 */}
+      <div className="flex flex-col md:hidden">
+        <span>{Math.abs(keyword.rankChange)}위 {keyword.rankChange > 0 ? '상승' : '하락'}</span>
+        <span className="text-xs">({keyword.previousRank}위→{keyword.currentRank}위)</span>
+      </div>
+    </Badge>
+  ) : null}
+</div>
                   <div className="ml-auto flex items-center">
                     <div className="w-20 bg-gray-200 rounded-full h-2.5">
                       <div 
@@ -806,6 +815,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
             </div>
           </>
         )}
+
 
         {/* Tags Tab Panel */}
         {activeTab === 'tags' && (
