@@ -12,16 +12,16 @@ export interface KeywordItem {
 export interface AnalysisData {
   lastUpdated: string;
   keywords: KeywordItem[];
-  keywordCounts: KeywordItem[];
   tags: KeywordItem[];
+  keywordCounts: KeywordItem[];
   savedAt: string;
 }
 
 // Query type
 export interface AnalysisSnapshot {
   keywords: KeywordItem[];
-  keywordCounts: KeywordItem[];
   tags: KeywordItem[];
+  keywordCounts: KeywordItem[];
   lastUpdated: string;
   savedAt: string;
 }
@@ -35,8 +35,9 @@ export interface Query {
   currentSnapshot?: AnalysisSnapshot;
   previousSnapshot?: AnalysisSnapshot;
   keywords: KeywordItem[]; // 변화가 적용된 키워드 목록
-  keywordCounts: KeywordItem[]; // 변화가 적용된 키워드 개수 목록
   tags: KeywordItem[]; // 변화가 적용된 태그 목록
+  keywordCounts: KeywordItem[]; // 변화가 적용된 키워드 개수 목록
+
 }
 
 // User type
