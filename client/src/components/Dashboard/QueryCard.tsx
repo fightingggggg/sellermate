@@ -666,8 +666,149 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
           </div>
         )}
 
-   {/* Tags Tab Panel */}
-   {activeTab === 'tags' && (
+        {/* Keyword Counts Tab Panel - Ranking by frequency */}
+        {activeTab === 'keywordCounts' && (
+          <>
+            <h4 className="text-sm font-medium text-gray-500 mb-2">키워드 개수</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {(comparedData ? 
+                  (Array.isArray(comparedData.keywordCounts) ? [...comparedData.keywordCounts] : []) : 
+                  (Array.isArray(query.keywordCounts) ? [...query.keywordCounts] : [])
+              ).sort((a, b) => b.value - a.value).map((count, index) => (
+                <Dialog key={index}>
+                  <DialogTrigger asChild>
+                    <div 
+                      className={`flex items-center p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                        count.status === 'removed' ? 'text-gray-400 bg-gray-100' :
+                        count.status === 'added' ? 'bg-blue-50 border border-blue-200' :
+                        count.rankChange !== undefined && count.rankChange !== 0 ? 
+                          (count.rankChange > 0 ? 'bg-green-50 border border-green-200' : 'bg-amber-50 border border-amber-200') :
+                        'bg-gray-50 hover:bg-gray-100'
+                      }`}
+                    >
+                      <div className="flex items-center">
+                        <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs mr-2">
+                          {count.status === 'removed' ? 
+                            (count.previousRank || index + 1) : 
+                            (count.currentRank || index + 1)}
+                        </div>
+                        <span className="text-sm font-medium">{count.key}</span>
+                        {count.status === 'added' ? (
+                          <Badge className="ml-2 bg-blue-500 text-white">NEW</Badge>
+                        ) : count.status === 'removed' ? (
+                          <Badge className="ml-2 bg-red-500 text-white">OUT</Badge>
+                        ) : count.rankChange !== undefined && count.rankChange !== 0 ? (
+                          <Badge className={`ml-2 ${
+                            count.rankChange > 0 
+                            ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
+                            : 'bg-amber-100 text-amber-800 border-amber-300'
+                          } hover:bg-blue-200 border`}>
+                            {Math.abs(count.rankChange)}위 {count.rankChange > 0 ? `상승(${count.previousRank}위→${count.currentRank}위)` : `하락(${count.previousRank}위→${count.currentRank}위)`}
+                          </Badge>
+                        ) : null}
+                      </div>
+                      <div className="ml-auto flex items-center">
+                        <div className="w-20 bg-gray-200 rounded-full h-2.5">
+                          <div 
+                            className={`${count.status === 'removed' ? 'bg-gray-400' : 'bg-primary'} h-2.5 rounded-full`} 
+                            style={{ width: `${Math.min(100, count.value * 2)}%` }}
+                          ></div>
+                        </div>
+                        <span className={`ml-2 font-semibold ${
+                          count.status === 'removed' ? 'text-gray-400' : 'text-primary'
+                        }`}>
+                          {count.value}
+                          {count.status === 'increased' && count.change ? (
+                            <span className="ml-1 text-sm font-bold text-emerald-500">+{count.change}</span>
+                          ) : count.status === 'decreased' && count.change ? (
+                            <span className="ml-1 text-sm font-bold text-red-500">-{count.change}</span>
+                          ) : (
+                            <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="text-center">
+                        {count.key} <span className="text-sm text-gray-500">변화</span>
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4">
+                      <div className="p-4 bg-gray-50 rounded-lg">
+                        <div className="flex justify-between mb-4">
+                          <div>
+                            <h5 className="text-sm font-medium text-gray-600 mb-1">이전 값</h5>
+                            {count.status === 'added' ? (
+                              <span className="text-2xl font-bold text-gray-400">-</span>
+                            ) : (
+                              <div className="flex items-center">
+                                <span className="text-2xl font-bold">
+                                  {count.status === 'increased' && count.change ? count.value - count.change : 
+                                   count.status === 'decreased' && count.change ? count.value + count.change : 
+                                   count.value}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="text-center mt-2">
+                            <span className="text-4xl">
+                              {count.status === 'added' ? (
+                                <span className="text-emerald-500">→</span>
+                              ) : count.status === 'removed' ? (
+                                <span className="text-red-500">→</span>
+                              ) : count.status === 'increased' ? (
+                                <span className="text-blue-500">↑</span>
+                              ) : (
+                                <span className="text-amber-500">↓</span>
+                              )}
+                            </span>
+                          </div>
+                          <div className="text-right">
+                            <h5 className="text-sm font-medium text-gray-600 mb-1">현재 값</h5>
+                            {count.status === 'removed' ? (
+                              <span className="text-2xl font-bold text-gray-400">-</span>
+                            ) : (
+                              <div className="flex items-center justify-end">
+                                <span className="text-2xl font-bold">{count.value}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="text-center my-4">
+                          <span className="text-sm font-medium">
+                            {count.status === 'added' ? (
+                              `"${count.key}"이(가) 새로 추가되어 ${count.currentRank}위에 올랐습니다.`
+                            ) : count.status === 'removed' ? (
+                              `"${count.key}"이(가) 순위에서 제외되었습니다.`
+                            ) : count.rankChange !== undefined && count.rankChange !== 0 ? (
+                              `"${count.key}"의 순위가 ${Math.abs(count.rankChange)}단계 ${count.rankChange > 0 ? '상승' : '하락'}했습니다. (${count.previousRank}위 → ${count.currentRank}위)`
+                            ) : (
+                              `"${count.key}"의 순위가 변경되지 않았습니다.`
+                            )}
+                          </span>
+                        </div>
+
+                        <div className="mt-4 text-sm text-gray-500">
+                          <p>
+                            {selectedCurrentDate && format(new Date(selectedCurrentDate), 'yyyy년 MM월 dd일')}과(와) 
+                            {selectedCompareDate && selectedCompareDate !== "none" && format(new Date(selectedCompareDate), 'yyyy년 MM월 dd일')} 사이의 
+                            변화입니다.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* Tags Tab Panel */}
+        {activeTab === 'tags' && (
           <>
             <div className="mb-4">
               <h4 className="text-sm font-medium text-gray-500 mb-2">태그 순위</h4>
@@ -923,149 +1064,6 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
             </div>
           </>
         )}
-        
-        {/* Keyword Counts Tab Panel - Ranking by frequency */}
-        {activeTab === 'keywordCounts' && (
-          <>
-            <h4 className="text-sm font-medium text-gray-500 mb-2">키워드 개수</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {(comparedData ? 
-                  (Array.isArray(comparedData.keywordCounts) ? [...comparedData.keywordCounts] : []) : 
-                  (Array.isArray(query.keywordCounts) ? [...query.keywordCounts] : [])
-              ).sort((a, b) => b.value - a.value).map((count, index) => (
-                <Dialog key={index}>
-                  <DialogTrigger asChild>
-                    <div 
-                      className={`flex items-center p-3 rounded-lg cursor-pointer transition-all duration-200 ${
-                        count.status === 'removed' ? 'text-gray-400 bg-gray-100' :
-                        count.status === 'added' ? 'bg-blue-50 border border-blue-200' :
-                        count.rankChange !== undefined && count.rankChange !== 0 ? 
-                          (count.rankChange > 0 ? 'bg-green-50 border border-green-200' : 'bg-amber-50 border border-amber-200') :
-                        'bg-gray-50 hover:bg-gray-100'
-                      }`}
-                    >
-                      <div className="flex items-center">
-                        <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs mr-2">
-                          {count.status === 'removed' ? 
-                            (count.previousRank || index + 1) : 
-                            (count.currentRank || index + 1)}
-                        </div>
-                        <span className="text-sm font-medium">{count.key}</span>
-                        {count.status === 'added' ? (
-                          <Badge className="ml-2 bg-blue-500 text-white">NEW</Badge>
-                        ) : count.status === 'removed' ? (
-                          <Badge className="ml-2 bg-red-500 text-white">OUT</Badge>
-                        ) : count.rankChange !== undefined && count.rankChange !== 0 ? (
-                          <Badge className={`ml-2 ${
-                            count.rankChange > 0 
-                            ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
-                            : 'bg-amber-100 text-amber-800 border-amber-300'
-                          } hover:bg-blue-200 border`}>
-                            {Math.abs(count.rankChange)}위 {count.rankChange > 0 ? `상승(${count.previousRank}위→${count.currentRank}위)` : `하락(${count.previousRank}위→${count.currentRank}위)`}
-                          </Badge>
-                        ) : null}
-                      </div>
-                      <div className="ml-auto flex items-center">
-                        <div className="w-20 bg-gray-200 rounded-full h-2.5">
-                          <div 
-                            className={`${count.status === 'removed' ? 'bg-gray-400' : 'bg-primary'} h-2.5 rounded-full`} 
-                            style={{ width: `${Math.min(100, count.value * 2)}%` }}
-                          ></div>
-                        </div>
-                        <span className={`ml-2 font-semibold ${
-                          count.status === 'removed' ? 'text-gray-400' : 'text-primary'
-                        }`}>
-                          {count.value}
-                          {count.status === 'increased' && count.change ? (
-                            <span className="ml-1 text-sm font-bold text-emerald-500">+{count.change}</span>
-                          ) : count.status === 'decreased' && count.change ? (
-                            <span className="ml-1 text-sm font-bold text-red-500">-{count.change}</span>
-                          ) : (
-                            <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                          )}
-                        </span>
-                      </div>
-                    </div>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle className="text-center">
-                        {count.key} <span className="text-sm text-gray-500">변화</span>
-                      </DialogTitle>
-                    </DialogHeader>
-                    <div className="py-4">
-                      <div className="p-4 bg-gray-50 rounded-lg">
-                        <div className="flex justify-between mb-4">
-                          <div>
-                            <h5 className="text-sm font-medium text-gray-600 mb-1">이전 값</h5>
-                            {count.status === 'added' ? (
-                              <span className="text-2xl font-bold text-gray-400">-</span>
-                            ) : (
-                              <div className="flex items-center">
-                                <span className="text-2xl font-bold">
-                                  {count.status === 'increased' && count.change ? count.value - count.change : 
-                                   count.status === 'decreased' && count.change ? count.value + count.change : 
-                                   count.value}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                          <div className="text-center mt-2">
-                            <span className="text-4xl">
-                              {count.status === 'added' ? (
-                                <span className="text-emerald-500">→</span>
-                              ) : count.status === 'removed' ? (
-                                <span className="text-red-500">→</span>
-                              ) : count.status === 'increased' ? (
-                                <span className="text-blue-500">↑</span>
-                              ) : (
-                                <span className="text-amber-500">↓</span>
-                              )}
-                            </span>
-                          </div>
-                          <div className="text-right">
-                            <h5 className="text-sm font-medium text-gray-600 mb-1">현재 값</h5>
-                            {count.status === 'removed' ? (
-                              <span className="text-2xl font-bold text-gray-400">-</span>
-                            ) : (
-                              <div className="flex items-center justify-end">
-                                <span className="text-2xl font-bold">{count.value}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="text-center my-4">
-                          <span className="text-sm font-medium">
-                            {count.status === 'added' ? (
-                              `"${count.key}"이(가) 새로 추가되어 ${count.currentRank}위에 올랐습니다.`
-                            ) : count.status === 'removed' ? (
-                              `"${count.key}"이(가) 순위에서 제외되었습니다.`
-                            ) : count.rankChange !== undefined && count.rankChange !== 0 ? (
-                              `"${count.key}"의 순위가 ${Math.abs(count.rankChange)}단계 ${count.rankChange > 0 ? '상승' : '하락'}했습니다. (${count.previousRank}위 → ${count.currentRank}위)`
-                            ) : (
-                              `"${count.key}"의 순위가 변경되지 않았습니다.`
-                            )}
-                          </span>
-                        </div>
-
-                        <div className="mt-4 text-sm text-gray-500">
-                          <p>
-                            {selectedCurrentDate && format(new Date(selectedCurrentDate), 'yyyy년 MM월 dd일')}과(와) 
-                            {selectedCompareDate && selectedCompareDate !== "none" && format(new Date(selectedCompareDate), 'yyyy년 MM월 dd일')} 사이의 
-                            변화입니다.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              ))}
-            </div>
-          </>
-        )}
-
-     
       </CardContent>
     </Card>
   );
