@@ -1,11 +1,8 @@
 
-import { Search, FileText, Image, LineChart, CheckSquare, Wand2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import ScrollToLink from "@/components/ui/scroll-to-link";
 
 const TextFeaturesSection = () => {
   return (
-    <section id="textfeatures" className="py-24 bg-[#F8F9FA]">
+    <section id="textfeatures" className="py-24 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <div className="text-xl md:text-3xl font-bold leading-snug md:leading-tight space-y-2 md:space-y-3">

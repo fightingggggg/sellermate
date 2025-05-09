@@ -116,14 +116,41 @@ export default function Home() {
         </div>
       </section>
 
-      <TextFeaturesSection />
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+      >
+        <ExampleSection />
+      </motion.div>
 
-      <ExampleSection />
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+      >
+        <TextFeaturesSection />
+      </motion.div>
 
-      <ReviewSection />
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+      >
+        <ReviewSection />
+      </motion.div>
 
       {/* Features */}
-      <section className="py-16 px-4">
+      <motion.section
+        className="py-16 px-4"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+      >
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">주요 기능</h2>
@@ -133,47 +160,73 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <FeatureCard 
-              icon={<Search className="h-8 w-8" />} 
-              title="상위 노출 키워드, 태그 분석" 
-              description="상품에 최적화된 키워드를 찾고 경쟁사 키워드 전략을 분석하여 검색 노출을 극대화합니다."
-              color="blue"
-            />
-            <FeatureCard 
-              icon={<Wand2 className="h-8 w-8" />} 
-              title="상품명 최적화" 
-              description="네이버 검색 알고리즘에 최적화된 상품명을 AI가 자동으로 생성"
-              color="green"
-            />
-            <FeatureCard 
-              icon={<FileText className="h-8 w-8" />} 
-              title="카테고리, 태그 최적화" 
-              description="상품에 가장 적합한 네이버 카테고리와 태그를 추천해 검색 노출을 극대화합니다."
-              color="indigo"
-            />
-            <FeatureCard 
-              icon={<CheckSquare className="h-8 w-8" />} 
-              title="원클릭 최적화" 
-              description="복잡한 SEO 작업을 버튼 하나로 자동 수행하여 시간을 절약하고 효율성을 높입니다."
-              color="blue"
-            />
-            <FeatureCard 
-              icon={<LineChart className="h-8 w-8" />} 
-              title="키워드 추적" 
-              description="상위노출 상품명 키워드, 키워드 개수, 태그를 추적합니다"
-              color="green"
-            />
-            <FeatureCard 
-              icon={<Star className="h-8 w-8" />} 
-              title="황금 키워드 제공" 
-              description="다음 페이지에는 없고 현재 페이지에만 있는 상위 노출 핵심 키워드를 제공합니다."
-              color="indigo"
-            />
-          </div>
-        </div>
-      </section>
+  {[
+    {
+      icon: <Search className="h-8 w-8" />,
+      title: "상위 노출 키워드, 태그 분석",
+      description: "상품에 최적화된 키워드를 찾고 경쟁사 키워드 전략을 분석하여 검색 노출을 극대화합니다.",
+      color: "blue",
+    },
+    {
+      icon: <Wand2 className="h-8 w-8" />,
+      title: "상품명 최적화",
+      description: "네이버 검색 알고리즘에 최적화된 상품명을 AI가 자동으로 생성",
+      color: "green",
+    },
+    {
+      icon: <FileText className="h-8 w-8" />,
+      title: "카테고리, 태그 최적화",
+      description: "상품에 가장 적합한 네이버 카테고리와 태그를 추천해 검색 노출을 극대화합니다.",
+      color: "indigo",
+    },
+    {
+      icon: <CheckSquare className="h-8 w-8" />,
+      title: "원클릭 최적화",
+      description: "복잡한 SEO 작업을 버튼 하나로 자동 수행하여 시간을 절약하고 효율성을 높입니다.",
+      color: "blue",
+    },
+    {
+      icon: <LineChart className="h-8 w-8" />,
+      title: "키워드 추적",
+      description: "상위노출 상품명 키워드, 키워드 개수, 태그를 추적합니다",
+      color: "green",
+    },
+    {
+      icon: <Star className="h-8 w-8" />,
+      title: "황금 키워드 제공",
+      description: "다음 페이지에는 없고 현재 페이지에만 있는 상위 노출 핵심 키워드를 제공합니다.",
+      color: "indigo",
+    }
+  ].map((feature, index) => (
+    <motion.div
+      key={feature.title}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: index * 0.2 }}
+      viewport={{ once: true }}
+    >
+      <FeatureCard 
+        icon={feature.icon} 
+        title={feature.title} 
+        description={feature.description} 
+        color={feature.color as "blue" | "green" | "indigo"} 
+      />
+    </motion.div>
+  ))}
+</div>
 
+        </div>
+      </motion.section>
+
+
+      <motion.section
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+      >
       <FaqSection />
+      </motion.section>
       
       <CtaSection />
       <FooterSection />

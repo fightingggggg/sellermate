@@ -11,7 +11,7 @@ const steps = [
   },
   {
     number: 2,
-    title: "서비스 이용 후\n매출 증가 경험",
+    title: "실제 이용 후\n매출 증가 경험",
     description: "31.3%",
     icon: ShoppingCart,
     color: "bg-gradient-to-br from-blue-500 to-blue-600"
@@ -43,8 +43,8 @@ const ExampleSection = () => {
               <div className={`${step.color} h-2`}></div>
               <div className="p-8 text-center">
                 <div className="mb-6">
-                  <div className={`w-24 h-24 ${step.color} rounded-full flex items-center justify-center mx-auto shadow-lg`}>
-                    <Icon className="text-white" size={40} />
+                  <div className={`w-16 h-16 ${step.color} rounded-full flex items-center justify-center mx-auto shadow-lg`}>
+                    <Icon className="text-white" size={24} />
                   </div>
                 </div>
                 <h3 className="text-xl font-bold mb-4 whitespace-pre-line">{step.title}</h3>
