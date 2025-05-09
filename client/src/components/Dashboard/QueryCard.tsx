@@ -487,7 +487,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                   {comparedData?.tags?.some(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)) && (
                     <div className="bg-white p-3 rounded-lg border border-purple-100 shadow-sm">
                       <h5 className="text-sm font-semibold mb-2 text-purple-700 border-b pb-1 border-purple-100">
-                        태그 변화 <span className="font-normal text-purple-500">({comparedData?.tags.filter(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)).length}건)</span>
+                        주요 태그 변화 <span className="font-normal text-purple-500">({comparedData?.tags.filter(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)).length}건)</span>
                       </h5>
                       <ul className="text-sm space-y-2.5">
                         {comparedData?.tags
@@ -524,7 +524,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                   {comparedData?.keywordCounts?.some(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)) && (
                     <div className="bg-white p-3 rounded-lg border border-indigo-100 shadow-sm">
                       <h5 className="text-sm font-semibold mb-2 text-indigo-700 border-b pb-1 border-indigo-100">
-                        키워드 개수 변화 <span className="font-normal text-indigo-500">({comparedData?.keywordCounts.filter(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)).length}건)</span>
+                        주요 키워드 개수 변화 <span className="font-normal text-indigo-500">({comparedData?.keywordCounts.filter(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)).length}건)</span>
                       </h5>
                       <ul className="text-sm space-y-2.5">
                         {comparedData?.keywordCounts

@@ -9,6 +9,7 @@ import CtaSection from "../components/CtaSection";
 import FooterSection from "../components/FooterSection";
 import FaqSection from "../components/FaqSection";
 import DashboardLayout from "@/components/DashboardLayout";
+import ReviewSection from "../components/ReviewSection";
 
 export default function Home() {
   const { currentUser, loading } = useAuth();
@@ -118,6 +119,8 @@ export default function Home() {
       <TextFeaturesSection />
 
       <ExampleSection />
+
+      <ReviewSection />
 
       {/* Features */}
       <section className="py-16 px-4">
