@@ -24,14 +24,13 @@ interface QueryCardProps {
 }
 
 export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps) {
-  const [activeTab, setActiveTab] = useState<'keywords' |'tags'|'keywordCounts'>('keywords');
+  const [activeTab, setActiveTab] = useState<'keywords' | 'keywordCounts' | 'tags'>('keywords');
   const [selectedCurrentDate, setSelectedCurrentDate] = useState<string | null>(null);
   const [selectedCompareDate, setSelectedCompareDate] = useState<string | null>(null);
   const [comparedData, setComparedData] = useState<{
     keywords: KeywordItem[];
-    tags: KeywordItem[];
     keywordCounts: KeywordItem[];
- 
+    tags: KeywordItem[];
   } | null>(null);
 
   // Sort dates for the selectors
@@ -52,9 +51,8 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
     if (!compareDate || compareDate === "none" || !query.dates[compareDate]) {
       setComparedData({
         keywords: currentData?.keywords || [],
-        tags: currentData?.tags || [],
-        keywordCounts: currentData?.keywordCounts || []
-   
+        keywordCounts: currentData?.keywordCounts || [],
+        tags: currentData?.tags || []
       });
       return;
     }
@@ -63,9 +61,8 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
     if (!compareData) {
       setComparedData({
         keywords: currentData.keywords || [],
-        tags: currentData.tags || [],
-        keywordCounts: currentData.keywordCounts || []
-     
+        keywordCounts: currentData.keywordCounts || [],
+        tags: currentData.tags || []
       });
       return;
     }
@@ -178,9 +175,8 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
 
     setComparedData({
       keywords: compareAndMarkChanges(compareData.keywords, currentData.keywords),
-      tags: compareAndMarkChanges(compareData.tags, currentData.tags),
-      keywordCounts: compareAndMarkChanges(compareData.keywordCounts, currentData.keywordCounts)
-   
+      keywordCounts: compareAndMarkChanges(compareData.keywordCounts, currentData.keywordCounts),
+      tags: compareAndMarkChanges(compareData.tags, currentData.tags)
     });
   };
 
@@ -251,17 +247,17 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
       k.status === 'increased' || k.status === 'decreased'
     );
 
-    const hasTagChanges = comparedData.tags.some(k => 
-      k.status === 'added' || k.status === 'removed' || 
-      k.status === 'increased' || k.status === 'decreased'
-    );
-
     const hasKeywordCountChanges = comparedData.keywordCounts.some(k => 
       k.status === 'added' || k.status === 'removed' || 
       k.status === 'increased' || k.status === 'decreased'
     );
 
-    return hasKeywordChanges || hasTagChanges || hasKeywordCountChanges ;
+    const hasTagChanges = comparedData.tags.some(k => 
+      k.status === 'added' || k.status === 'removed' || 
+      k.status === 'increased' || k.status === 'decreased'
+    );
+
+    return hasKeywordChanges || hasKeywordCountChanges || hasTagChanges;
   };
 
   // Helper function to determine if an item should show dialog
@@ -482,43 +478,6 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                     </div>
                   )}
 
-     {/* 태그 섹션 */}
-     {comparedData?.tags?.some(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)) && (
-                    <div className="bg-white p-3 rounded-lg border border-purple-100 shadow-sm">
-                      <h5 className="text-sm font-semibold mb-2 text-purple-700 border-b pb-1 border-purple-100">
-                        태그 변화 <span className="font-normal text-purple-500">({comparedData?.tags.filter(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)).length}건)</span>
-                      </h5>
-                      <ul className="text-sm space-y-2.5">
-                        {comparedData?.tags
-                          .filter(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0))
-                          .sort((a, b) => {
-                            if ((a.status === 'added' || a.status === 'removed') && !(b.status === 'added' || b.status === 'removed')) return -1;
-                            if (!(a.status === 'added' || a.status === 'removed') && (b.status === 'added' || b.status === 'removed')) return 1;
-                            return Math.abs((b.rankChange || 0)) - Math.abs((a.rankChange || 0));
-                          })
-                          .slice(0, 3)
-                          .map((k, idx) => (
-                            <li key={idx} className="flex items-start py-1 px-2 rounded-md hover:bg-purple-50">
-                              {renderChangeIndicator(k)}
-                              <div>
-                                <span className="font-medium text-gray-800">"{k.key}"</span>{' '}
-                                {k.status === 'added' ? (
-                                  <span>새로 추가되어 <span className="font-semibold text-emerald-600">{k.currentRank}위</span>에 진입했습니다.</span>
-                                ) : k.status === 'removed' ? (
-                                  <span>순위에서 제외되었습니다. (이전 <span className="font-semibold text-red-600">{k.previousRank}위</span>)</span>
-                                ) : k.rankChange !== undefined && k.rankChange !== 0 ? (
-                                  <span>순위가 <span className="font-semibold">{Math.abs(k.rankChange)}위 {k.rankChange > 0 ? 
-                                    <span className="text-emerald-600">상승</span> : 
-                                    <span className="text-amber-600">하락</span>}
-                                  </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
-                                ) : null}
-                              </div>
-                            </li>
-                          ))}
-                      </ul>
-                    </div>
-                  )}
-
                   {/* 키워드 개수 섹션 */}
                   {comparedData?.keywordCounts?.some(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)) && (
                     <div className="bg-white p-3 rounded-lg border border-indigo-100 shadow-sm">
@@ -556,7 +515,42 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                     </div>
                   )}
 
-             
+                  {/* 태그 섹션 */}
+                  {comparedData?.tags?.some(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)) && (
+                    <div className="bg-white p-3 rounded-lg border border-purple-100 shadow-sm">
+                      <h5 className="text-sm font-semibold mb-2 text-purple-700 border-b pb-1 border-purple-100">
+                        태그 변화 <span className="font-normal text-purple-500">({comparedData?.tags.filter(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)).length}건)</span>
+                      </h5>
+                      <ul className="text-sm space-y-2.5">
+                        {comparedData?.tags
+                          .filter(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0))
+                          .sort((a, b) => {
+                            if ((a.status === 'added' || a.status === 'removed') && !(b.status === 'added' || b.status === 'removed')) return -1;
+                            if (!(a.status === 'added' || a.status === 'removed') && (b.status === 'added' || b.status === 'removed')) return 1;
+                            return Math.abs((b.rankChange || 0)) - Math.abs((a.rankChange || 0));
+                          })
+                          .slice(0, 3)
+                          .map((k, idx) => (
+                            <li key={idx} className="flex items-start py-1 px-2 rounded-md hover:bg-purple-50">
+                              {renderChangeIndicator(k)}
+                              <div>
+                                <span className="font-medium text-gray-800">"{k.key}"</span>{' '}
+                                {k.status === 'added' ? (
+                                  <span>새로 추가되어 <span className="font-semibold text-emerald-600">{k.currentRank}위</span>에 진입했습니다.</span>
+                                ) : k.status === 'removed' ? (
+                                  <span>순위에서 제외되었습니다. (이전 <span className="font-semibold text-red-600">{k.previousRank}위</span>)</span>
+                                ) : k.rankChange !== undefined && k.rankChange !== 0 ? (
+                                  <span>순위가 <span className="font-semibold">{Math.abs(k.rankChange)}위 {k.rankChange > 0 ? 
+                                    <span className="text-emerald-600">상승</span> : 
+                                    <span className="text-amber-600">하락</span>}
+                                  </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
+                                ) : null}
+                              </div>
+                            </li>
+                          ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -578,16 +572,6 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
             </button>
             <button 
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'tags' 
-                  ? 'border-primary text-primary' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-              onClick={() => setActiveTab('tags')}
-            >
-              태그
-            </button>
-            <button 
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'keywordCounts' 
                   ? 'border-primary text-primary' 
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -595,6 +579,16 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
               onClick={() => setActiveTab('keywordCounts')}
             >
               키워드 개수
+            </button>
+            <button 
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'tags' 
+                  ? 'border-primary text-primary' 
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+              onClick={() => setActiveTab('tags')}
+            >
+              태그
             </button>
           </nav>
         </div>
@@ -672,8 +666,8 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
           </div>
         )}
 
-     {/* Tags Tab Panel */}
-     {activeTab === 'tags' && (
+   {/* Tags Tab Panel */}
+   {activeTab === 'tags' && (
           <>
             <div className="mb-4">
               <h4 className="text-sm font-medium text-gray-500 mb-2">태그 순위</h4>
@@ -1071,6 +1065,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
           </>
         )}
 
+     
       </CardContent>
     </Card>
   );
