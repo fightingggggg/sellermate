@@ -155,7 +155,7 @@ export default function Home() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">주요 기능</h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              스마트스토어 SEO 대시보드는 상품 검색 결과를 분석하여 다양한 인사이트를 제공합니다.
+              상위 노출 상품명의 키워드, 태그, 카테고리를 분석하고 SEO 최적 상품명을 생성합니다.
             </p>
           </div>
 
