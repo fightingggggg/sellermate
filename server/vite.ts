@@ -84,7 +84,8 @@ export async function setupVite(app: Express, server: Server) {
 //   });
 // }
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "public");
+  // dist/public으로 경로 수정
+  const distPath = path.resolve(import.meta.dirname, "dist/public");
 
   if (!fs.existsSync(distPath)) {
     throw new Error(
@@ -92,9 +93,8 @@ export function serveStatic(app: Express) {
     );
   }
 
-  // 정적 파일 서빙을 위한 미들웨어
+  // JavaScript 파일에 대한 올바른 MIME 타입 설정
   app.use(express.static(distPath, {
-    // JavaScript 파일을 위한 적절한 MIME 타입 설정
     setHeaders: (res, filePath) => {
       if (filePath.endsWith('.js')) {
         res.setHeader('Content-Type', 'application/javascript');
@@ -102,8 +102,13 @@ export function serveStatic(app: Express) {
     }
   }));
 
-  // 클라이언트 사이드 라우팅을 위한 fallback 처리
-  app.get('*', (_req, res) => {
+  // 클라이언트 사이드 라우팅을 위한 처리
+  // use 대신 get을 사용하고 명시적으로 모든 경로를 index.html로 리다이렉트
+  app.get('*', (req, res) => {
+    // API 요청은 제외
+    if (req.path.startsWith('/api')) {
+      return res.status(404).send('API endpoint not found');
+    }
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }
