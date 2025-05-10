@@ -1,3 +1,6 @@
+
+import path from 'path';
+
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
@@ -5,6 +8,19 @@ import { setupVite, serveStatic, log } from "./vite";
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(express.static(path.join(process.cwd(), 'client/dist'), {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    }
+    if (filePath.endsWith('.mjs') || filePath.endsWith('.js.map')) {
+      res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    }
+    if (filePath.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css; charset=utf-8');
+    }
+  }
+}));
 const PORT = process.env.PORT || 8081;
 
 app.use((req, res, next) => {
