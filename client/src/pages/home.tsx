@@ -11,9 +11,26 @@ import FaqSection from "../components/FaqSection";
 import DashboardLayout from "@/components/DashboardLayout";
 import ReviewSection from "../components/ReviewSection";
 
+import { trackTimeSpent } from "@/lib/analytics";
+import { useEffect } from "react";
+
 export default function Home() {
   const { currentUser, loading } = useAuth();
   const [, navigate] = useLocation();
+
+  useEffect(() => {
+    const cleanupHero = trackTimeSpent('Hero Section');
+    const cleanupFeatures = trackTimeSpent('Features Section');
+    const cleanupReviews = trackTimeSpent('Reviews Section');
+    const cleanupFaq = trackTimeSpent('FAQ Section');
+
+    return () => {
+      cleanupHero();
+      cleanupFeatures();
+      cleanupReviews();
+      cleanupFaq();
+    };
+  }, []);
 
   if (loading) {
     return (
