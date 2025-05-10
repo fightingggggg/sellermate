@@ -84,8 +84,8 @@ export async function setupVite(app: Express, server: Server) {
 //   });
 // }
 export function serveStatic(app: Express) {
-  // dist/public으로 경로 수정
-  const distPath = path.resolve(import.meta.dirname, "dist/public");
+  // dist/public 경로 확인
+  const distPath = path.resolve(import.meta.dirname, "..", "dist/public");
 
   if (!fs.existsSync(distPath)) {
     throw new Error(
@@ -102,12 +102,11 @@ export function serveStatic(app: Express) {
     }
   }));
 
-  // 클라이언트 사이드 라우팅을 위한 처리
-  // use 대신 get을 사용하고 명시적으로 모든 경로를 index.html로 리다이렉트
-  app.get('*', (req, res) => {
-    // API 요청은 제외
+  // API 경로를 제외한 모든 요청을 index.html로 처리
+  app.get('*', (req, res, next) => {
+    // API 요청은 무시
     if (req.path.startsWith('/api')) {
-      return res.status(404).send('API endpoint not found');
+      return next();
     }
     res.sendFile(path.resolve(distPath, "index.html"));
   });

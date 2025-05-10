@@ -27,15 +27,16 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
-    rollupOptions: {
-      output: {
-        manualChunks: undefined,
-      },
+
+  rollupOptions: {
+    output: {
+      // 청크 이름 포맷 변경으로 MIME 타입 문제 방지
+      entryFileNames: 'assets/[name]-[hash].js',
+      chunkFileNames: 'assets/[name]-[hash].js',
+      assetFileNames: 'assets/[name]-[hash].[ext]'
     },
-    // ES 모듈 형식 유지
-    target: 'esnext',
-    // CSS가 별도 파일로 추출되도록 설정
-    cssCodeSplit: true
+  },
+
   },
   // server: {
   //   allowedHosts: ['sellermate.koyeb.app'] // 호스트 허용 추가
