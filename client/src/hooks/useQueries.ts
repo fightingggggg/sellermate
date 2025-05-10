@@ -42,7 +42,7 @@ export function useQueries() {
     // 날짜별 구조로 저장되어 있으므로 정렬 없이 모든 문서 가져오기
     const q = firestoreQuery(userQueriesRef);
     
-    console.log(`쿼리 실행: analysisLogs/${userEmail}/queries`);
+    // console.log(`쿼리 실행: analysisLogs/${userEmail}/queries`);
     
     // Subscribe to changes
     const unsubscribe = onSnapshot(q, async (snapshot) => {
@@ -69,7 +69,7 @@ export function useQueries() {
             
             // Document ID가 실제 검색어 쿼리 문자열이 됨
             docData.text = docSnapshot.id;
-            console.log("문서 ID (검색어):", docSnapshot.id);
+            // console.log("문서 ID (검색어):", docSnapshot.id);
             
             if (!docData.lastUpdated) {
               // Use current date as lastUpdated if missing
@@ -95,19 +95,19 @@ export function useQueries() {
             } 
             // 새 형식의 날짜별 데이터 처리
             else {
-              console.log("새 형식 데이터 처리 - 문서 내용:", docData);
+              // console.log("새 형식 데이터 처리 - 문서 내용:", docData);
               
               // 문서의 필드 중 날짜 형식(YYYY-MM-DD)을 가진 필드들만 추출
               const dateFields = Object.keys(docData).filter(key => 
                 /^\d{4}-\d{2}-\d{2}$/.test(key)
               );
               
-              console.log("발견된 날짜 필드:", dateFields);
+              // console.log("발견된 날짜 필드:", dateFields);
               
               // 각 날짜 필드에 대해 데이터 처리
               dateFields.forEach(dateKey => {
                 const dateData = docData[dateKey];
-                console.log(`날짜 [${dateKey}]의 데이터:`, dateData);
+                // console.log(`날짜 [${dateKey}]의 데이터:`, dateData);
                 
                 // Firebase에서 가져온 데이터가 객체인지 확인
                 if (dateData && typeof dateData === 'object') {
@@ -121,11 +121,11 @@ export function useQueries() {
                 }
               });
               
-              console.log("처리된 날짜 데이터:", dates);
+              // console.log("처리된 날짜 데이터:", dates);
               
               // 날짜 형식 필드가 하나도 없으면 기본 데이터 사용
               if (Object.keys(dates).length === 0) {
-                console.log("날짜 필드가 없습니다. 기본 데이터를 생성합니다.");
+                // console.log("날짜 필드가 없습니다. 기본 데이터를 생성합니다.");
                 
                 // 기본 날짜 사용 (오늘 날짜)
                 const defaultDate = new Date().toISOString().split('T')[0];
@@ -186,7 +186,7 @@ export function useQueries() {
             
             // Count changes in this query
             const changesInQuery = countChanges(query);
-            console.log(`상품 "${query.text}"의 변화 건수: ${changesInQuery}`);
+            // console.log(`상품 "${query.text}"의 변화 건수: ${changesInQuery}`);
             totalChanges += changesInQuery;
             
             // Track latest update date
@@ -196,7 +196,7 @@ export function useQueries() {
             
             loadedQueries.push(query);
           } catch (docError) {
-            console.error(`Error processing document ${docSnapshot.id}:`, docError);
+            // console.error(`Error processing document ${docSnapshot.id}:`, docError);
           }
         }
         
@@ -209,7 +209,7 @@ export function useQueries() {
         
         setQueries(loadedQueries);
       } catch (error) {
-        console.error("Error processing query snapshot:", error);
+        // console.error("Error processing query snapshot:", error);
         toast({
           title: "데이터 로딩 오류",
           description: "분석 데이터를 불러오는 중 오류가 발생했습니다.",
@@ -219,7 +219,7 @@ export function useQueries() {
         setLoading(false);
       }
     }, (error: any) => {
-      console.error("Error fetching queries:", error);
+      // console.error("Error fetching queries:", error);
       
       // Dispatch custom event for Firebase permission errors
       if (error.code === 'permission-denied') {
@@ -244,11 +244,11 @@ export function useQueries() {
   function processKeywordItems(items: any[]): KeywordItem[] {
     // If items is null, undefined, or not an array, return empty array
     if (!items || !Array.isArray(items) || items.length === 0) {
-      console.log("빈 아이템 배열 받음");
+      // console.log("빈 아이템 배열 받음");
       return [];
     }
     
-    console.log("처리 중인 아이템 배열:", items);
+    // console.log("처리 중인 아이템 배열:", items);
     
     return items.map(item => {
       if (typeof item === 'object' && item !== null) {

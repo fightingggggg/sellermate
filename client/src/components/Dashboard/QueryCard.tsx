@@ -16,6 +16,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog";
+import React from "react";
 
 interface QueryCardProps {
   query: Query;
@@ -668,7 +669,12 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
               );
 
               // 모든 카드에 대해 Dialog로 감싸서 반환
-              return wrapInDialog(KeywordCard, keyword);
+              return (
+                <React.Fragment key={keyword.key || index}>
+                  {wrapInDialog(KeywordCard, keyword)}
+                </React.Fragment>
+              );
+              
              })}
           </div>
         )}
