@@ -44,6 +44,11 @@ export async function setupVite(app: Express, server: Server) {
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
 
+    // API 경로는 처리하지 않음
+    if (url.startsWith('/api')) {
+      return next();
+    }
+
     try {
       const clientTemplate = path.resolve(
         import.meta.dirname,
@@ -67,47 +72,50 @@ export async function setupVite(app: Express, server: Server) {
   });
 }
 
-// export function serveStatic(app: Express) {
-//   const distPath = path.resolve(import.meta.dirname, "public");
-
-//   if (!fs.existsSync(distPath)) {
-//     throw new Error(
-//       `Could not find the build directory: ${distPath}, make sure to build the client first`,
-//     );
-//   }
-
-//   app.use(express.static(distPath));
-
-//   // fall through to index.html if the file doesn't exist
-//   app.use("*", (_req, res) => {
-//     res.sendFile(path.resolve(distPath, "index.html"));
-//   });
-// }
 export function serveStatic(app: Express) {
-  // dist/public 경로 확인
+  // 빌드 경로 확인 - 실제 빌드된 위치를 정확히 찾아야 함
   const distPath = path.resolve(import.meta.dirname, "..", "dist/public");
-
+  
+  console.log(`정적 파일 서빙 경로: ${distPath}`);
+  
   if (!fs.existsSync(distPath)) {
+    console.error(`빌드 디렉토리가 존재하지 않습니다: ${distPath}`);
     throw new Error(
       `Could not find the build directory: ${distPath}, make sure to build the client first`,
     );
   }
 
-  // JavaScript 파일에 대한 올바른 MIME 타입 설정
+  // JS 파일에 대한 MIME 타입을 명시적으로 설정
   app.use(express.static(distPath, {
     setHeaders: (res, filePath) => {
       if (filePath.endsWith('.js')) {
         res.setHeader('Content-Type', 'application/javascript');
+      } else if (filePath.endsWith('.mjs')) {
+        res.setHeader('Content-Type', 'application/javascript');
+      } else if (filePath.endsWith('.css')) {
+        res.setHeader('Content-Type', 'text/css');
       }
+      // 캐시 제어 추가
+      res.setHeader('Cache-Control', 'no-cache');
     }
   }));
 
-  // API 경로를 제외한 모든 요청을 index.html로 처리
+  // API 경로를 제외한 모든 요청을 SPA의 index.html로 리다이렉션
   app.get('*', (req, res, next) => {
-    // API 요청은 무시
+    // API 요청은 express 라우터가 처리하도록 next() 호출
     if (req.path.startsWith('/api')) {
       return next();
     }
-    res.sendFile(path.resolve(distPath, "index.html"));
+    
+    console.log(`SPA 경로 처리: ${req.path} -> index.html`);
+    
+    // index.html이 존재하는지 확인
+    const indexPath = path.resolve(distPath, "index.html");
+    if (fs.existsSync(indexPath)) {
+      return res.sendFile(indexPath);
+    } else {
+      console.error(`index.html을 찾을 수 없습니다: ${indexPath}`);
+      return res.status(404).send('Application not found');
+    }
   });
 }
