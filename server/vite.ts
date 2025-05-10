@@ -23,7 +23,7 @@ export async function setupVite(app: Express, server: Server) {
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
-    allowedHosts: ["localhost"]
+    allowedHosts: ["localhost"],
   };
 
   const vite = await createViteServer({
@@ -41,6 +41,8 @@ export async function setupVite(app: Express, server: Server) {
   });
 
   app.use(vite.middlewares);
+
+  // Only send index.html for other requests
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
 
@@ -52,7 +54,7 @@ export async function setupVite(app: Express, server: Server) {
         "index.html",
       );
 
-      // always reload the index.html file from disk incase it changes
+      // Always reload the index.html file from disk in case it changes
       let template = await fs.promises.readFile(clientTemplate, "utf-8");
       template = template.replace(
         `src="/src/main.tsx"`,
@@ -67,6 +69,7 @@ export async function setupVite(app: Express, server: Server) {
   });
 }
 
+// Static files are now handled by Vite's middleware, no need to use express.static
 export function serveStatic(app: Express) {
   const distPath = path.resolve(import.meta.dirname, "public");
 
@@ -76,10 +79,8 @@ export function serveStatic(app: Express) {
     );
   }
 
-  // ✅ 정적 파일 먼저 처리 (예: /assets/*.js, /favicon.ico 등)
-  app.use(express.static(distPath));
+  // app.use(express.static(distPath)); // No need for this anymore
 
-  // ✅ 그 외의 GET 요청은 index.html 반환 (SPA 대응)
   app.get("*", (_req, res) => {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
