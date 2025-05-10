@@ -4,7 +4,6 @@ import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
 export default defineConfig({
-  base: '/',
   plugins: [
     react(),
     runtimeErrorOverlay(),
@@ -29,7 +28,7 @@ export default defineConfig({
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
   },
-  server: {
-    allowedHosts: ['sellermate.koyeb.app'] // 호스트 허용 추가
-  }
+  // server: {
+  //   allowedHosts: ['sellermate.koyeb.app'] // 호스트 허용 추가
+  // }
 });

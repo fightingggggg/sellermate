@@ -23,7 +23,7 @@ export async function setupVite(app: Express, server: Server) {
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
-    allowedHosts: ["localhost"],
+    allowedHosts: ["localhost"]
   };
 
   const vite = await createViteServer({
@@ -41,8 +41,6 @@ export async function setupVite(app: Express, server: Server) {
   });
 
   app.use(vite.middlewares);
-
-  // Only send index.html for other requests
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
 
@@ -54,7 +52,7 @@ export async function setupVite(app: Express, server: Server) {
         "index.html",
       );
 
-      // Always reload the index.html file from disk in case it changes
+      // always reload the index.html file from disk incase it changes
       let template = await fs.promises.readFile(clientTemplate, "utf-8");
       template = template.replace(
         `src="/src/main.tsx"`,
@@ -69,7 +67,6 @@ export async function setupVite(app: Express, server: Server) {
   });
 }
 
-// Static files are now handled by Vite's middleware, no need to use express.static
 export function serveStatic(app: Express) {
   const distPath = path.resolve(import.meta.dirname, "public");
 
@@ -79,9 +76,10 @@ export function serveStatic(app: Express) {
     );
   }
 
-  // app.use(express.static(distPath)); // No need for this anymore
+  app.use(express.static(distPath));
 
-  app.get("*", (_req, res) => {
+  // fall through to index.html if the file doesn't exist
+  app.use("*", (_req, res) => {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }
