@@ -67,6 +67,22 @@ export async function setupVite(app: Express, server: Server) {
   });
 }
 
+// export function serveStatic(app: Express) {
+//   const distPath = path.resolve(import.meta.dirname, "public");
+
+//   if (!fs.existsSync(distPath)) {
+//     throw new Error(
+//       `Could not find the build directory: ${distPath}, make sure to build the client first`,
+//     );
+//   }
+
+//   app.use(express.static(distPath));
+
+//   // fall through to index.html if the file doesn't exist
+//   app.use("*", (_req, res) => {
+//     res.sendFile(path.resolve(distPath, "index.html"));
+//   });
+// }
 export function serveStatic(app: Express) {
   const distPath = path.resolve(import.meta.dirname, "public");
 
@@ -76,10 +92,18 @@ export function serveStatic(app: Express) {
     );
   }
 
-  app.use(express.static(distPath));
+  // 정적 파일 서빙을 위한 미들웨어
+  app.use(express.static(distPath, {
+    // JavaScript 파일을 위한 적절한 MIME 타입 설정
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript');
+      }
+    }
+  }));
 
-  // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
+  // 클라이언트 사이드 라우팅을 위한 fallback 처리
+  app.get('*', (_req, res) => {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }
