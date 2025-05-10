@@ -76,10 +76,11 @@ export function serveStatic(app: Express) {
     );
   }
 
+  // ✅ 정적 파일 먼저 처리 (예: /assets/*.js, /favicon.ico 등)
   app.use(express.static(distPath));
 
-  // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
+  // ✅ 그 외의 GET 요청은 index.html 반환 (SPA 대응)
+  app.get("*", (_req, res) => {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }
