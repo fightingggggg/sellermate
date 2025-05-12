@@ -11,7 +11,7 @@ import FaqSection from "../components/FaqSection";
 import DashboardLayout from "@/components/DashboardLayout";
 import ReviewSection from "../components/ReviewSection";
 
-import { trackTimeSpent } from "@/lib/analytics";
+import { trackEvent, trackTimeSpent } from "@/lib/analytics";
 import { useEffect } from "react";
 
 export default function Home() {
@@ -20,14 +20,18 @@ export default function Home() {
 
   useEffect(() => {
     const cleanupHero = trackTimeSpent('Hero Section');
+    const cleanupExample = trackTimeSpent('Example Section');
+    const cleanupTextfeature = trackTimeSpent('Textfeature Section');
+    const cleanupReview = trackTimeSpent('Review Section');
     const cleanupFeatures = trackTimeSpent('Features Section');
-    const cleanupReviews = trackTimeSpent('Reviews Section');
     const cleanupFaq = trackTimeSpent('FAQ Section');
 
     return () => {
       cleanupHero();
+      cleanupExample();
+      cleanupTextfeature();
       cleanupFeatures();
-      cleanupReviews();
+      cleanupReview();
       cleanupFaq();
     };
   }, []);
@@ -61,7 +65,9 @@ export default function Home() {
                 <Button 
                   size="lg" 
                   className="bg-[#1a73e8] hover:bg-[#1a73e8]/90 text-white font-semibold py-3 px-6 shadow-lg transition-all transform hover:scale-105 w-full sm:w-auto"
-                  onClick={() => window.open("https://chromewebstore.google.com/detail/%EC%8A%A4%EB%A7%88%ED%8A%B8%EC%8A%A4%ED%86%A0%EC%96%B4-%EC%83%81%EC%9C%84%EB%85%B8%EC%B6%9C-%EC%B5%9C%EC%A0%81%ED%99%94-%EB%8F%84%EA%B5%AC/plgdaggkagiakemkoclkpkbdiocllbbi?hl=ko")}
+                  onClick={() => 
+                    {trackEvent('Home', 'click', 'install');
+                    window.open("https://chromewebstore.google.com/detail/%EC%8A%A4%EB%A7%88%ED%8A%B8%EC%8A%A4%ED%86%A0%EC%96%B4-%EC%83%81%EC%9C%84%EB%85%B8%EC%B6%9C-%EC%B5%9C%EC%A0%81%ED%99%94-%EB%8F%84%EA%B5%AC/plgdaggkagiakemkoclkpkbdiocllbbi?hl=ko")}}
                 >
                   <Download className="w-4 h-4 mr-2" />지금 바로 무료로 최적화하기
                 </Button>
@@ -69,7 +75,9 @@ export default function Home() {
                   size="lg" 
                   variant="outline" 
                   className="border-[#1A73E8] text-[#1A73E8] hover:bg-[#1A73E8] hover:text-white py-3 px-6 w-full sm:w-auto"
-                  onClick={() => navigate("/dashboard")}
+                  onClick={() => 
+                    {trackEvent('Home', 'click', 'Dashboard')
+                    navigate("/dashboard")}}
                 >
                   대시보드 바로가기
                 </Button>

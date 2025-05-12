@@ -90,7 +90,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </Link>
                 <button
                   onClick={() => {
-                    trackEvent('ExternalLink', 'click', 'ExtensionInstall');
+                    trackEvent('Navigation', 'click', 'ExtensionInstall');
                     window.open("https://chromewebstore.google.com/detail/%EC%8A%A4%EB%A7%88%ED%8A%B8%EC%8A%A4%ED%86%A0%EC%96%B4-%EC%83%81%EC%9C%84%EB%85%B8%EC%B6%9C-%EC%B5%9C%EC%A0%81%ED%99%94-%EB%8F%84%EA%B5%AC/plgdaggkagiakemkoclkpkbdiocllbbi?hl=ko", "_blank")
                   }}
                   className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-700 flex items-center"
@@ -105,7 +105,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </Link>
                 <button 
                   onClick={() => {
-                    trackEvent('Interaction', 'click', 'Feedback');
+                    trackEvent('Navigation', 'click', 'Feedback');
                     setIsFeedbackOpen(true);
                   }}
                   className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-700 flex items-center"
@@ -166,7 +166,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     <Button 
                       variant="outline"
                       className="border-blue-500 text-blue-600 hover:bg-blue-50"
-                      onClick={() => trackEvent('Authentication', 'click', 'RegisterButton')}
+                      onClick={() => trackEvent('Navigation', 'click', 'RegisterButton')}
                     >
                       <UserPlus className="mr-2 h-4 w-4" />
                     3초! 회원가입
@@ -174,7 +174,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   </Link>
                   <Button 
                     onClick={() => {
-                      trackEvent('Authentication', 'click', 'LoginButton');
+                      trackEvent('Navigation', 'click', 'LoginButton');
                       navigate("/login");
                     }}
                     className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
@@ -205,7 +205,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               </Link>
               <button
                 onClick={() => {
-                  trackEvent('ExternalLink', 'click', 'MobileExtensionInstall');
+                  trackEvent('Navigation', 'click', 'MobileExtensionInstall');
                   window.open("https://chromewebstore.google.com/detail/%EC%8A%A4%EB%A7%88%ED%8A%B8%EC%8A%A4%ED%86%A0%EC%96%B4-%EC%83%81%EC%9C%84%EB%85%B8%EC%B6%9C-%EC%B5%9C%EC%A0%81%ED%99%94-%EB%8F%84%EA%B5%AC/plgdaggkagiakemkoclkpkbdiocllbbi?hl=ko", "_blank")
                 }}
                 className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-700"
@@ -227,7 +227,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               )}
               <button 
                 onClick={() =>  {
-                  trackEvent('Interaction', 'click', 'MobileFeedback');
+                  trackEvent('Navigation', 'click', 'MobileFeedback');
                   setIsFeedbackOpen(true);
                 }}
                 className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-700"

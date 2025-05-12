@@ -17,19 +17,24 @@ export const trackEvent = (category: string, action: string, label?: string) => 
 
 export const trackTimeSpent = (section: string) => {
   const startTime = Date.now();
-  
+
+  const logAndTrack = () => {
+    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+    console.log(`[TimeSpent] Section: ${section}, Time: ${timeSpent}s`);
+    trackEvent('Section Time', 'time_spent', `${section}: ${timeSpent}s`);
+  };
+
   const handleVisibilityChange = () => {
     if (document.hidden) {
-      const timeSpent = Date.now() - startTime;
-      trackEvent('Section Time', 'time_spent', `${section}: ${timeSpent}ms`);
+      logAndTrack();
     }
   };
 
   document.addEventListener('visibilitychange', handleVisibilityChange);
-  
+
   return () => {
     document.removeEventListener('visibilitychange', handleVisibilityChange);
-    const timeSpent = Date.now() - startTime;
-    trackEvent('Section Time', 'time_spent', `${section}: ${timeSpent}ms`);
+    logAndTrack();
   };
 };
+
