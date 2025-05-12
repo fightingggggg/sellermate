@@ -18,23 +18,23 @@ export default function Home() {
   const { currentUser, loading } = useAuth();
   const [, navigate] = useLocation();
 
-  useEffect(() => {
-    const cleanupHero = trackTimeSpent('Hero Section');
-    const cleanupExample = trackTimeSpent('Example Section');
-    const cleanupTextfeature = trackTimeSpent('Textfeature Section');
-    const cleanupReview = trackTimeSpent('Review Section');
-    const cleanupFeatures = trackTimeSpent('Features Section');
-    const cleanupFaq = trackTimeSpent('FAQ Section');
+  // useEffect(() => {
+  //   const cleanupHero = trackTimeSpent('Hero Section');
+  //   const cleanupExample = trackTimeSpent('Example Section');
+  //   const cleanupTextfeature = trackTimeSpent('Textfeature Section');
+  //   const cleanupReview = trackTimeSpent('Review Section');
+  //   const cleanupFeatures = trackTimeSpent('Features Section');
+  //   const cleanupFaq = trackTimeSpent('FAQ Section');
 
-    return () => {
-      cleanupHero();
-      cleanupExample();
-      cleanupTextfeature();
-      cleanupFeatures();
-      cleanupReview();
-      cleanupFaq();
-    };
-  }, []);
+  //   return () => {
+  //     cleanupHero();
+  //     cleanupExample();
+  //     cleanupTextfeature();
+  //     cleanupFeatures();
+  //     cleanupReview();
+  //     cleanupFaq();
+  //   };
+  // }, []);
 
   if (loading) {
     return (
