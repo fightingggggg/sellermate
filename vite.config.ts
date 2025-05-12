@@ -1,6 +1,5 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import fs from "fs";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
@@ -30,10 +29,6 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
-    https: {
-      key: fs.readFileSync(path.resolve( "ssl/server.key")),
-      cert: fs.readFileSync(path.resolve(__dirname, "ssl/server.cert")),
-    },
-    allowedHosts: ['sellermate.koyeb.app', 'localhost']
+    allowedHosts: ['sellermate.koyeb.app'] // 호스트 허용 추가
   }
 });

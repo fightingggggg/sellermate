@@ -1,15 +1,8 @@
 import type { Express } from "express";
-import { createServer, type Server } from "https";
-import fs from "fs";
-import path from "path";
+import { createServer, type Server } from "http";
 import { storage } from "./storage";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  
-  const httpsOptions = {
-    key: fs.readFileSync(path.join(__dirname, "./ssl/server.key")),
-    cert: fs.readFileSync(path.join(__dirname, "./ssl/server.cert")),
-  };
   // API Endpoint to check server status
   app.get('/api/status', (req, res) => {
     res.json({ status: 'ok', message: 'SEO Dashboard API is running' });
@@ -36,7 +29,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // ✅ HTTPS 서버 생성 (반환)
-  const httpsServer = createServer(httpsOptions, app);
-  return httpsServer;
+  const httpServer = createServer(app);
+
+  return httpServer;
 }
