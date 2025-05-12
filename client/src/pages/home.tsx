@@ -36,6 +36,15 @@ export default function Home() {
   //   };
   // }, []);
 
+  useEffect(() => {
+    const cleanupHome = trackTimeSpent('Home');
+  
+
+    return () => {
+      cleanupHome();
+    };
+  }, []);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
