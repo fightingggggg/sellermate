@@ -2,10 +2,10 @@
   "name": "rest-express",
   "version": "1.0.0",
   "engines": {
-    "node": ">=20.11.0"},
+    "node": ">=20.11.0"
+  },
   "type": "module",
   "license": "MIT",
-
   "scripts": {
     "dev": "tsx server/index.ts",
     "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
@@ -50,6 +50,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "connect-pg-simple": "^10.0.0",
+    "cors": "^2.8.5",
     "date-fns": "^3.6.0",
     "drizzle-orm": "^0.39.1",
     "drizzle-zod": "^0.7.0",
@@ -86,6 +87,7 @@
     "@replit/vite-plugin-runtime-error-modal": "^0.0.3",
     "@tailwindcss/typography": "^0.5.15",
     "@types/connect-pg-simple": "^7.0.3",
+    "@types/cors": "^2.8.18",
     "@types/express": "^4.17.21",
     "@types/express-session": "^1.18.0",
     "@types/node": "20.16.11",
