@@ -1,10 +1,22 @@
 import { Button } from "@/components/ui/button";
-import { Search, ShoppingBag, TrendingUp } from "lucide-react";
+import { Search, ShoppingBag, TrendingUp, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
+import { useState } from "react";
 
 export default function EmptyState() {
   const { currentUser } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // 모달 열기 함수
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  // 모달 닫기 함수
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   return (
     <Card className="border border-muted bg-gradient-to-b from-white to-blue-50">
@@ -106,14 +118,39 @@ export default function EmptyState() {
               <h3 className="text-xl font-semibold text-center mb-4">
                 대시보드 예시 화면
               </h3>
-              <div className="border rounded-lg overflow-hidden mx-auto max-w-full w-full  shadow-lg">
+              <div className="border rounded-lg overflow-hidden mx-auto max-w-full w-full shadow-lg">
                 <img
                   src="./demo.jpg"
                   alt="대시보드 예시"
-                  className="w-full h-auto"
+                  className="w-full h-auto cursor-pointer"
+                  onClick={openModal}
                 />
               </div>
             </div>
+
+            {/* 이미지 모달 */}
+            {isModalOpen && (
+              <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+                <div className="relative max-w-4xl w-full">
+                  <button
+                    onClick={closeModal}
+                    className="absolute -top-10 right-0 text-white hover:text-gray-300"
+                  >
+                    <X className="h-6 w-6" />
+                  </button>
+                  <img
+                    src="./demo.jpg"
+                    alt="대시보드 예시 확대"
+                    className="w-full h-auto rounded"
+                  />
+                </div>
+                {/* 배경 클릭 시 모달 닫기 */}
+                <div
+                  className="absolute inset-0 z-[-1]"
+                  onClick={closeModal}
+                ></div>
+              </div>
+            )}
           </>
         )}
       </CardContent>
