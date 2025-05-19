@@ -30,5 +30,5 @@ export default defineConfig({
   },
   server: {
     allowedHosts: ['sellermate.koyeb.app'] // 호스트 허용 추가
-  }
+  },
 });
