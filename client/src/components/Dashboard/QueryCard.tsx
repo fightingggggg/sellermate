@@ -16,7 +16,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog";
-import React from "react";
+import React, { Fragment } from "react";
 import TrackingNotificationModal from "./TrackingNotificationModal";
 
 interface QueryCardProps {
