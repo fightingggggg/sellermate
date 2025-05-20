@@ -344,7 +344,15 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                    (item.keywordCountChange !== undefined && item.keywordCountChange !== 0) ? (
                     <div className="space-y-1">
                       {item.rankChange !== undefined && item.rankChange !== 0 && (
-                        <span className="inline-block">{`"${item.key}"의 순위가 ${Math.abs(item.rankChange)}단계 ${item.rankChange > 0 ? '상승' : '하락'}했습니다. (${item.previousRank}위 → ${item.currentRank}위)`}</span>
+                        <span className="inline-block">
+                                        "{item.key}"의 순위가 {Math.abs(item.rankChange)}위{" "}
+                                        {item.rankChange > 0 ? (
+                                          <span className="text-emerald-600">상승</span>
+                                        ) : (
+                                          <span className="text-amber-600">하락</span>
+                                        )}
+                                        했습니다. ({item.previousRank}위 → {item.currentRank}위)
+                                      </span>
                       )}
                       {item.tagChange !== undefined && item.tagChange !== 0 && (
                         `"${item.key}"의 태그 개수가 ${Math.abs(item.tagChange)}개 ${item.tagChange > 0 ? '증가' : '감소'}했습니다.`
@@ -491,10 +499,15 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                                  (k.keywordCountChange !== undefined && k.keywordCountChange !== 0) ? (
                                   <div className="space-y-1">
                                     {k.rankChange !== undefined && k.rankChange !== 0 && (
-                                      <span className="inline-block">{`"${k.key}"의 순위가 ${Math.abs(k.rankChange)}위 ${k.rankChange > 0 ? 
-                                        <span className="text-emerald-600">상승</span> : 
-                                        <span className="text-amber-600">하락</span>}
-                                      </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
+                                      <span className="inline-block">
+                                        "{k.key}"의 순위가 {Math.abs(k.rankChange)}위{" "}
+                                        {k.rankChange > 0 ? (
+                                          <span className="text-emerald-600">상승</span>
+                                        ) : (
+                                          <span className="text-amber-600">하락</span>
+                                        )}
+                                        했습니다. ({k.previousRank}위 → {k.currentRank}위)
+                                      </span>
                                     )}
                                     {k.tagChange !== undefined && k.tagChange !== 0 && (
                                       <span>태그가 <span className="font-semibold">{Math.abs(k.tagChange)}개 {k.tagChange > 0 ? 
@@ -546,10 +559,15 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                                  (k.keywordCountChange !== undefined && k.keywordCountChange !== 0) ? (
                                   <div className="space-y-1">
                                     {k.rankChange !== undefined && k.rankChange !== 0 && (
-                                      <span className="inline-block">{`"${k.key}"의 순위가 ${Math.abs(k.rankChange)}위 ${k.rankChange > 0 ? 
-                                        <span className="text-emerald-600">상승</span> : 
-                                        <span className="text-amber-600">하락</span>}
-                                      </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
+                                      <span className="inline-block">
+                                        "{k.key}"의 순위가 {Math.abs(k.rankChange)}위{" "}
+                                        {k.rankChange > 0 ? (
+                                          <span className="text-emerald-600">상승</span>
+                                        ) : (
+                                          <span className="text-amber-600">하락</span>
+                                        )}
+                                        했습니다. ({k.previousRank}위 → {k.currentRank}위)
+                                      </span>
                                     )}
                                     {k.tagChange !== undefined && k.tagChange !== 0 && (
                                       <span>태그가 <span className="font-semibold">{Math.abs(k.tagChange)}개 {k.tagChange > 0 ? 
@@ -601,10 +619,15 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                                  (k.keywordCountChange !== undefined && k.keywordCountChange !== 0) ? (
                                   <div className="space-y-1">
                                     {k.rankChange !== undefined && k.rankChange !== 0 && (
-                                      <span className="inline-block">{`"${k.key}"의 순위가 ${Math.abs(k.rankChange)}위 ${k.rankChange > 0 ? 
-                                        <span className="text-emerald-600">상승</span> : 
-                                        <span className="text-amber-600">하락</span>}
-                                      </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
+                                      <span className="inline-block">
+                                        "{k.key}"의 순위가 {Math.abs(k.rankChange)}위{" "}
+                                        {k.rankChange > 0 ? (
+                                          <span className="text-emerald-600">상승</span>
+                                        ) : (
+                                          <span className="text-amber-600">하락</span>
+                                        )}
+                                        했습니다. ({k.previousRank}위 → {k.currentRank}위)
+                                      </span>
                                     )}
                                     {k.tagChange !== undefined && k.tagChange !== 0 && (
                                       <span>태그가 <span className="font-semibold">{Math.abs(k.tagChange)}개 {k.tagChange > 0 ? 
