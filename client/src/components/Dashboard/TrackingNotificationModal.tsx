@@ -5,6 +5,7 @@ import { db } from "@/lib/firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { trackEvent } from "@/lib/analytics";
 
 interface TrackingNotificationModalProps {
   isOpen: boolean;
