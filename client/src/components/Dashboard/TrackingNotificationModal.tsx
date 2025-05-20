@@ -21,6 +21,10 @@ export default function TrackingNotificationModal({ isOpen, onClose }: TrackingN
 
     setIsSubmitting(true);
     try {
+      if (!currentUser?.email) {
+        throw new Error("사용자 이메일이 없습니다.");
+      }
+
       // Check if notification already exists
       const notificationRef = doc(db, "notifications", currentUser.email);
       const notificationDoc = await getDoc(notificationRef);
@@ -33,12 +37,13 @@ export default function TrackingNotificationModal({ isOpen, onClose }: TrackingN
         onClose();
         return;
       }
-      const userEmail = currentUser.email || '';
-      await setDoc(doc(db, "notifications", userEmail), {
-        email: userEmail,
+
+      await setDoc(notificationRef, {
+        email: currentUser.email,
         timestamp: new Date().toISOString(),
         isSubscribed: true,
-        type: 'tracking'
+        type: 'tracking',
+        userId: currentUser.uid
       });
 
       toast({
