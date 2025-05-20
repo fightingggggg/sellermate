@@ -638,21 +638,16 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
         <div className="border-b border-gray-200 mb-4">
           <nav className="-mb-px flex space-x-8">
             <button 
-              className={`py-2 px-3 rounded-full font-medium text-sm transition-all duration-200 ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'tracking' 
-                  ? 'bg-blue-100 text-blue-700 border border-blue-200 shadow-sm' 
-                  : 'bg-transparent hover:bg-gray-100 text-gray-600 hover:text-gray-800'
+                  ? 'border-primary text-primary' 
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
               onClick={() => setActiveTab('tracking')}
             >
               <div className="flex items-center">
-                <LineChart className={`h-4 w-4 mr-1.5 ${activeTab === 'tracking' ? 'text-blue-600' : 'text-gray-500'}`} />
+                <LineChart className="h-4 w-4 mr-1" />
                 상품 순위 추적
-                {activeTab !== 'tracking' && (
-                  <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-blue-50 text-blue-600 rounded-full border border-blue-100">
-                    추천
-                  </span>
-                )}
               </div>
             </button>
             <button 
