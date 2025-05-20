@@ -637,12 +637,12 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
         <div className="border-b border-gray-200 mb-4">
           <nav className="-mb-px flex space-x-8">
             <button
-              className="py-2 px-1 border-b-2 font-medium text-sm text-blue-600 border-transparent hover:text-blue-700 hover:border-blue-300 flex items-center"
-              onClick={() => setIsTrackingModalOpen(true)}
-            >
-              <LineChart className="h-4 w-4 mr-1" />
-              상품 순위 추적
-            </button>
+    className="py-2 px-1 border-b-2 font-medium text-sm text-blue-600 border-transparent hover:text-blue-700 hover:border-blue-300 flex items-center"
+    onClick={() => setIsTrackingModalOpen(true)}
+  >
+    <LineChart className="h-4 w-4 mr-1" />
+    상품 순위 추적 등록하기
+  </button>
             <button 
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'keywords' 

@@ -18,11 +18,13 @@ export default function TrackingNotificationModal({ isOpen, onClose }: TrackingN
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubscribe = async () => {
-    if (!currentUser?.email) return;
+    if (!currentUser?.uid) return;
     
     setIsSubmitting(true);
     try {
-      await setDoc(doc(db, "trackingNotifications", currentUser.email), {
+      const userRef = doc(db, "trackingNotifications", currentUser.uid);
+      await setDoc(userRef, {
+        userId: currentUser.uid,
         email: currentUser.email,
         createdAt: new Date().toISOString(),
       });
@@ -33,6 +35,7 @@ export default function TrackingNotificationModal({ isOpen, onClose }: TrackingN
       });
       onClose();
     } catch (error) {
+      console.error("Error saving notification subscription:", error);
       toast({
         title: "오류 발생",
         description: "알림 신청 중 문제가 발생했습니다. 다시 시도해주세요.",
@@ -52,7 +55,7 @@ export default function TrackingNotificationModal({ isOpen, onClose }: TrackingN
             상품 추적 기능이 출시되면 이메일로 알려드립니다. 신청하시겠습니까?
           </DialogDescription>
         </DialogHeader>
-        <div className="flex justify-end space-x-2 mt-4">
+        <div className="flex justify-center space-x-2 mt-4">
           <Button variant="outline" onClick={onClose}>아니오</Button>
           <Button onClick={handleSubscribe} disabled={isSubmitting}>
             {isSubmitting ? "처리중..." : "예"}
