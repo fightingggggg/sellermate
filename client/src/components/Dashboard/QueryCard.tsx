@@ -25,6 +25,12 @@ interface QueryCardProps {
   onRefresh: (queryId: string) => void;
 }
 
+// Placeholder for GA tracking function (replace with your actual implementation)
+const trackEvent = (category: string, action: string, label: string) => {
+  console.log(`GA event: ${category}, ${action}, ${label}`);
+  // Add your Google Analytics tracking code here
+};
+
 export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps) {
   const [activeTab, setActiveTab] = useState<'keywords' | 'tags' | 'keywordCount' | 'tracking'>('keywords');
   const [isTrackingModalOpen, setIsTrackingModalOpen] = useState(false);
@@ -643,7 +649,10 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                   ? 'border-primary text-primary' 
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
-              onClick={() => setActiveTab('tracking')}
+              onClick={() => {
+                setActiveTab('tracking');
+                trackEvent('Dashboard', 'click', 'Tracking Tab'); // Track event here
+              }}
             >
               <div className="flex items-center">
                 <LineChart className="h-4 w-4 mr-1" />
@@ -694,7 +703,10 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
         상품의 순위 변화를 자동으로 추적하세요
       </p>
       <Button 
-        onClick={() => setIsTrackingModalOpen(true)}
+        onClick={() => {
+          setIsTrackingModalOpen(true);
+          trackEvent('Dashboard', 'click', '순위 추적 등록하기'); // Track event here
+        }}
         className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6"
       >
         <LineChart className="h-4 w-4 mr-2" />

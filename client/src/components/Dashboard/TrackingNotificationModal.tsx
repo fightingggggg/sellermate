@@ -74,7 +74,13 @@ export default function TrackingNotificationModal({ isOpen, onClose }: TrackingN
         </DialogHeader>
         <div className="flex justify-center space-x-2 mt-4">
           <Button variant="outline" onClick={onClose}>아니오</Button>
-          <Button onClick={handleSubscribe} disabled={isSubmitting}>
+          <Button 
+            onClick={() => {
+              trackEvent('Dashboard', 'click', 'Register Tracking');
+              handleSubscribe();
+            }} 
+            disabled={isSubmitting}
+          >
             {isSubmitting ? "처리중..." : "예"}
           </Button>
         </div>
