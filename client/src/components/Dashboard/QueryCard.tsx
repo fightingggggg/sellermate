@@ -684,8 +684,23 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
         </div>
 
 {activeTab === 'tracking' && (
-  <div className="p-4">
-    <Button onClick={() => setIsTrackingModalOpen(true)}>상품 순위 추적 등록하기</Button>
+  <div className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
+    <div className="text-center space-y-4">
+      <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 mb-2">
+        <LineChart className="h-6 w-6 text-blue-600" />
+      </div>
+      <h3 className="text-lg font-semibold text-gray-900">상품 순위 자동 추적</h3>
+      <p className="text-sm text-gray-600 max-w-md mx-auto">
+        상품의 순위 변화를 자동으로 추적하고 중요한 변동사항이 있을 때 이메일로 알림을 받아보세요.
+      </p>
+      <Button 
+        onClick={() => setIsTrackingModalOpen(true)}
+        className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6"
+      >
+        <LineChart className="h-4 w-4 mr-2" />
+        순위 추적 등록하기
+      </Button>
+    </div>
   </div>
 )}
         {/* Keywords Tab Panel */}

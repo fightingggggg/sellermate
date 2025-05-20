@@ -22,9 +22,11 @@ export default function TrackingNotificationModal({ isOpen, onClose }: TrackingN
     
     setIsSubmitting(true);
     try {
-      await setDoc(doc(db, "trackingNotifications", currentUser.email), {
-        email: currentUser.email,
-        timestamp: new Date().toISOString()
+      const userEmail = currentUser.email || '';
+      await setDoc(doc(db, "analysisLogs", userEmail, "notifications", "tracking"), {
+        email: userEmail,
+        timestamp: new Date().toISOString(),
+        isSubscribed: true
       });
       
       toast({
