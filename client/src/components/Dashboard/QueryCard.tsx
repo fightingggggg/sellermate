@@ -691,7 +691,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
       </div>
       <h3 className="text-lg font-semibold text-gray-900">상품 순위 자동 추적</h3>
       <p className="text-sm text-gray-600 max-w-md mx-auto">
-        상품의 순위 변화를 자동으로 추적하고 중요한 변동사항이 있을 때 이메일로 알림을 받아보세요.
+        상품의 순위 변화를 자동으로 추적하세요
       </p>
       <Button 
         onClick={() => setIsTrackingModalOpen(true)}

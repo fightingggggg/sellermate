@@ -22,8 +22,20 @@ export default function TrackingNotificationModal({ isOpen, onClose }: TrackingN
     
     setIsSubmitting(true);
     try {
+      // Check if notification already exists
+      const notificationRef = doc(db, "notifications", currentUser.email);
+      const notificationDoc = await getDoc(notificationRef);
+      
+      if (notificationDoc.exists()) {
+        toast({
+          title: "알림 이미 설정됨",
+          description: "이미 알림이 설정되었습니다. 출시되면 이메일로 알려드리겠습니다.",
+        });
+        onClose();
+        return;
+      }
       const userEmail = currentUser.email || '';
-      await setDoc(doc(db, "notifications", `notification-${userEmail}`), {
+      await setDoc(doc(db, "notifications", userEmail), {
         email: userEmail,
         timestamp: new Date().toISOString(),
         isSubscribed: true,
