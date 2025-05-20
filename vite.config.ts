@@ -28,7 +28,7 @@ export default defineConfig({
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
   },
-   server: {
+  server: {
     allowedHosts: ['sellermate.koyeb.app'] // 호스트 허용 추가
   },
 });
