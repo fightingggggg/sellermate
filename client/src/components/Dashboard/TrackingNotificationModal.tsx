@@ -79,7 +79,11 @@ export default function TrackingNotificationModal({ isOpen, onClose }: TrackingN
       </DialogDescription>
     </DialogHeader>
     <div className="flex justify-center space-x-2 mt-6">
-      <Button variant="outline" onClick={onClose}>아니오, 관심 없어요</Button>
+      <Button variant="outline" onClick={() => {
+  trackEvent('Dashboard', 'click', 'Register refuse');
+  onClose();
+}}
+    >아니오, 관심 없어요</Button>
       <Button
         className="bg-gradient-to-r from-blue-600 to-blue-400 text-white hover:opacity-90"
         onClick={() => {
