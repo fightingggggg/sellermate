@@ -65,27 +65,35 @@ export default function TrackingNotificationModal({ isOpen, onClose }: TrackingN
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>상품 추적 기능 알림 신청</DialogTitle>
-          <DialogDescription>
-            상품 추적 기능이 출시되면 이메일로 알려드립니다. 신청하시겠습니까?
-          </DialogDescription>
-        </DialogHeader>
-        <div className="flex justify-center space-x-2 mt-4">
-          <Button variant="outline" onClick={onClose}>아니오</Button>
-          <Button 
-            onClick={() => {
-              trackEvent('Dashboard', 'click', 'Register Tracking');
-              handleSubscribe();
-            }} 
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "처리중..." : "예"}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+<Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+  <DialogContent className="sm:max-w-md flex flex-col items-center justify-center text-center">
+    <DialogHeader className="w-full">
+      <DialogTitle className="text-xl font-semibold text-center">
+        상품 순위 추적 기능 안내
+      </DialogTitle>
+      <DialogDescription className="text-gray-900 mt-2 text-center leading-relaxed">
+      상품 순위 추적 기능이 곧 출시될 예정이에요.
+            <br /> 키워드 추적과 함께 더 풍부한 인사이트를 제공해드릴게요.
+        <br />
+        출시되면 이메일로 바로 알려드릴게요!
+      </DialogDescription>
+    </DialogHeader>
+    <div className="flex justify-center space-x-2 mt-6">
+      <Button variant="outline" onClick={onClose}>아니오, 관심 없어요</Button>
+      <Button
+        className="bg-gradient-to-r from-blue-600 to-blue-400 text-white hover:opacity-90"
+        onClick={() => {
+          trackEvent('Dashboard', 'click', 'Register Tracking');
+          handleSubscribe();
+        }}
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? "처리중..." : "네, 출시되면 알려주세요!"}
+      </Button>
+    </div>
+  </DialogContent>
+</Dialog>
+
+
   );
 }

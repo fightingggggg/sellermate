@@ -32,7 +32,7 @@ const trackEvent = (category: string, action: string, label: string) => {
 };
 
 export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps) {
-  const [activeTab, setActiveTab] = useState<'keywords' | 'tags' | 'keywordCount' | 'tracking'>('keywords');
+  const [activeTab, setActiveTab] = useState<'keywords' | 'tags' | 'keywordCount' | 'tracking'>('tracking');
   const [isTrackingModalOpen, setIsTrackingModalOpen] = useState(false);
   const [selectedCurrentDate, setSelectedCurrentDate] = useState<string | null>(null);
   const [selectedCompareDate, setSelectedCompareDate] = useState<string | null>(null);
@@ -655,7 +655,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
             >
               <div className="flex items-center">
                 <LineChart className="h-4 w-4 mr-1" />
-                상품 순위 추적
+              <span className="font-bold">상품 순위 추적</span>
               </div>
             </button>
             <button 
