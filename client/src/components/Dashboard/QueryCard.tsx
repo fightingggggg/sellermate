@@ -3,8 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Query, KeywordItem, AnalysisSnapshot } from "@/types";
 import { 
-  RefreshCcw, Trash2, ArrowUp, ArrowDown, Star, Calendar, Clock, 
-  AlertCircle, ChevronDown, ChevronUp, BarChart, PieChart
+  BarChart, ChevronDown, ChevronUp, LineChart, RefreshCcw, Trash2, ArrowUp, ArrowDown, Star, Calendar, Clock, 
+  AlertCircle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -17,6 +17,7 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import React from "react";
+import TrackingNotificationModal from "./TrackingNotificationModal";
 
 interface QueryCardProps {
   query: Query;
@@ -25,7 +26,8 @@ interface QueryCardProps {
 }
 
 export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps) {
-  const [activeTab, setActiveTab] = useState<'keywords' | 'tags' |'keywordCounts'>('keywords');
+  const [activeTab, setActiveTab] = useState<'keywords' | 'tags' | 'keywordCount'>('keywords');
+  const [isTrackingModalOpen, setIsTrackingModalOpen] = useState(false);
   const [selectedCurrentDate, setSelectedCurrentDate] = useState<string | null>(null);
   const [selectedCompareDate, setSelectedCompareDate] = useState<string | null>(null);
   const [comparedData, setComparedData] = useState<{
@@ -54,7 +56,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
         keywords: currentData?.keywords || [],
         tags: currentData?.tags || [],
         keywordCounts: currentData?.keywordCounts || []
-  
+
       });
       return;
     }
@@ -180,7 +182,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
       keywords: compareAndMarkChanges(compareData.keywords, currentData.keywords),
       tags: compareAndMarkChanges(compareData.tags, currentData.tags),
       keywordCounts: compareAndMarkChanges(compareData.keywordCounts, currentData.keywordCounts)
-   
+
     });
   };
 
@@ -261,7 +263,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
       k.status === 'increased' || k.status === 'decreased'
     );
 
-  
+
 
     return hasKeywordChanges || hasTagChanges || hasKeywordCountChanges ;
   };
@@ -336,8 +338,20 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                     `"${item.key}"이(가) 새로 추가되어 ${item.currentRank}위에 올랐습니다.`
                   ) : item.status === 'removed' ? (
                     `"${item.key}"이(가) 순위에서 제외되었습니다.`
-                  ) : item.rankChange !== undefined && item.rankChange !== 0 ? (
-                    `"${item.key}"의 순위가 ${Math.abs(item.rankChange)}단계 ${item.rankChange > 0 ? '상승' : '하락'}했습니다. (${item.previousRank}위 → ${item.currentRank}위)`
+                  ) : (item.rankChange !== undefined && item.rankChange !== 0) || 
+                   (item.tagChange !== undefined && item.tagChange !== 0) || 
+                   (item.keywordCountChange !== undefined && item.keywordCountChange !== 0) ? (
+                    <div className="space-y-1">
+                      {item.rankChange !== undefined && item.rankChange !== 0 && (
+                        `"${item.key}"의 순위가 ${Math.abs(item.rankChange)}단계 ${item.rankChange > 0 ? '상승' : '하락'}했습니다. (${item.previousRank}위 → ${item.currentRank}위)`
+                      )}
+                      {item.tagChange !== undefined && item.tagChange !== 0 && (
+                        `"${item.key}"의 태그 개수가 ${Math.abs(item.tagChange)}개 ${item.tagChange > 0 ? '증가' : '감소'}했습니다.`
+                      )}
+                      {item.keywordCountChange !== undefined && item.keywordCountChange !== 0 && (
+                        `"${item.key}"의 키워드 개수가 ${Math.abs(item.keywordCountChange)}개 ${item.keywordCountChange > 0 ? '증가' : '감소'}했습니다.`
+                      )}
+                    </div>
                   ) : (
                     `"${item.key}"의 순위가 변경되지 않았습니다.`
                   )}
@@ -471,11 +485,29 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                                   <span>새로 추가되어 <span className="font-semibold text-emerald-600">{k.currentRank}위</span>에 진입했습니다.</span>
                                 ) : k.status === 'removed' ? (
                                   <span>순위에서 제외되었습니다. (이전 <span className="font-semibold text-red-600">{k.previousRank}위</span>)</span>
-                                ) : k.rankChange !== undefined && k.rankChange !== 0 ? (
-                                  <span>순위가 <span className="font-semibold">{Math.abs(k.rankChange)}위 {k.rankChange > 0 ? 
-                                    <span className="text-emerald-600">상승</span> : 
-                                    <span className="text-amber-600">하락</span>}
-                                  </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
+                                ) : (k.rankChange !== undefined && k.rankChange !== 0) || 
+                                 (k.tagChange !== undefined && k.tagChange !== 0) || 
+                                 (k.keywordCountChange !== undefined && k.keywordCountChange !== 0) ? (
+                                  <div className="space-y-1">
+                                    {k.rankChange !== undefined && k.rankChange !== 0 && (
+                                      <span>순위가 <span className="font-semibold">{Math.abs(k.rankChange)}위 {k.rankChange > 0 ? 
+                                        <span className="text-emerald-600">상승</span> : 
+                                        <span className="text-amber-600">하락</span>}
+                                      </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
+                                    )}
+                                    {k.tagChange !== undefined && k.tagChange !== 0 && (
+                                      <span>태그가 <span className="font-semibold">{Math.abs(k.tagChange)}개 {k.tagChange > 0 ? 
+                                        <span className="text-emerald-600">증가</span> : 
+                                        <span className="text-amber-600">감소</span>}
+                                      </span>했습니다.</span>
+                                    )}
+                                    {k.keywordCountChange !== undefined && k.keywordCountChange !== 0 && (
+                                      <span>키워드가 <span className="font-semibold">{Math.abs(k.keywordCountChange)}개 {k.keywordCountChange > 0 ? 
+                                        <span className="text-emerald-600">증가</span> : 
+                                        <span className="text-amber-600">감소</span>}
+                                      </span>했습니다.</span>
+                                    )}
+                                  </div>
                                 ) : null}
                               </div>
                             </li>
@@ -508,11 +540,29 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                                   <span>새로 추가되어 <span className="font-semibold text-emerald-600">{k.currentRank}위</span>에 진입했습니다.</span>
                                 ) : k.status === 'removed' ? (
                                   <span>순위에서 제외되었습니다. (이전 <span className="font-semibold text-red-600">{k.previousRank}위</span>)</span>
-                                ) : k.rankChange !== undefined && k.rankChange !== 0 ? (
-                                  <span>순위가 <span className="font-semibold">{Math.abs(k.rankChange)}위 {k.rankChange > 0 ? 
-                                    <span className="text-emerald-600">상승</span> : 
-                                    <span className="text-amber-600">하락</span>}
-                                  </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
+                                ) : (k.rankChange !== undefined && k.rankChange !== 0) || 
+                                 (k.tagChange !== undefined && k.tagChange !== 0) || 
+                                 (k.keywordCountChange !== undefined && k.keywordCountChange !== 0) ? (
+                                  <div className="space-y-1">
+                                    {k.rankChange !== undefined && k.rankChange !== 0 && (
+                                      <span>순위가 <span className="font-semibold">{Math.abs(k.rankChange)}위 {k.rankChange > 0 ? 
+                                        <span className="text-emerald-600">상승</span> : 
+                                        <span className="text-amber-600">하락</span>}
+                                      </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
+                                    )}
+                                    {k.tagChange !== undefined && k.tagChange !== 0 && (
+                                      <span>태그가 <span className="font-semibold">{Math.abs(k.tagChange)}개 {k.tagChange > 0 ? 
+                                        <span className="text-emerald-600">증가</span> : 
+                                        <span className="text-amber-600">감소</span>}
+                                      </span>했습니다.</span>
+                                    )}
+                                    {k.keywordCountChange !== undefined && k.keywordCountChange !== 0 && (
+                                      <span>키워드가 <span className="font-semibold">{Math.abs(k.keywordCountChange)}개 {k.keywordCountChange > 0 ? 
+                                        <span className="text-emerald-600">증가</span> : 
+                                        <span className="text-amber-600">감소</span>}
+                                      </span>했습니다.</span>
+                                    )}
+                                  </div>
                                 ) : null}
                               </div>
                             </li>
@@ -545,11 +595,29 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                                   <span>새로 추가되어 <span className="font-semibold text-emerald-600">{k.currentRank}위</span>에 진입했습니다.</span>
                                 ) : k.status === 'removed' ? (
                                   <span>순위에서 제외되었습니다. (이전 <span className="font-semibold text-red-600">{k.previousRank}위</span>)</span>
-                                ) : k.rankChange !== undefined && k.rankChange !== 0 ? (
-                                  <span>순위가 <span className="font-semibold">{Math.abs(k.rankChange)}위 {k.rankChange > 0 ? 
-                                    <span className="text-emerald-600">상승</span> : 
-                                    <span className="text-amber-600">하락</span>}
-                                  </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
+                                ) : (k.rankChange !== undefined && k.rankChange !== 0) || 
+                                 (k.tagChange !== undefined && k.tagChange !== 0) || 
+                                 (k.keywordCountChange !== undefined && k.keywordCountChange !== 0) ? (
+                                  <div className="space-y-1">
+                                    {k.rankChange !== undefined && k.rankChange !== 0 && (
+                                      <span>순위가 <span className="font-semibold">{Math.abs(k.rankChange)}위 {k.rankChange > 0 ? 
+                                        <span className="text-emerald-600">상승</span> : 
+                                        <span className="text-amber-600">하락</span>}
+                                      </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
+                                    )}
+                                    {k.tagChange !== undefined && k.tagChange !== 0 && (
+                                      <span>태그가 <span className="font-semibold">{Math.abs(k.tagChange)}개 {k.tagChange > 0 ? 
+                                        <span className="text-emerald-600">증가</span> : 
+                                        <span className="text-amber-600">감소</span>}
+                                      </span>했습니다.</span>
+                                    )}
+                                    {k.keywordCountChange !== undefined && k.keywordCountChange !== 0 && (
+                                      <span>키워드가 <span className="font-semibold">{Math.abs(k.keywordCountChange)}개 {k.keywordCountChange > 0 ? 
+                                        <span className="text-emerald-600">증가</span> : 
+                                        <span className="text-amber-600">감소</span>}
+                                      </span>했습니다.</span>
+                                    )}
+                                  </div>
                                 ) : null}
                               </div>
                             </li>
@@ -558,7 +626,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                     </div>
                   )}
 
-            
+
                 </div>
               </div>
             )}
@@ -568,6 +636,13 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
         {/* Product Analysis Tabs */}
         <div className="border-b border-gray-200 mb-4">
           <nav className="-mb-px flex space-x-8">
+            <button
+              className="py-2 px-1 border-b-2 font-medium text-sm text-blue-600 border-transparent hover:text-blue-700 hover:border-blue-300 flex items-center"
+              onClick={() => setIsTrackingModalOpen(true)}
+            >
+              <LineChart className="h-4 w-4 mr-1" />
+              상품 순위 추적
+            </button>
             <button 
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'keywords' 
@@ -635,7 +710,9 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                       <Badge className="ml-2 bg-blue-500 text-white">NEW</Badge>
                     ) : keyword.status === 'removed' ? (
                       <Badge className="ml-2 bg-red-500 text-white">OUT</Badge>
-                    ) : keyword.rankChange !== undefined && keyword.rankChange !== 0 ? (
+                    ) : (keyword.rankChange !== undefined && keyword.rankChange !== 0) || 
+                     (keyword.tagChange !== undefined && keyword.tagChange !== 0) || 
+                     (keyword.keywordCountChange !== undefined && keyword.keywordCountChange !== 0) ? (
                       <Badge className={`ml-2 ${
                         keyword.rankChange > 0 
                         ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
@@ -674,7 +751,7 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                   {wrapInDialog(KeywordCard, keyword)}
                 </React.Fragment>
               );
-              
+
              })}
           </div>
         )}
@@ -711,7 +788,9 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                             <Badge className="ml-2 bg-blue-500 text-white">NEW</Badge>
                           ) : tag.status === 'removed' ? (
                             <Badge className="ml-2 bg-red-500 text-white">OUT</Badge>
-                          ) : tag.rankChange !== undefined && tag.rankChange !== 0 ? (
+                          ) : (tag.rankChange !== undefined && tag.rankChange !== 0) || 
+                           (tag.tagChange !== undefined && tag.tagChange !== 0) || 
+                           (tag.keywordCountChange !== undefined && tag.keywordCountChange !== 0) ? (
                             <Badge className={`ml-2 ${
                               tag.rankChange > 0 
                               ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
@@ -795,8 +874,20 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                                 `"${tag.key}"이(가) 새로 추가되어 ${tag.currentRank}위에 올랐습니다.`
                               ) : tag.status === 'removed' ? (
                                 `"${tag.key}"이(가) 순위에서 제외되었습니다.`
-                              ) : tag.rankChange !== undefined && tag.rankChange !== 0 ? (
-                                `"${tag.key}"의 순위가 ${Math.abs(tag.rankChange)}단계 ${tag.rankChange > 0 ? '상승' : '하락'}했습니다. (${tag.previousRank}위 → ${tag.currentRank}위)`
+                              ) : (tag.rankChange !== undefined && tag.rankChange !== 0) || 
+                               (tag.tagChange !== undefined && tag.tagChange !== 0) || 
+                               (tag.keywordCountChange !== undefined && tag.keywordCountChange !== 0) ? (
+                                <div className="space-y-1">
+                                  {tag.rankChange !== undefined && tag.rankChange !== 0 && (
+                                    `"${tag.key}"의 순위가 ${Math.abs(tag.rankChange)}단계 ${tag.rankChange > 0 ? '상승' : '하락'}했습니다. (${tag.previousRank}위 → ${tag.currentRank}위)`
+                                  )}
+                                  {tag.tagChange !== undefined && tag.tagChange !== 0 && (
+                                    `"${tag.key}"의 태그 개수가 ${Math.abs(tag.tagChange)}개 ${tag.tagChange > 0 ? '증가' : '감소'}했습니다.`
+                                  )}
+                                  {tag.keywordCountChange !== undefined && tag.keywordCountChange !== 0 && (
+                                    `"${tag.key}"의 키워드 개수가 ${Math.abs(tag.keywordCountChange)}개 ${tag.keywordCountChange > 0 ? '증가' : '감소'}했습니다.`
+                                  )}
+                                </div>
                               ) : (
                                 `"${tag.key}"의 순위가 변경되지 않았습니다.`
                               )}
@@ -848,7 +939,9 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                         <Badge className="ml-1 px-1 py-0 text-xs bg-blue-100 text-blue-800 border border-blue-200">NEW</Badge>
                       ) : tag.status === 'removed' ? (
                         <Badge className="ml-1 px-1 py-0 text-xs bg-red-100 text-red-800 border border-red-200">OUT</Badge>
-                      ) : tag.rankChange !== undefined && tag.rankChange !== 0 ? (
+                      ) : (tag.rankChange !== undefined && tag.rankChange !== 0) || 
+                       (tag.tagChange !== undefined && tag.tagChange !== 0) || 
+                       (tag.keywordCountChange !== undefined && tag.keywordCountChange !== 0) ? (
                         <Badge className={`ml-1 px-1 py-0 text-xs ${
                         tag.rankChange > 0 
                         ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
@@ -913,8 +1006,20 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                               `"${tag.key}"이(가) 새로 추가되어 ${tag.currentRank}위에 올랐습니다.`
                             ) : tag.status === 'removed' ? (
                               `"${tag.key}"이(가) 순위에서 제외되었습니다.`
-                            ) : tag.rankChange !== undefined && tag.rankChange !== 0 ? (
-                              `"${tag.key}"의 순위가 ${Math.abs(tag.rankChange)}단계 ${tag.rankChange > 0 ? '상승' : '하락'}했습니다. (${tag.previousRank}위 → ${tag.currentRank}위)`
+                            ) : (tag.rankChange !== undefined && tag.rankChange !== 0) || 
+                             (tag.tagChange !== undefined && tag.tagChange !== 0) || 
+                             (tag.keywordCountChange !== undefined && tag.keywordCountChange !== 0) ? (
+                              <div className="space-y-1">
+                                {tag.rankChange !== undefined && tag.rankChange !== 0 && (
+                                  `"${tag.key}"의 순위가 ${Math.abs(tag.rankChange)}단계 ${tag.rankChange > 0 ? '상승' : '하락'}했습니다. (${tag.previousRank}위 → ${tag.currentRank}위)`
+                                )}
+                                {tag.tagChange !== undefined && tag.tagChange !== 0 && (
+                                  `"${tag.key}"의 태그 개수가 ${Math.abs(tag.tagChange)}개 ${tag.tagChange > 0 ? '증가' : '감소'}했습니다.`
+                                )}
+                                {tag.keywordCountChange !== undefined && tag.keywordCountChange !== 0 && (
+                                  `"${tag.key}"의 키워드 개수가 ${Math.abs(tag.keywordCountChange)}개 ${tag.keywordCountChange > 0 ? '증가' : '감소'}했습니다.`
+                                )}
+                              </div>
                             ) : (
                               `"${tag.key}"의 순위가 변경되지 않았습니다.`
                             )}
@@ -968,7 +1073,9 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                           <Badge className="ml-2 bg-blue-500 text-white">NEW</Badge>
                         ) : count.status === 'removed' ? (
                           <Badge className="ml-2 bg-red-500 text-white">OUT</Badge>
-                        ) : count.rankChange !== undefined && count.rankChange !== 0 ? (
+                        ) : (count.rankChange !== undefined && count.rankChange !== 0) || 
+                         (count.tagChange !== undefined && count.tagChange !== 0) || 
+                         (count.keywordCountChange !== undefined && count.keywordCountChange !== 0) ? (
                           <Badge className={`ml-2 ${
                             count.rankChange > 0 
                             ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
@@ -1054,8 +1161,20 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                               `"${count.key}"이(가) 새로 추가되어 ${count.currentRank}위에 올랐습니다.`
                             ) : count.status === 'removed' ? (
                               `"${count.key}"이(가) 순위에서 제외되었습니다.`
-                            ) : count.rankChange !== undefined && count.rankChange !== 0 ? (
-                              `"${count.key}"의 순위가 ${Math.abs(count.rankChange)}단계 ${count.rankChange > 0 ? '상승' : '하락'}했습니다. (${count.previousRank}위 → ${count.currentRank}위)`
+                            ) : (count.rankChange !== undefined && count.rankChange !== 0) || 
+                             (count.tagChange !== undefined && count.tagChange !== 0) || 
+                             (count.keywordCountChange !== undefined && count.keywordCountChange !== 0) ? (
+                              <div className="space-y-1">
+                                {count.rankChange !== undefined && count.rankChange !== 0 && (
+                                  `"${count.key}"의 순위가 ${Math.abs(count.rankChange)}단계 ${count.rankChange > 0 ? '상승' : '하락'}했습니다. (${count.previousRank}위 → ${count.currentRank}위)`
+                                )}
+                                {count.tagChange !== undefined && count.tagChange !== 0 && (
+                                  `"${count.key}"의 태그 개수가 ${Math.abs(count.tagChange)}개 ${count.tagChange > 0 ? '증가' : '감소'}했습니다.`
+                                )}
+                                {count.keywordCountChange !== undefined && count.keywordCountChange !== 0 && (
+                                  `"${count.key}"의 키워드 개수가 ${Math.abs(count.keywordCountChange)}개 ${count.keywordCountChange > 0 ? '증가' : '감소'}했습니다.`
+                                )}
+                              </div>
                             ) : (
                               `"${count.key}"의 순위가 변경되지 않았습니다.`
                             )}
@@ -1077,8 +1196,10 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
             </div>
           </>
         )}
-
-    
+  <TrackingNotificationModal
+    isOpen={isTrackingModalOpen}
+    onClose={() => setIsTrackingModalOpen(false)}
+  />
       </CardContent>
     </Card>
   );
