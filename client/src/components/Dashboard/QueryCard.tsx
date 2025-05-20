@@ -484,154 +484,153 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
                           })
                           .slice(0, 3)
                           .map((k, idx) => (
-                            <li key={idx} className="flex items-start py-1 px-2 rounded-md hover:bg-blue-50">
-                              {renderChangeIndicator(k)}
-                              <div>
-                                <span className="font-medium text-gray-800">"{k.key}"</span>{' '}
-                                {k.status === 'added' ? (
-                                  <span>새로 추가되어 <span className="font-semibold text-emerald-600">{k.currentRank}위</span>에 진입했습니다.</span>
-                                ) : k.status === 'removed' ? (
-                                  <span>순위에서 제외되었습니다. (이전 <span className="font-semibold text-red-600">{k.previousRank}위</span>)</span>
-                                ) : (k.rankChange !== undefined && k.rankChange !== 0) || 
-                                 (k.tagChange !== undefined && k.tagChange !== 0) || 
-                                 (k.keywordCountChange !== undefined && k.keywordCountChange !== 0) ? (
-                                  <div className="space-y-1">
-                                    {k.rankChange !== undefined && k.rankChange !== 0 && (
-                                      <span>순위가 <span className="font-semibold">{Math.abs(k.rankChange)}위 {k.rankChange > 0 ? 
-                                        <span className="text-emerald-600">상승</span> : 
-                                        <span className="text-amber-600">하락</span>}
-                                      </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
-                                    )}
-                                    {k.tagChange !== undefined && k.tagChange !== 0 && (
-                                      <span>태그가 <span className="font-semibold">{Math.abs(k.tagChange)}개 {k.tagChange > 0 ? 
-                                        <span className="text-emerald-600">증가</span> : 
-                                        <span className="text-amber-600">감소</span>}
-                                      </span>했습니다.</span>
-                                    )}
-                                    {k.keywordCountChange !== undefined && k.keywordCountChange !== 0 && (
-                                      <span>키워드가 <span className="font-semibold">{Math.abs(k.keywordCountChange)}개 {k.keywordCountChange > 0 ? 
-                                        <span className="text-emerald-600">증가</span> : 
-                                        <span className="text-amber-600">감소</span>}
-                                      </span>했습니다.</span>
-                                    )}
-                                  </div>
-                                ) : null}
-                              </div>
-                            </li>
+                           <li key={idx} className="flex items-start py-1 px-2 rounded-md hover:bg-blue-50">
+  {renderChangeIndicator(k)}
+  <div className="text-sm text-gray-800">
+    <span className="font-medium">"{k.key}"</span>{' '}
+    {k.status === 'added' ? (
+      <span>새로 추가되어 <span className="font-semibold teㄴxt-emerald-600">{k.currentRank}위</span>에 진입했습니다.</span>
+    ) : k.status === 'removed' ? (
+      <span>순위에서 제외되었습니다. (이전 <span className="font-semibold text-red-600">{k.previousRank}위</span>)</span>
+    ) : (k.rankChange !== undefined && k.rankChange !== 0) ||
+      (k.tagChange !== undefined && k.tagChange !== 0) ||
+      (k.keywordCountChange !== undefined && k.keywordCountChange !== 0) ? (
+      <>
+        {k.rankChange !== undefined && k.rankChange !== 0 && (
+          <span>
+            순위가 <span className="font-semibold">{Math.abs(k.rankChange)}위 {k.rankChange > 0 ?
+              <span className="text-emerald-600">상승</span> :
+              <span className="text-amber-600">하락</span>}
+            </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)
+          </span>
+        )}
+        {k.tagChange !== undefined && k.tagChange !== 0 && (
+          <span> 태그가 <span className="font-semibold">{Math.abs(k.tagChange)}개 {k.tagChange > 0 ?
+            <span className="text-emerald-600">증가</span> :
+            <span className="text-amber-600">감소</span>}
+          </span>했습니다.</span>
+        )}
+        {k.keywordCountChange !== undefined && k.keywordCountChange !== 0 && (
+          <span> 키워드가 <span className="font-semibold">{Math.abs(k.keywordCountChange)}개 {k.keywordCountChange > 0 ?
+            <span className="text-emerald-600">증가</span> :
+            <span className="text-amber-600">감소</span>}
+          </span>했습니다.</span>
+        )}
+      </>
+    ) : null}
+  </div>
+</li>
+
                           ))}
                       </ul>
                     </div>
                   )}
 
-                  {/* 태그 섹션 */}
-                  {comparedData?.tags?.some(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)) && (
-                    <div className="bg-white p-3 rounded-lg border border-purple-100 shadow-sm">
-                      <h5 className="text-sm font-semibold mb-2 text-purple-700 border-b pb-1 border-purple-100">
-                        주요 태그 변화 <span className="font-normal text-purple-500">({comparedData?.tags.filter(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)).length}건)</span>
-                      </h5>
-                      <ul className="text-sm space-y-2.5">
-                        {comparedData?.tags
-                          .filter(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0))
-                          .sort((a, b) => {
-                            if ((a.status === 'added' || a.status === 'removed') && !(b.status === 'added' || b.status === 'removed')) return -1;
-                            if (!(a.status === 'added' || a.status === 'removed') && (b.status === 'added' || b.status === 'removed')) return 1;
-                            return Math.abs((b.rankChange || 0)) - Math.abs((a.rankChange || 0));
-                          })
-                          .slice(0, 3)
-                          .map((k, idx) => (
-                            <li key={idx} className="flex items-start py-1 px-2 rounded-md hover:bg-purple-50">
-                              {renderChangeIndicator(k)}
-                              <div>
-                                <span className="font-medium text-gray-800">"{k.key}"</span>{' '}
-                                {k.status === 'added' ? (
-                                  <span>새로 추가되어 <span className="font-semibold text-emerald-600">{k.currentRank}위</span>에 진입했습니다.</span>
-                                ) : k.status === 'removed' ? (
-                                  <span>순위에서 제외되었습니다. (이전 <span className="font-semibold text-red-600">{k.previousRank}위</span>)</span>
-                                ) : (k.rankChange !== undefined && k.rankChange !== 0) || 
-                                 (k.tagChange !== undefined && k.tagChange !== 0) || 
-                                 (k.keywordCountChange !== undefined && k.keywordCountChange !== 0) ? (
-                                  <div className="space-y-1">
-                                    {k.rankChange !== undefined && k.rankChange !== 0 && (
-                                      <span>순위가 <span className="font-semibold">{Math.abs(k.rankChange)}위 {k.rankChange > 0 ? 
-                                        <span className="text-emerald-600">상승</span> : 
-                                        <span className="text-amber-600">하락</span>}
-                                      </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
-                                    )}
-                                    {k.tagChange !== undefined && k.tagChange !== 0 && (
-                                      <span>태그가 <span className="font-semibold">{Math.abs(k.tagChange)}개 {k.tagChange > 0 ? 
-                                        <span className="text-emerald-600">증가</span> : 
-                                        <span className="text-amber-600">감소</span>}
-                                      </span>했습니다.</span>
-                                    )}
-                                    {k.keywordCountChange !== undefined && k.keywordCountChange !== 0 && (
-                                      <span>키워드가 <span className="font-semibold">{Math.abs(k.keywordCountChange)}개 {k.keywordCountChange > 0 ? 
-                                        <span className="text-emerald-600">증가</span> : 
-                                        <span className="text-amber-600">감소</span>}
-                                      </span>했습니다.</span>
-                                    )}
-                                  </div>
-                                ) : null}
-                              </div>
-                            </li>
-                          ))}
-                      </ul>
-                    </div>
+             {/* 태그 섹션 */}
+{comparedData?.tags?.some(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)) && (
+  <div className="bg-white p-3 rounded-lg border border-purple-100 shadow-sm">
+    <h5 className="text-sm font-semibold mb-2 text-purple-700 border-b pb-1 border-purple-100">
+      주요 태그 변화 <span className="font-normal text-purple-500">({comparedData?.tags.filter(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)).length}건)</span>
+    </h5>
+    <ul className="text-sm space-y-2.5">
+      {comparedData?.tags
+        .filter(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0))
+        .sort((a, b) => {
+          if ((a.status === 'added' || a.status === 'removed') && !(b.status === 'added' || b.status === 'removed')) return -1;
+          if (!(a.status === 'added' || a.status === 'removed') && (b.status === 'added' || b.status === 'removed')) return 1;
+          return Math.abs((b.rankChange || 0)) - Math.abs((a.rankChange || 0));
+        })
+        .slice(0, 3)
+        .map((k, idx) => (
+          <li key={idx} className="flex items-start py-1 px-2 rounded-md hover:bg-purple-50">
+            {renderChangeIndicator(k)}
+            <div>
+              <span className="font-medium text-gray-800">"{k.key}"</span>{' '}
+              {k.status === 'added' ? (
+                <span>새로 추가되어 <span className="font-semibold text-emerald-600">{k.currentRank}위</span>에 진입했습니다.</span>
+              ) : k.status === 'removed' ? (
+                <span>순위에서 제외되었습니다. (이전 <span className="font-semibold text-red-600">{k.previousRank}위</span>)</span>
+              ) : (
+                <>
+                  {k.rankChange !== undefined && k.rankChange !== 0 && (
+                    <span>순위가 <span className="font-semibold">{Math.abs(k.rankChange)}위 {k.rankChange > 0 ?
+                      <span className="text-emerald-600">상승</span> :
+                      <span className="text-amber-600">하락</span>}
+                    </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
                   )}
+                  {k.tagChange !== undefined && k.tagChange !== 0 && (
+                    <span> 태그가 <span className="font-semibold">{Math.abs(k.tagChange)}개 {k.tagChange > 0 ?
+                      <span className="text-emerald-600">증가</span> :
+                      <span className="text-amber-600">감소</span>}
+                    </span>했습니다.</span>
+                  )}
+                  {k.keywordCountChange !== undefined && k.keywordCountChange !== 0 && (
+                    <span> 키워드가 <span className="font-semibold">{Math.abs(k.keywordCountChange)}개 {k.keywordCountChange > 0 ?
+                      <span className="text-emerald-600">증가</span> :
+                      <span className="text-amber-600">감소</span>}
+                    </span>했습니다.</span>
+                  )}
+                </>
+              )}
+            </div>
+          </li>
+        ))}
+    </ul>
+  </div>
+)}
 
-                  {/* 키워드 개수 섹션 */}
-                  {comparedData?.keywordCounts?.some(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)) && (
-                    <div className="bg-white p-3 rounded-lg border border-indigo-100 shadow-sm">
-                      <h5 className="text-sm font-semibold mb-2 text-indigo-700 border-b pb-1 border-indigo-100">
-                        주요 키워드 개수 변화 <span className="font-normal text-indigo-500">({comparedData?.keywordCounts.filter(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)).length}건)</span>
-                      </h5>
-                      <ul className="text-sm space-y-2.5">
-                        {comparedData?.keywordCounts
-                          .filter(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0))
-                          .sort((a, b) => {
-                            if ((a.status === 'added' || a.status === 'removed') && !(b.status === 'added' || b.status === 'removed')) return -1;
-                            if (!(a.status === 'added' || a.status === 'removed') && (b.status === 'added' || b.status === 'removed')) return 1;
-                            return Math.abs((b.rankChange || 0)) - Math.abs((a.rankChange || 0));
-                          })
-                          .slice(0, 3)
-                          .map((k, idx) => (
-                            <li key={idx} className="flex items-start py-1 px-2 rounded-md hover:bg-indigo-50">
-                              {renderChangeIndicator(k)}
-                              <div>
-                                <span className="font-medium text-gray-800">"{k.key}"</span>{' '}
-                                {k.status === 'added' ? (
-                                  <span>새로 추가되어 <span className="font-semibold text-emerald-600">{k.currentRank}위</span>에 진입했습니다.</span>
-                                ) : k.status === 'removed' ? (
-                                  <span>순위에서 제외되었습니다. (이전 <span className="font-semibold text-red-600">{k.previousRank}위</span>)</span>
-                                ) : (k.rankChange !== undefined && k.rankChange !== 0) || 
-                                 (k.tagChange !== undefined && k.tagChange !== 0) || 
-                                 (k.keywordCountChange !== undefined && k.keywordCountChange !== 0) ? (
-                                  <div className="space-y-1">
-                                    {k.rankChange !== undefined && k.rankChange !== 0 && (
-                                      <span>순위가 <span className="font-semibold">{Math.abs(k.rankChange)}위 {k.rankChange > 0 ? 
-                                        <span className="text-emerald-600">상승</span> : 
-                                        <span className="text-amber-600">하락</span>}
-                                      </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
-                                    )}
-                                    {k.tagChange !== undefined && k.tagChange !== 0 && (
-                                      <span>태그가 <span className="font-semibold">{Math.abs(k.tagChange)}개 {k.tagChange > 0 ? 
-                                        <span className="text-emerald-600">증가</span> : 
-                                        <span className="text-amber-600">감소</span>}
-                                      </span>했습니다.</span>
-                                    )}
-                                    {k.keywordCountChange !== undefined && k.keywordCountChange !== 0 && (
-                                      <span>키워드가 <span className="font-semibold">{Math.abs(k.keywordCountChange)}개 {k.keywordCountChange > 0 ? 
-                                        <span className="text-emerald-600">증가</span> : 
-                                        <span className="text-amber-600">감소</span>}
-                                      </span>했습니다.</span>
-                                    )}
-                                  </div>
-                                ) : null}
-                              </div>
-                            </li>
-                          ))}
-                      </ul>
-                    </div>
+{/* 키워드 개수 섹션 */}
+{comparedData?.keywordCounts?.some(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)) && (
+  <div className="bg-white p-3 rounded-lg border border-indigo-100 shadow-sm">
+    <h5 className="text-sm font-semibold mb-2 text-indigo-700 border-b pb-1 border-indigo-100">
+      주요 키워드 개수 변화 <span className="font-normal text-indigo-500">({comparedData?.keywordCounts.filter(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0)).length}건)</span>
+    </h5>
+    <ul className="text-sm space-y-2.5">
+      {comparedData?.keywordCounts
+        .filter(k => (k.status === 'added' || k.status === 'removed' || k.rankChange !== undefined && k.rankChange !== 0))
+        .sort((a, b) => {
+          if ((a.status === 'added' || a.status === 'removed') && !(b.status === 'added' || b.status === 'removed')) return -1;
+          if (!(a.status === 'added' || a.status === 'removed') && (b.status === 'added' || b.status === 'removed')) return 1;
+          return Math.abs((b.rankChange || 0)) - Math.abs((a.rankChange || 0));
+        })
+        .slice(0, 3)
+        .map((k, idx) => (
+          <li key={idx} className="flex items-start py-1 px-2 rounded-md hover:bg-indigo-50">
+            {renderChangeIndicator(k)}
+            <div>
+              <span className="font-medium text-gray-800">"{k.key}"</span>{' '}
+              {k.status === 'added' ? (
+                <span>새로 추가되어 <span className="font-semibold text-emerald-600">{k.currentRank}위</span>에 진입했습니다.</span>
+              ) : k.status === 'removed' ? (
+                <span>순위에서 제외되었습니다. (이전 <span className="font-semibold text-red-600">{k.previousRank}위</span>)</span>
+              ) : (
+                <>
+                  {k.rankChange !== undefined && k.rankChange !== 0 && (
+                    <span>순위가 <span className="font-semibold">{Math.abs(k.rankChange)}위 {k.rankChange > 0 ?
+                      <span className="text-emerald-600">상승</span> :
+                      <span className="text-amber-600">하락</span>}
+                    </span>했습니다. ({k.previousRank}위 → {k.currentRank}위)</span>
                   )}
+                  {k.tagChange !== undefined && k.tagChange !== 0 && (
+                    <span> 태그가 <span className="font-semibold">{Math.abs(k.tagChange)}개 {k.tagChange > 0 ?
+                      <span className="text-emerald-600">증가</span> :
+                      <span className="text-amber-600">감소</span>}
+                    </span>했습니다.</span>
+                  )}
+                  {k.keywordCountChange !== undefined && k.keywordCountChange !== 0 && (
+                    <span> 키워드가 <span className="font-semibold">{Math.abs(k.keywordCountChange)}개 {k.keywordCountChange > 0 ?
+                      <span className="text-emerald-600">증가</span> :
+                      <span className="text-amber-600">감소</span>}
+                    </span>했습니다.</span>
+                  )}
+                </>
+              )}
+            </div>
+          </li>
+        ))}
+    </ul>
+  </div>
+)}
 
 
                 </div>
