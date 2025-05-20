@@ -18,15 +18,13 @@ export default function TrackingNotificationModal({ isOpen, onClose }: TrackingN
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubscribe = async () => {
-    if (!currentUser?.uid) return;
+    if (!currentUser?.email) return;
     
     setIsSubmitting(true);
     try {
-      const userRef = doc(db, "trackingNotifications", currentUser.uid);
-      await setDoc(userRef, {
-        userId: currentUser.uid,
+      await setDoc(doc(db, "trackingNotifications", currentUser.email), {
         email: currentUser.email,
-        createdAt: new Date().toISOString(),
+        timestamp: new Date().toISOString()
       });
       
       toast({

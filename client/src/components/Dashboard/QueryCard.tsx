@@ -26,7 +26,7 @@ interface QueryCardProps {
 }
 
 export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps) {
-  const [activeTab, setActiveTab] = useState<'keywords' | 'tags' | 'keywordCount'>('keywords');
+  const [activeTab, setActiveTab] = useState<'keywords' | 'tags' | 'keywordCount' | 'tracking'>('keywords');
   const [isTrackingModalOpen, setIsTrackingModalOpen] = useState(false);
   const [selectedCurrentDate, setSelectedCurrentDate] = useState<string | null>(null);
   const [selectedCompareDate, setSelectedCompareDate] = useState<string | null>(null);
@@ -250,22 +250,23 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
 
     const hasKeywordChanges = comparedData.keywords.some(k => 
       k.status === 'added' || k.status === 'removed' || 
-      k.status === 'increased' || k.status === 'decreased'
+      k.status === 'increased' || k.status === 'decreased' ||
+      (k.rankChange !== undefined && k.rankChange !== 0)
     );
 
     const hasTagChanges = comparedData.tags.some(k => 
       k.status === 'added' || k.status === 'removed' || 
-      k.status === 'increased' || k.status === 'decreased'
+      k.status === 'increased' || k.status === 'decreased' ||
+      (k.rankChange !== undefined && k.rankChange !== 0)
     );
 
     const hasKeywordCountChanges = comparedData.keywordCounts.some(k => 
       k.status === 'added' || k.status === 'removed' || 
-      k.status === 'increased' || k.status === 'decreased'
+      k.status === 'increased' || k.status === 'decreased' ||
+      (k.rankChange !== undefined && k.rankChange !== 0)
     );
 
-
-
-    return hasKeywordChanges || hasTagChanges || hasKeywordCountChanges ;
+    return hasKeywordChanges || hasTagChanges || hasKeywordCountChanges;
   };
 
   // Helper function to determine if an item should show dialog
@@ -636,13 +637,19 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
         {/* Product Analysis Tabs */}
         <div className="border-b border-gray-200 mb-4">
           <nav className="-mb-px flex space-x-8">
-            <button
-    className="py-2 px-1 border-b-2 font-medium text-sm text-blue-600 border-transparent hover:text-blue-700 hover:border-blue-300 flex items-center"
-    onClick={() => setIsTrackingModalOpen(true)}
-  >
-    <LineChart className="h-4 w-4 mr-1" />
-    상품 순위 추적 등록하기
-  </button>
+            <button 
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'tracking' 
+                  ? 'border-primary text-primary' 
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+              onClick={() => setActiveTab('tracking')}
+            >
+              <div className="flex items-center">
+                <LineChart className="h-4 w-4 mr-1" />
+                상품 순위 추적
+              </div>
+            </button>
             <button 
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'keywords' 
@@ -676,6 +683,11 @@ export default function QueryCard({ query, onDelete, onRefresh }: QueryCardProps
           </nav>
         </div>
 
+{activeTab === 'tracking' && (
+  <div className="p-4">
+    <Button onClick={() => setIsTrackingModalOpen(true)}>상품 순위 추적 등록하기</Button>
+  </div>
+)}
         {/* Keywords Tab Panel */}
         {activeTab === 'keywords' && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
