@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -19,13 +18,13 @@ export default function TrackingNotificationModal({ isOpen, onClose }: TrackingN
 
   const handleSubscribe = async () => {
     if (!currentUser?.email) return;
-    
+
     setIsSubmitting(true);
     try {
       // Check if notification already exists
       const notificationRef = doc(db, "notifications", currentUser.email);
       const notificationDoc = await getDoc(notificationRef);
-      
+
       if (notificationDoc.exists()) {
         toast({
           title: "알림 이미 설정됨",
@@ -41,7 +40,7 @@ export default function TrackingNotificationModal({ isOpen, onClose }: TrackingN
         isSubscribed: true,
         type: 'tracking'
       });
-      
+
       toast({
         title: "알림 신청 완료",
         description: "상품 추적 기능이 출시되면 이메일로 알려드리겠습니다.",
