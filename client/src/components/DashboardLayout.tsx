@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { FeedbackDialog } from "./ui/feedback-dialog";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
-import { LogOut, Menu, PlusCircle, ShoppingBag, Home, User, UserPlus, MessageSquare } from "lucide-react";
+import { LogOut, Menu, PlusCircle, ShoppingBag, Home, User, UserPlus, MessageSquare, Download } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -162,16 +162,18 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </>
               ) : (
                 <div className="flex items-center space-x-3">
-                  <Link href="/login?tab=register">
                     <Button 
                       variant="outline"
                       className="border-blue-500 text-blue-600 hover:bg-blue-50"
-                      onClick={() => trackEvent('Navigation', 'click', 'RegisterButton')}
+                      onClick={() => {
+                    trackEvent('Navigation', 'click', 'ExtensionInstall');
+                    window.open("https://chromewebstore.google.com/detail/%EC%8A%A4%EB%A7%88%ED%8A%B8%EC%8A%A4%ED%86%A0%EC%96%B4-%EC%83%81%EC%9C%84%EB%85%B8%EC%B6%9C-%EC%B5%9C%EC%A0%81%ED%99%94-%EB%8F%84%EA%B5%AC/plgdaggkagiakemkoclkpkbdiocllbbi?hl=ko", "_blank")
+                  }}
                     >
-                      <UserPlus className="mr-2 h-4 w-4" />
-                    3초! 회원가입
+                      <Download className="mr-2 h-4 w-4"/>
+                    무료로 사용하기
                     </Button>
-                  </Link>
+                  
                   <Button 
                     onClick={() => {
                       trackEvent('Navigation', 'click', 'LoginButton');
