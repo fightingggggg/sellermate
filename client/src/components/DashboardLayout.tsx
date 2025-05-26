@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { FeedbackDialog } from "./ui/feedback-dialog";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
-import { LogOut, Menu, PlusCircle, ShoppingBag, Home, User, UserPlus, MessageSquare, Download } from "lucide-react";
+import { LogOut, Menu, PlusCircle, ShoppingBag, Home, User, UserPlus, MessageSquare, Download, HelpCircle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -112,6 +112,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 >
                   <MessageSquare className="h-4 w-4 mr-1" />
                   문의 및 피드백
+                </button>
+                  <button
+                  onClick={() => {
+                    trackEvent('Navigation', 'click', 'howto');
+                    window.open("https://chambray-midnight-e7f.notion.site/100-1ff78708053f80448367f602dca87ce6?pvs=74", "_blank")
+                  }}
+                  className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-700 flex items-center"
+                >
+                  <HelpCircle className="h-4 w-4 mr-1" />
+                  사용법
                 </button>
               </div>
             </div>
