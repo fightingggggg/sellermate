@@ -246,6 +246,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               >
                 피드백 및 문의 보내기
               </button>
+               <button
+                  onClick={() => {
+                    trackEvent('Navigation', 'click', 'Mobilehowto');
+                    window.open("https://chambray-midnight-e7f.notion.site/100-1ff78708053f80448367f602dca87ce6?pvs=74", "_blank")
+                  }}
+                  className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-700 flex items-center"
+                >
+                 
+                  사용법
+                </button>
               {currentUser && (
                 <button 
                   onClick={() => {
