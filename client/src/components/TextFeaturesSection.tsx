@@ -7,7 +7,8 @@ const TextFeaturesSection = () => {
             {/* ✅ 모바일 전용 줄바꿈 */}
             <div className="md:hidden space-y-1">
               <p>스마트스토어,</p>
-              <p>지금보다 더 많이 노출되고 판매 될 수 있어요</p>
+              <p>지금보다 더 많이 노출되고</p>
+              <p>판매 될 수 있어요</p>
               <br />
               <p>광고 없이도</p>
               <p>상위 노출을 실현하는 최적화 솔루션</p>

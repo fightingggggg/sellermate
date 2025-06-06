@@ -60,13 +60,13 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row items-center justify-between">
             <div className="lg:w-1/2 mb-12 lg:mb-0">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              <h2 className="text-3xl md:text-5xl font-bold mb-4">
                 <div className="mb-4">네이버 스마트스토어</div>
                 <div className="mb-4 text-[#1a73e8]">상위노출 최적화를 위한</div>
                 <div>완벽한 솔루션</div>
               </h2>
               <p className="text-xl mb-8 text-gray-600">
-                스마트스토어 상위 노출을 위한 상품명 키워드<br />
+                스마트스토어 상위 노출을 위한 키워드,<br />
                 최적의 상품명, 카테고리, 태그 제안
               </p>
 
@@ -179,9 +179,9 @@ export default function Home() {
           <div className="inline-block px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
             상위노출 최적화
           </div>
-          <h3 className="text-3xl font-bold text-gray-900 leading-tight">
+          <h3 className="text-2xl font-bold text-gray-900 leading-tight">
              <span className="font-bold text-blue-600">광고 없이도 상위 노출</span>을 이끄는<br />
-            원클릭 키워드, 검색 태그, 상품명 SEO
+            원클릭 키워드, 검색 태그, 상품명
           </h3>
           <p className="text-lg text-gray-600 leading-relaxed">
             실제 상위 상품명 키워드, 태그를 분석하고 <br/> <span className="font-bold text-blue-600"> 네이버 SEO 가이드를 준수한 AI 상품명</span>을 생성합니다. 
@@ -233,7 +233,7 @@ export default function Home() {
           <div className="inline-block px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
             상품 등록 최적화
           </div>
-          <h3 className="text-3xl font-bold text-gray-900 leading-tight">
+          <h3 className="text-2xl font-bold text-gray-900 leading-tight">
 상품 등록에 드는 시간과 노력,<br />
 이제 <span className="text-blue-600"> 단 10분의 1로</span>
 

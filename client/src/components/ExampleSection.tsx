@@ -19,7 +19,7 @@ const steps = [
   {
     number: 3,
     title: "서비스로\n분석한 상품",
-    description: "1.3만개",
+    description: "4.6만개",
     icon: Search,
     color: "bg-gradient-to-br from-blue-500 to-blue-600"
   }
