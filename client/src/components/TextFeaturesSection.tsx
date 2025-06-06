@@ -1,8 +1,6 @@
-
-
 const TextFeaturesSection = () => {
   return (
-    <section id="textfeatures" className="py-24 bg-white">
+    <section id="textfeatures" className="py-24 bg-white-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <div className="text-xl md:text-3xl font-bold leading-snug md:leading-tight space-y-2 md:space-y-3">
@@ -10,7 +8,6 @@ const TextFeaturesSection = () => {
             <div className="md:hidden space-y-1">
               <p>스마트스토어,</p>
               <p>지금보다 더 많이 노출되고 판매 될 수 있어요</p>
-              {/* 강제 줄바꿈 */}
               <br />
               <p>광고 없이도</p>
               <p>상위 노출을 실현하는 최적화 솔루션</p>

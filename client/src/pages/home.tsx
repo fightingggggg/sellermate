@@ -104,7 +104,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">이미 <span className="font-bold text-[#1a73e8]">450+</span>명의 셀러가 사용 중</p>
+                  <p className="text-sm font-medium text-gray-600">이미 <span className="font-bold text-[#1a73e8]">800+</span>명의 셀러가 사용 중</p>
                 </div>
               </div>
             </div>
@@ -149,6 +149,124 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+      >
+        <TextFeaturesSection />
+      </motion.div>
+{/* Feature Section 1 */}
+<motion.section
+  className="py-16 px-4 bg-gradient-to-r from-blue-50 to-indigo-50"
+  initial={{ opacity: 0, y: 50 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  transition={{ duration: 0.6 }}
+>
+  <div className="max-w-7xl mx-auto">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      {/* Text Content */}
+      <motion.div 
+        className="space-y-6"
+        initial={{ opacity: 0, x: -50 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        viewport={{ once: true }}
+      >
+        <div className="space-y-4">
+          <div className="inline-block px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
+            상위노출 최적화
+          </div>
+          <h3 className="text-3xl font-bold text-gray-900 leading-tight">
+             <span className="font-bold text-blue-600">광고 없이도 상위 노출</span>을 이끄는<br />
+            원클릭 키워드, 검색 태그, 상품명 SEO
+          </h3>
+          <p className="text-lg text-gray-600 leading-relaxed">
+            실제 상위 상품명 키워드, 태그를 분석하고 <br/> <span className="font-bold text-blue-600"> 네이버 SEO 가이드를 준수한 AI 상품명</span>을 생성합니다. 
+
+          </p>
+          <p className="text-lg text-gray-600 leading-relaxed">
+          <span className="font-bold text-blue-600">실제 상위 노출의 키워드와 태그</span>를 확인하고,<br/> 바로 내 상품에 적용해보세요!
+          </p>
+        </div>
+      </motion.div>
+
+      {/* Screenshot */}
+      <motion.div 
+        className="relative"
+        initial={{ opacity: 0, x: 50 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+        viewport={{ once: true }}
+      >
+        <img
+          src="/image1.jpg"
+          alt="키워드 분석 화면"
+          className="w-full rounded-2xl shadow-2xl"
+        />
+      </motion.div>
+    </div>
+  </div>
+</motion.section>
+
+{/* Feature Section 2 */}
+<motion.section
+  className="py-16 px-4 bg-gradient-to-r from-blue-50 to-indigo-50"
+  initial={{ opacity: 0, y: 50 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  transition={{ duration: 0.6 }}
+>
+  <div className="max-w-7xl mx-auto">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      {/* Text Content */}
+      <motion.div 
+        className="space-y-6"
+        initial={{ opacity: 0, x: -50 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        viewport={{ once: true }}
+      >
+        <div className="space-y-4">
+          <div className="inline-block px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
+            상품 등록 최적화
+          </div>
+          <h3 className="text-3xl font-bold text-gray-900 leading-tight">
+상품 등록에 드는 시간과 노력,<br />
+이제 <span className="text-blue-600"> 단 10분의 1로</span>
+
+
+          </h3>
+          <p className="text-lg text-gray-600 leading-relaxed">
+            상위노출을 위한 핵심 키워드, 태그, 상품명을 저장해 <br/><span className="font-bold text-blue-600">스마트스토어 상품 등록 페이지에서 바로 확인</span> 할 수 있어요.
+           
+          </p>
+          <p className="text-lg text-gray-600 leading-relaxed">
+             매번 검색하고 복사하던 번거로움은 끝! <br/> <span className="font-bold text-blue-600">나만의 컨닝 페이퍼</span>처럼 활용해 보세요.
+          </p>
+        </div>
+      </motion.div>
+
+      {/* Screenshot */}
+      <motion.div 
+        className="relative"
+        initial={{ opacity: 0, x: 50 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+        viewport={{ once: true }}
+      >
+        <img
+          src="/image2.jpg"
+          alt="상품 등록 최적화 화면"
+          className="w-full rounded-2xl shadow-2xl"
+        />
+      </motion.div>
+    </div>
+  </div>
+</motion.section>
+
 
       <motion.div
         initial={{ opacity: 0, y: 50 }}
@@ -159,14 +277,6 @@ export default function Home() {
         <ExampleSection />
       </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-      >
-        <TextFeaturesSection />
-      </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 50 }}
@@ -177,81 +287,7 @@ export default function Home() {
         <ReviewSection />
       </motion.div>
 
-      {/* Features */}
-      <motion.section
-        className="py-16 px-4"
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">주요 기능</h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              상위 노출 상품명의 키워드, 태그, 카테고리를 분석하고 SEO 최적 상품명을 생성합니다.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-  {[
-    {
-      icon: <Search className="h-8 w-8" />,
-      title: "상위 노출 키워드, 태그 분석",
-      description: "상품에 최적화된 키워드를 찾고 경쟁사 키워드 전략을 분석하여 검색 노출을 극대화합니다.",
-      color: "blue",
-    },
-    {
-      icon: <Wand2 className="h-8 w-8" />,
-      title: "상품명 최적화",
-      description: "네이버 검색 알고리즘에 최적화된 상품명을 AI가 자동으로 생성",
-      color: "green",
-    },
-    {
-      icon: <FileText className="h-8 w-8" />,
-      title: "카테고리, 태그 최적화",
-      description: "상품에 가장 적합한 네이버 카테고리와 태그를 추천해 검색 노출을 극대화합니다.",
-      color: "indigo",
-    },
-    {
-      icon: <CheckSquare className="h-8 w-8" />,
-      title: "원클릭 최적화",
-      description: "복잡한 SEO 작업을 버튼 하나로 자동 수행하여 시간을 절약하고 효율성을 높입니다.",
-      color: "blue",
-    },
-    {
-      icon: <LineChart className="h-8 w-8" />,
-      title: "키워드 추적",
-      description: "상위노출 상품명 키워드, 키워드 개수, 태그를 추적합니다",
-      color: "green",
-    },
-    {
-      icon: <Star className="h-8 w-8" />,
-      title: "황금 키워드 제공",
-      description: "다음 페이지에는 없고 현재 페이지에만 있는 상위 노출 핵심 키워드를 제공합니다.",
-      color: "indigo",
-    }
-  ].map((feature, index) => (
-    <motion.div
-      key={feature.title}
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.2 }}
-      viewport={{ once: true }}
-    >
-      <FeatureCard 
-        icon={feature.icon} 
-        title={feature.title} 
-        description={feature.description} 
-        color={feature.color as "blue" | "green" | "indigo"} 
-      />
-    </motion.div>
-  ))}
-</div>
-
-        </div>
-      </motion.section>
-
+     
 
       <motion.section
         initial={{ opacity: 0, y: 50 }}
@@ -269,27 +305,4 @@ export default function Home() {
   );
 }
 
-interface FeatureCardProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  color: 'blue' | 'green' | 'indigo';
-}
 
-function FeatureCard({ icon, title, description, color }: FeatureCardProps) {
-  const colorMap = {
-    blue: 'bg-blue-50 border-blue-100 text-blue-600',
-    green: 'bg-green-50 border-green-100 text-green-600',
-    indigo: 'bg-indigo-50 border-indigo-100 text-indigo-600'
-  };
-
-  return (
-    <div className="border border-slate-200 rounded-lg p-6 bg-white hover:shadow-md transition-shadow">
-      <div className={`w-14 h-14 rounded-lg ${colorMap[color]} flex items-center justify-center mb-4`}>
-        {icon}
-      </div>
-      <h3 className="text-xl font-semibold mb-2">{title}</h3>
-      <p className="text-slate-600">{description}</p>
-    </div>
-  );
-}

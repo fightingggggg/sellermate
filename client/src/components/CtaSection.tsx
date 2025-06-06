@@ -9,7 +9,7 @@ const CtaSection = () => {
       <div className="max-w-[2000px] mx-auto text-center">
         <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">지금 바로 스마트스토어 노출을 늘려보세요</h2>
         <p className="text-xl text-white opacity-90 mb-8 max-w-3xl mx-auto">
-          이미 450명 이상의 스마트스토어 셀러가 이 확장 프로그램으로 매출을 늘리고 있습니다.<br />
+          이미 800명 이상의 스마트스토어 셀러가 이 확장 프로그램으로 매출을 늘리고 있습니다.<br />
           지금 무료로 시작하세요.
         </p>
         <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
