@@ -179,15 +179,15 @@ export default function Home() {
           <div className="inline-block px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
             상위노출 최적화
           </div>
-          <h3 className="text-4xl font-bold text-gray-900 leading-tight">
-             <span className="font-bold text-blue-600">광고 없이도 상위 노출</span>을 이끄는<br />
-            원클릭 키워드, 검색 태그, 상품명
-          </h3>
-          <p className="text-lg text-gray-600 leading-relaxed">
+          <h3 className="text-2xl md:text-4xl font-bold text-gray-900 leading-relaxed">
+  <span className="font-bold text-blue-600">광고 없이도 상위 노출</span>을 이끄는<br />
+  원클릭 키워드, 검색 태그, 상품명
+</h3>
+            <p className="text-base md:text-lg text-gray-600 leading-relaxed">
             실제 상위 상품명 키워드, 태그를 분석하고 <br/> <span className="font-bold text-blue-600"> 네이버 SEO 가이드를 준수한 AI 상품명</span>을 생성합니다. 
 
           </p>
-          <p className="text-lg text-gray-600 leading-relaxed">
+    <p className="text-base md:text-lg text-gray-600 leading-relaxed">
           <span className="font-bold text-blue-600">실제 상위 노출의 키워드와 태그</span>를 확인하고,<br/> 바로 내 상품에 적용해보세요!
           </p>
         </div>
@@ -233,19 +233,18 @@ export default function Home() {
           <div className="inline-block px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
             상품 등록 최적화
           </div>
-          <h3 className="text-4xl font-bold text-gray-900 leading-tight">
+          <h3 className="text-2xl md:text-4xl font-bold text-gray-900 leading-relaxed">
 상품 등록에 드는 시간과 노력,<br />
 이제 <span className="text-blue-600"> 단 10분의 1로</span>
 
 
           </h3>
-          <p className="text-lg text-gray-600 leading-relaxed">
-            상위노출을 위한 핵심 키워드, 태그, 상품명을 저장해 <br/><span className="font-bold text-blue-600">스마트스토어 상품 등록 페이지에서 바로 확인</span> 할 수 있어요.
-           
-          </p>
-          <p className="text-lg text-gray-600 leading-relaxed">
-             매번 검색하고 복사하던 번거로움은 끝! <br/> <span className="font-bold text-blue-600">나만의 컨닝 페이퍼</span>처럼 활용해 보세요.
-          </p>
+      <p className="text-base md:text-lg text-gray-600 leading-">
+  상위노출을 위한 핵심 키워드, 태그, 상품명을 저장해 <br/><span className="font-bold text-blue-600">스마트스토어 상품 등록 페이지에서 바로 확인</span> 할 수 있어요.
+</p>
+<p className="text-base md:text-lg text-gray-600 leading-relaxed">
+   매번 검색하고 복사하던 번거로움은 끝! <br/> <span className="font-bold text-blue-600">나만의 컨닝 페이퍼</span>처럼 활용해 보세요.
+</p>
         </div>
       </motion.div>
 
